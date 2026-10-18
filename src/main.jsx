@@ -11,9 +11,9 @@ import Status from './components/status/Status.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
-    <Profile />
     <Login />
     <Wall/>
+    <Profile />
     <Community/>
     <Status/>
   </StrictMode>,
