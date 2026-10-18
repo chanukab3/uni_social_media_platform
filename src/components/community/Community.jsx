@@ -5,8 +5,8 @@
         </>
      );
 }
+*/
 
-export default Community; */
 
 import { useState } from "react";
 import "./Community.css";
@@ -50,7 +50,7 @@ const sampleFriends = [
   { id: 105, name: "Daniel Kumar" },
 ];
 
-export default function Community() {
+function Community() {
   const [communities, setCommunities] = useState(initialCommunities);
   const [activeView, setActiveView] = useState("world");
   const [selectedCommunity, setSelectedCommunity] = useState(null);
@@ -453,3 +453,4 @@ function deleteGroup() {
     </div>
   );
 }
+export default Community;
