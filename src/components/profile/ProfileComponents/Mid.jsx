@@ -10,12 +10,12 @@ function Mid() {
             <div className="posts">
                 <div className="post-div">
                     <div className="publisher-info">
-                        <div className="publisher-logo"></div>
+                        <div className="publisher-logo"><img src="src\assets\dummy-post-square-1.jpg" className="publisher-logo-img"></img></div>
                         <div className="info-texts">
-                            <div className="publisher-name"></div>
+                            <div className="publisher-name">Chanuka Bandara</div>
                             <div className="otherinfo">
-                                <div className="location"></div>
-                                <div className="time-ago"></div>
+                                <div className="location">Sabaragamuwa University</div>
+                                <div className="time-ago">14 minutes</div>
                             </div>
                         </div>
                         <div className="more-button"></div>

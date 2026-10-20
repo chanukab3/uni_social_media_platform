@@ -39,3 +39,50 @@
     margin-left: 0px;
     margin-top: 30px;
 }
+
+.post-div{
+    width: 100%;
+    background-color: rgb(227, 185, 185);
+    ;
+}
+
+.publisher-info{
+    display: flex;
+    grid-template-columns: 50px auto 50px;
+    height: 50px;
+}
+.publisher-logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+}
+
+.publisher-logo-img{
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+}
+
+.info-texts{
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    padding: 5px;
+}
+
+.otherinfo{
+    display: flex;
+    align-items: center;
+    height: 20px;
+    
+}
+
+.publisher-name{
+    display: flex;
+    align-items: center;
+    height: 20px;
+    font-weight: bold;
+;}
