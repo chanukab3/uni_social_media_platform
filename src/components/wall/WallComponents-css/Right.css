@@ -1,0 +1,26 @@
+.right{
+    grid-column: 3;
+    width: 37.5%;
+    background-color: rgba(223, 213, 214, 1);
+    height: 100vh;
+    display: grid;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    flex-direction: column;
+    grid-template-rows: 2fr 6.5fr;
+}
+
+.suggestions{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+}
+
+.chat-box{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+}

@@ -1,0 +1,41 @@
+.mid{
+    grid-column: 2;
+    background-color: rgba(223, 213, 214, 1);
+    margin: 10px;
+    margin-left: 0px;
+}
+
+.search-icon{
+    height: 40px;
+    border-radius: 20px;
+    margin-left: 5px;
+}
+
+.search-icon-img{
+    height: 40px;
+    border-radius: 20px;
+}
+
+.search-text{
+    display: flex;
+    font-size: 0.9em;
+    align-items: center;
+    padding-left: 15px;
+}
+
+.search{
+    display: grid;
+    grid-template-columns: 40px auto;
+    background-color: rgba(242, 235, 237, 1);
+    align-items: center;
+    height: 50px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.posts{
+    background-color: rgba(242, 235, 237, 1);
+    height: 100vh;
+    margin-left: 0px;
+    margin-top: 30px;
+}

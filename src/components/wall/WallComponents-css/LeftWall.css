@@ -1,0 +1,38 @@
+.left{
+    grid-column: 1;
+    width: 18.75%;
+    height: 100vh;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(223, 213, 214, 1);
+    grid-template-rows: 1fr 2fr 2.5fr 3.5fr;
+}
+
+.logo{
+    margin: 10px;
+    border-radius: 15px;
+}
+
+.profile{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+
+}
+
+.communities{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+
+}
+
+.groups{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+}

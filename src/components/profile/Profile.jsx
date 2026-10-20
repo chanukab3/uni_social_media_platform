@@ -1,8 +1,17 @@
+import React from "react";
+import Left from "./ProfileComponents/Left";
+import Right from "../wall/WallComponents/Right"
+import Mid from "./ProfileComponents/Mid"
+
+import "./Profile.css";
+
 function Profile() {
     return ( 
-        <>
-        <h2>Profile Page</h2>
-        </>
+        <div className="container">
+            <Left/>
+            <Mid/>
+            <Right/>
+        </div>
      );
 }
 
