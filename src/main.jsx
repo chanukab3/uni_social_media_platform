@@ -7,14 +7,18 @@ import Login from './components/login/Login.jsx'
 import Wall from './components/wall/Wall.jsx'
 import Community from './components/community/Community.jsx'
 import Status from './components/status/Status.jsx'
+import Register from './components/login/Register.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Login/>
+    
+    
+    {/* <App />
     <Login />
     <Wall/>
     <Profile />
     <Community/>
-    <Status/>
+    <Status/> */}
   </StrictMode>,
 )
