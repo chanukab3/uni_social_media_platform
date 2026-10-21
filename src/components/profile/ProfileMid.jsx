@@ -1,7 +1,7 @@
-import "../ProfileComponents-css/Mid.css";
-import EventsSlider from "../../wall/WallComponents/EventsSlider";
+import "./ProfileMid.css";
 
-function Mid() {
+
+function ProfileMid() {
 
     const myDiv = document.getElementById("search");
 
@@ -128,4 +128,4 @@ function Mid() {
      );
 }
 
-export default Mid;
+export default ProfileMid;

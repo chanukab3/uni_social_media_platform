@@ -1,15 +1,15 @@
 import React from "react";
-import Left from "./ProfileComponents/Left";
-import Right from "../wall/WallComponents/Right"
-import Mid from "./ProfileComponents/Mid"
+import Right from "../wall/Right";
+import ProfileMid from "./ProfileMid";
+import ProfileLeft from "./ProfileLeft";
 
 import "./Profile.css";
 
 function Profile() {
     return ( 
         <div className="container">
-            <Left/>
-            <Mid/>
+            <ProfileLeft/>
+            <ProfileMid/>
             <Right/>
         </div>
      );

@@ -1,7 +1,7 @@
 import React from "react";
-import LeftWall from "./WallComponents/LeftWall";
-import Right from "./WallComponents/Right";
-import MidWall from "./WallComponents/MidWall";
+import WallLeft from "./WallLeft";
+import Right from "./Right";
+import WallMid from "./WallMid";
 
 import "./Wall.css"
 
@@ -9,8 +9,8 @@ import "./Wall.css"
 function Wall() {
     return ( 
         <div className="container">
-            <LeftWall/>
-            <MidWall/>
+            <WallLeft/>
+            <WallMid/>
             <Right/>
         </div>
      );

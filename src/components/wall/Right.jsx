@@ -1,4 +1,4 @@
-import "../WallComponents-css/Right.css";
+import "./Right.css";
 
 function Right() {
     return ( 

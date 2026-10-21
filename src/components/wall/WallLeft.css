@@ -1,4 +1,4 @@
-.left{
+.w-left{
     grid-column: 1;
     width: 22.75%;
     height: 100vh;
@@ -8,24 +8,24 @@
     left: 0px;
     display: grid;
     flex-direction: column;
-    grid-template-rows: 1fr 8fr;
+    grid-template-rows: 1fr 2fr 2.5fr 3.5fr;
     background-color: rgba(223, 213, 214, 1);
 }
 
-.profile{
+.w-profile{
     background-color: rgba(242, 235, 237, 1);
     margin: 10px;
     border-radius: 15px;
 }
 
-.logo{
+.w-logo{
     display: flex;
     grid-template-columns: 40px 80px;
     align-items: center;
     justify-content: center;
 }
 
-.logo-img{
+.w-logo-img{
     width: 40px;
     height: 100%;
     display: flex;
@@ -33,12 +33,12 @@
     justify-content: center;
 }
 
-.logo-img-real{
+.w-logo-img-real{
     width:40px;
     height: 40px;
     border-radius: 30%;
 }
-.logo-text{
+.w-logo-text{
     display: flex;
     height: 100%;
     align-items: center;
@@ -49,4 +49,23 @@
     padding-top: 0;
     padding-bottom: 0;
 
+}
+
+.w-profile{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+}
+
+.w-communities{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
+
+}
+
+.w-groups{
+    background-color: rgba(242, 235, 237, 1);
+    margin: 10px;
+    border-radius: 15px;
 }

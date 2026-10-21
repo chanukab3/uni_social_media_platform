@@ -1,7 +1,7 @@
-import "./WallComponents-css/MidWall.css";
+import "./WallMid.css";
 import EventsSlider from "./EventsSlider";
 
-function MidWall() {
+function WallMid() {
 
     const myDiv = document.getElementById("search");
 
@@ -129,4 +129,4 @@ function MidWall() {
      );
 }
 
-export default MidWall;
+export default WallMid;

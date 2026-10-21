@@ -45,12 +45,12 @@
 }
 
 .posts{
-    background-color: rgb(185, 46, 60);
+    background-color: rgba(223, 213, 214, 1);
     margin-top: 80px;
     width: 100%;
     display: grid;
     justify-items: center;
-    row-gap: 20px;
+    row-gap: 0px;
     height: fit-content;
 }
 
