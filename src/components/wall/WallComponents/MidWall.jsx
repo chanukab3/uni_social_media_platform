@@ -1,4 +1,4 @@
-import "../WallComponents-css/MidWall.css";
+import "./WallComponents-css/MidWall.css";
 import EventsSlider from "./EventsSlider";
 
 function MidWall() {
