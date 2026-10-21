@@ -1,6 +1,6 @@
 .left{
     grid-column: 1;
-    width: 18.75%;
+    width: 22.75%;
     height: 100vh;
     position: fixed;
     top: 0px;
@@ -16,4 +16,37 @@
     background-color: rgba(242, 235, 237, 1);
     margin: 10px;
     border-radius: 15px;
+}
+
+.logo{
+    display: flex;
+    grid-template-columns: 40px 80px;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-img{
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-img-real{
+    width:40px;
+    height: 40px;
+    border-radius: 30%;
+}
+.logo-text{
+    display: flex;
+    height: 100%;
+    align-items: center;
+    font-size: 1.3rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 500;
+    padding: 5px;
+    padding-top: 0;
+    padding-bottom: 0;
+
 }

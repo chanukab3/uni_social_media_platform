@@ -1,8 +1,10 @@
 .mid{
     grid-column: 2;
     background-color: rgba(223, 213, 214, 1);
-    margin: 10px;
-    margin-left: 0px;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .search-icon{
@@ -21,68 +23,177 @@
     font-size: 0.9em;
     align-items: center;
     padding-left: 15px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .search{
-    display: grid;
+    display: flex;
     grid-template-columns: 40px auto;
-    background-color: rgba(242, 235, 237, 1);
+    background-color: #fcf4f6;
     align-items: center;
     height: 50px;
-    border-radius: 10px;
-    margin: 10px;
+    border-radius: 20px;
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 10px;
+    margin-left: 23.75%;
+    margin-right: 34.35%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 3;
+
 }
 
 .posts{
-    background-color: rgba(242, 235, 237, 1);
-    height: 100vh;
-    margin-left: 0px;
-    margin-top: 30px;
-}
-
-.post-div{
+    background-color: rgba(223, 213, 214, 1);
+    margin-top: 80px;
     width: 100%;
-    background-color: rgb(227, 185, 185);
-    ;
-}
-
-.publisher-info{
-    display: flex;
-    grid-template-columns: 50px auto 50px;
-    height: 50px;
-}
-.publisher-logo{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    width: 50px;
-    border-radius: 25px;
-}
-
-.publisher-logo-img{
-    height: 50px;
-    width: 50px;
-    border-radius: 25px;
-}
-
-.info-texts{
     display: flex;
     flex-direction: column;
-    padding-left: 10px;
-    padding: 5px;
+    justify-content: center;
+    height: fit-content;
 }
 
-.otherinfo{
-    display: flex;
-    align-items: center;
-    height: 20px;
-    
+
+/* Container */
+.social-card {
+  background-color: #fcf4f6; /* Soft pinkish background tint */
+  border-radius: 20px;
+  max-width: 700px;
+  width: auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #222;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: fit-content;
+  margin-bottom: 20px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-.publisher-name{
-    display: flex;
-    align-items: center;
-    height: 20px;
-    font-weight: bold;
-;}
+/* Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111;
+}
+
+.post-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.options-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.2rem;
+  cursor: pointer;
+  letter-spacing: 2px;
+}
+
+/* Body / Text */
+.card-body {
+  margin-bottom: 0px;
+}
+
+.post-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+/* Media / Image */
+.card-media {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.post-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+/* Stats */
+.card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #555;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+/* Footer / Actions */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.action-btn .icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.bookmark-btn {
+  padding: 8px;
+}
+
+
+.EventsSlide{
+    box-sizing: border-box;
+}

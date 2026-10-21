@@ -1,6 +1,6 @@
 .container{
     display: grid;
-    grid-template-columns: 18.75% auto 37.5%;
+    grid-template-columns: 22.75% auto 33.5%;
     height: 100vh;
     background-color: rgba(223, 213, 214, 1);
 }
