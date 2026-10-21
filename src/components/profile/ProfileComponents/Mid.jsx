@@ -1,5 +1,5 @@
 import "../ProfileComponents-css/Mid.css";
-import EventsSlider from "./EventsSlider";
+import EventsSlider from "../../wall/WallComponents/EventsSlider";
 
 function Mid() {
 
@@ -25,7 +25,6 @@ function Mid() {
            
 
             <div className="posts">
-                 <div className="EventsSlide"><EventsSlider/></div>
                  
                 <article className="social-card">
                

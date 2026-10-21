@@ -3,7 +3,7 @@ import Profile from "./components/profile/Profile";
 
 function App() {
   return ( 
-    <Profile/>
+    <Wall/>
    );
 }
 

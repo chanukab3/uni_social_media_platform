@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import '../ProfileComponents-css/EventsSlider.css';
+import '../WallComponents-css/EventsSlider.css';
 
 const eventsData = [
   {
