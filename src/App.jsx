@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { supabase } from '../supabase'
+import Community, { CommunityDirectory, CreateCommunityForm } from './components/community/Community'
+import { ProfileAvatar, ProfilePage } from './components/profile/Profile'
 
 const navigation = [
   { label: 'Home', icon: '⌂' },
@@ -96,6 +98,7 @@ function App(){
   const [posts, setPosts] = useState(startingPosts)
   const [communities, setCommunities] = useState(startingCommunities)
   const [joinedCommunities, setJoinedCommunities] = useState(['Green Living'])
+  const [discoverGroupIds, setDiscoverGroupIds] = useState(null)
   const [people, setPeople] = useState(friends)
   const [savedPosts, setSavedPosts] = useState([])
   const [query, setQuery] = useState('')
@@ -115,9 +118,14 @@ function App(){
   const [currentChat, setCurrentChat] = useState('World')
   const [currentGroupChat, setCurrentGroupChat] = useState('')
   const [chatSection, setChatSection] = useState('World')
+  const [inboxConversations, setInboxConversations] = useState([])
+  const [inboxSelected, setInboxSelected] = useState(false)
+  const [profileTarget, setProfileTarget] = useState(null)
   const [eventIndex, setEventIndex] = useState(0)
   const [events, setEvents] = useState(eventSlides)
   const [friendRequests, setFriendRequests] = useState([])
+  const [friendsList, setFriendsList] = useState([])
+  const [incomingFriendRequests, setIncomingFriendRequests] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
   const [messages, setMessages] = useState({
@@ -187,12 +195,12 @@ function App(){
       if (!active) return
       if (postsError){
         showToast(`Could not load posts: ${postsError.message}`)
-        return
       }
-      if (wallPosts?.length){
+      if (!postsError && wallPosts){
         const regularPosts = wallPosts.filter((post) => !post.is_event)
         setPosts(regularPosts.map((post) => ({
           id: post.id,
+          authorId: post.author_id,
           author: post.author_name,
           handle: post.handle || '',
           time: new Date(post.created_at).toLocaleDateString(),
@@ -231,20 +239,28 @@ function App(){
 
       const { data: groupRows, error: groupsError } = await supabase
         .from('groups')
-        .select('id, name, description, group_members(count)')
+        .select('id, name, description, image_url, image_path, invite_link, created_by, group_members(count)')
         .order('created_at', { ascending: false })
       if (!active) return
       if (groupsError){
         showToast(`Could not load groups: ${groupsError.message}`)
-      } else if (groupRows?.length){
+        setCommunities([])
+        setJoinedCommunities([])
+        setDiscoverGroupIds([])
+      } else if (groupRows){
         const remoteGroups = groupRows.map((group, index) => ({
           id: group.id,
           name: group.name,
-          description: group.description,
+          description: group.description || '',
+          image_url: group.image_url || '',
+          image_path: group.image_path || '',
+          invite_link: group.invite_link || '',
+          created_by: group.created_by,
           members: String(group.group_members?.[0]?.count ?? 0),
           tone: startingCommunities[index % startingCommunities.length].tone,
         }))
         setCommunities(remoteGroups)
+        let memberIds = new Set()
         if (user){
           const { data: memberships, error: membershipsError } = await supabase
             .from('group_members')
@@ -253,26 +269,33 @@ function App(){
           if (!active) return
           if (membershipsError) showToast(`Could not load your group memberships: ${membershipsError.message}`)
           else {
-            const memberIds = new Set(memberships.map((membership) => membership.group_id))
+            memberIds = new Set(memberships.map((membership) => membership.group_id))
             setJoinedCommunities(remoteGroups.filter((group) => memberIds.has(group.id)).map((group) => group.name))
           }
+        } else setJoinedCommunities([])
+        const shuffledGroups = remoteGroups.filter((group) => !memberIds.has(group.id) && group.created_by !== user?.id)
+        for (let index = shuffledGroups.length - 1; index > 0; index -= 1){
+          const swapIndex = Math.floor(Math.random() * (index + 1))
+          ;[shuffledGroups[index], shuffledGroups[swapIndex]] = [shuffledGroups[swapIndex], shuffledGroups[index]]
         }
+        setDiscoverGroupIds(shuffledGroups.slice(0, 3).map((group) => group.id))
       }
 
       const { data: profiles, error: peopleError } = await supabase
         .from('profiles')
         .select('id, display_name, handle')
         .neq('id', user?.id || '00000000-0000-0000-0000-000000000000')
-        .limit(8)
       if (!active) return
       if (peopleError) showToast(`Could not load people suggestions: ${peopleError.message}`)
       else if (profiles?.length){
-        setPeople(profiles.map((person, index) => ({
+        const peopleRows = profiles.map((person, index) => ({
           id: person.id,
           name: person.display_name,
+          handle: person.handle || '',
           status: index % 2 ? 'away' : 'online',
           color: friends[index % friends.length].color,
-        })))
+        }))
+        setPeople(peopleRows)
         if (user){
           const { data: requests, error: requestsError } = await supabase
             .from('friend_requests')
@@ -285,7 +308,33 @@ function App(){
             const requestedIds = new Set(requests.map((request) => request.recipient_id))
             setFriendRequests(profiles.filter((person) => requestedIds.has(person.id)).map((person) => person.display_name))
           }
+          const { data: acceptedRequests, error: acceptedError } = await supabase
+            .from('friend_requests')
+            .select('sender_id, recipient_id')
+            .eq('status', 'accepted')
+            .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+          if (!active) return
+          if (acceptedError) showToast(`Could not load your friends: ${acceptedError.message}`)
+          else {
+            const acceptedIds = new Set(acceptedRequests.map((request) => request.sender_id === user.id ? request.recipient_id : request.sender_id))
+            setFriendsList(peopleRows.filter((person) => acceptedIds.has(person.id)))
+          }
+          const { data: incomingRequests, error: incomingError } = await supabase
+            .from('friend_requests')
+            .select('id, sender_id')
+            .eq('recipient_id', user.id)
+            .eq('status', 'pending')
+          if (!active) return
+          if (incomingError) showToast(`Could not load incoming friend requests: ${incomingError.message}`)
+          else setIncomingFriendRequests(incomingRequests.map((request) => {
+            const sender = peopleRows.find((person) => person.id === request.sender_id)
+            return sender ? { ...sender, requestId: request.id } : null
+          }).filter(Boolean))
         }
+      } else if (user) {
+        setPeople([])
+        setFriendsList([])
+        setIncomingFriendRequests([])
       }
 
       const { data: worldMessages, error: messagesError } = await supabase
@@ -296,10 +345,11 @@ function App(){
         .limit(30)
       if (!active) return
       if (messagesError) showToast(`Could not load world chat: ${messagesError.message}`)
-      else if (worldMessages?.length){
+      else if (worldMessages){
         setMessages((current) => ({
           ...current,
           World: worldMessages.map((message) => ({
+            id: message.id,
             from: message.sender_id === user?.id ? profileName : message.sender_name,
             text: message.body,
             time: new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -316,7 +366,7 @@ function App(){
           .limit(20)
         if (!active) return
         if (notificationsError) showToast(`Could not load notifications: ${notificationsError.message}`)
-        else if (userNotifications?.length){
+        else if (userNotifications){
           setNotifications(userNotifications.map((item) => ({
             id: item.id,
             text: item.body,
@@ -334,6 +384,45 @@ function App(){
   }, [profileName, showToast, userId])
 
   useEffect(() => {
+    if (!supabase) return undefined
+    const channel = supabase.channel(`community-live-${userId || 'visitor'}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, ({ new: message }) => {
+        const messageTime = new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        const formatted = {
+          id: message.id,
+          from: message.sender_id === userId ? profileName : message.sender_name,
+          text: message.body,
+          time: messageTime,
+        }
+        let key
+        if (message.room === 'world') key = 'World'
+        else if (message.group_id) key = `group:${message.group_id}`
+        else if (userId && (message.sender_id === userId || message.recipient_id === userId)) {
+          const otherId = message.sender_id === userId ? message.recipient_id : message.sender_id
+          key = people.find((person) => person.id === otherId)?.name
+          if (!key) return
+        } else return
+
+        setMessages((current) => {
+          const existing = current[key] || []
+          if (existing.some((item) => item.id === message.id)) return current
+          return { ...current, [key]: [...existing, formatted] }
+        })
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: userId ? `user_id=eq.${userId}` : undefined }, ({ new: item }) => {
+        setNotifications((current) => current.some((notification) => notification.id === item.id)
+          ? current
+          : [{ id: item.id, text: item.body, time: 'Just now', read: Boolean(item.read_at) }, ...current])
+      })
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') showToast('Live updates are unavailable. Check Supabase Realtime settings.')
+      })
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [people, profileName, showToast, userId])
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
       setEventIndex((index) => (index + 1) % events.length)
     }, 6000)
@@ -345,17 +434,22 @@ function App(){
     const source = activePage === 'Status'
       ? posts.filter((post) => post.mine)
       : activePage === 'Profile'
-        ? posts.filter((post) => post.mine)
+        ? profileTarget?.id
+          ? posts.filter((post) => post.authorId === profileTarget.id)
+          : profileTarget
+            ? posts.filter((post) => post.author === profileTarget.name)
+            : posts.filter((post) => post.mine)
         : posts
 
     if (!term) return source
     return source.filter((post) => `${post.author} ${post.handle} ${post.text}`.toLowerCase().includes(term))
-  }, [activePage, posts, query])
+  }, [activePage, posts, profileTarget, query])
 
   const unreadCount = notifications.filter((item) => !item.read).length
 
   const navigate = (page) => {
     setActivePage(page)
+    if (page === 'Profile') setProfileTarget(null)
     setQuery('')
     setNotificationsOpen(false)
     setOpenMenu(null)
@@ -397,6 +491,7 @@ function App(){
     }
     const newPost = {
       id: postId,
+      authorId: userId,
       author: profileName,
       handle: '@amanda',
       time: 'just now',
@@ -510,7 +605,7 @@ function App(){
     showToast(isMember ? `You left ${name}.` : `You joined ${name}.`)
   }
 
-  const sendMessage = (event) => {
+  const sendMessage = async (event) => {
     event.preventDefault()
     const text = messageDraft.trim()
     if (!text) return
@@ -535,56 +630,78 @@ function App(){
       : selectedGroup
         ? `group:${selectedGroup.id || selectedGroup.name}`
         : currentChat
-    setMessages((current) => ({
-      ...current,
-      [conversationKey]: [...(current[conversationKey] || []), { from: profileName, text, time: 'now' }],
-    }))
+    const newMessage = { from: profileName, text, time: 'now' }
     if (supabase && userId && isWorldChat){
-      supabase.from('messages').insert({
+      const { data, error } = await supabase.from('messages').insert({
         sender_id: userId,
         sender_name: profileName,
         recipient_id: null,
         body: text,
         room: 'world',
-      }).then(({ error }) => {
-        if (error) showToast(`Could not send your message: ${error.message}`)
       })
+        .select('id, created_at')
+        .single()
+      if (error){
+        showToast(`Could not send your message: ${error.message}`)
+        return
+      }
+      newMessage.id = data.id
     } else if (supabase && userId && selectedGroup?.id){
-      supabase.from('messages').insert({
+      const { data, error } = await supabase.from('messages').insert({
         sender_id: userId,
         sender_name: profileName,
         group_id: selectedGroup.id,
         body: text,
-      }).then(({ error }) => {
-        if (error) showToast(`Could not send your group message: ${error.message}`)
       })
+        .select('id, created_at')
+        .single()
+      if (error){
+        showToast(`Could not send your group message: ${error.message}`)
+        return
+      }
+      newMessage.id = data.id
     } else if (supabase && userId && selectedGroup){
       showToast('This group is not connected to Supabase yet.')
       return
     } else if (supabase && userId){
-      const recipient = people.find((person) => person.name === currentChat)
-      if (recipient?.id){
-        supabase.from('messages').insert({
+      const recipient = [...people, ...friendsList, ...inboxConversations].find((person) => person.name === currentChat)
+      if (!recipient?.id){
+        showToast('Could not find this person’s account.')
+        return
+      }
+      const { data, error } = await supabase.from('messages').insert({
           sender_id: userId,
           sender_name: profileName,
           recipient_id: recipient.id,
           body: text,
-        }).then(({ error }) => {
-          if (error) showToast(`Could not send your message: ${error.message}`)
         })
+        .select('id, created_at')
+        .single()
+      if (error){
+        showToast(`Could not send your message: ${error.message}`)
+        return
       }
+      newMessage.id = data.id
     }
+    setMessages((current) => ({
+      ...current,
+      [conversationKey]: (current[conversationKey] || []).some((item) => item.id && item.id === newMessage.id)
+        ? current[conversationKey]
+        : [...(current[conversationKey] || []), newMessage],
+    }))
     setMessageDraft('')
   }
 
   const openFriendChat = async (friend) => {
     setCurrentChat(friend.name)
     setChatSection('Inbox')
+    setInboxSelected(true)
     if (!supabase || !userId || !friend.id) return
     const { data: directMessages, error } = await supabase
       .from('messages')
-      .select('sender_id, sender_name, body, created_at')
+      .select('id, sender_id, sender_name, body, created_at')
       .or(`and(sender_id.eq.${userId},recipient_id.eq.${friend.id}),and(sender_id.eq.${friend.id},recipient_id.eq.${userId})`)
+      .not('deleted_for', 'cs', `{${userId}}`)
       .order('created_at', { ascending: true })
       .limit(50)
     if (error){
@@ -594,6 +711,7 @@ function App(){
     setMessages((current) => ({
       ...current,
       [friend.name]: directMessages.map((message) => ({
+        id: message.id,
         from: message.sender_id === userId ? profileName : message.sender_name,
         text: message.body,
         time: new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -607,7 +725,7 @@ function App(){
     if (!supabase || !userId || !group.id) return
     const { data: groupMessages, error } = await supabase
       .from('messages')
-      .select('sender_id, sender_name, body, created_at')
+      .select('id, sender_id, sender_name, body, created_at')
       .eq('group_id', group.id)
       .order('created_at', { ascending: true })
       .limit(50)
@@ -618,6 +736,7 @@ function App(){
     setMessages((current) => ({
       ...current,
       [`group:${group.id}`]: groupMessages.map((message) => ({
+        id: message.id,
         from: message.sender_id === userId ? profileName : message.sender_name,
         text: message.body,
         time: new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -635,6 +754,7 @@ function App(){
       const { error } = await supabase.from('friend_requests').insert({
         sender_id: userId,
         recipient_id: person.id,
+        status: 'pending',
       })
       if (error){
         showToast(`Could not send your friend request: ${error.message}`)
@@ -645,145 +765,120 @@ function App(){
     showToast(`Friend request sent to ${name}.`)
   }
 
-  const renderWall = () => {
-    const term = query.trim().toLowerCase()
-    const event = events[eventIndex % events.length]
-    const selectedGroup = communities.find((group) => group.name === currentGroupChat)
-    const chatName = chatSection === 'World'
-      ? 'World chat'
-      : chatSection === 'Groups'
-        ? selectedGroup?.name || 'Group chats'
-        : currentChat
-    const conversationKey = selectedGroup ? `group:${selectedGroup.id || selectedGroup.name}` : currentChat
-    const chatMessages = messages[conversationKey] || []
-    const visibleSuggestions = people.filter((friend) => friend.name.toLowerCase().includes(term))
-    const visibleGroups = communities.filter((community) => `${community.name} ${community.description}`.toLowerCase().includes(term))
-    return (
-      <div className="wall-layout">
-        <aside className="wall-left">
-          <button type="button" className="wall-brand" onClick={() => navigate('Home')}>
-            <span className="brand-mark">M</span><strong>Mahagedara</strong>
-          </button>
-          <section className="mini-card wall-profile">
-            <button type="button" className="wall-profile-button" onClick={() => navigate('Profile')}>
-              <span className="avatar large avatar-olive">A</span>
-              <span><strong>{profileName}</strong><small>@amanda.silva</small></span>
-            </button>
-            <p>Finding my people, one coffee and creative project at a time.</p>
-            <div className="wall-profile-stats"><span><strong>{posts.filter((post) => post.mine).length + 128}</strong><small>Friends</small></span><span><strong>8</strong><small>Groups</small></span><button type="button" aria-label="View profile" onClick={() => navigate('Profile')}>↗</button></div>
-          </section>
-          <section className="mini-card wall-group-section">
-            <div className="section-head"><h3>Find your circle</h3><button type="button" onClick={() => navigate('Communities')}>See all</button></div>
-            {visibleGroups.filter((community) => !joinedCommunities.includes(community.name)).slice(0, 2).map((community, index) => (
-              <article className="wall-group-suggestion" key={community.name}>
-                <div className={`wall-group-cover group-cover-${index}`} />
-                <strong>{community.name}</strong><small>{community.members} members · {community.description}</small>
-                <button type="button" className="secondary-btn compact" onClick={() => toggleJoin(community.name)}>Join</button>
-              </article>
-            ))}
-            {!visibleGroups.some((community) => !joinedCommunities.includes(community.name)) && <p className="wall-muted">You’ve found all the circles matching your search.</p>}
-          </section>
-          <section className="mini-card wall-group-section joined-groups">
-            <div className="section-head"><h3>Your groups</h3><button type="button" onClick={() => navigate('Communities')}>View all</button></div>
-            {communities.filter((community) => joinedCommunities.includes(community.name)).map((community) => (
-              <button type="button" className="wall-joined-group" key={community.name} onClick={() => navigate('Communities')}>
-                <span className="wall-group-icon" style={{ background: community.tone }}>✦</span><span><strong>{community.name}</strong><small>New conversations</small></span><small>{community.members}</small>
-              </button>
-            ))}
-            <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}>＋ Create a group</button>
-          </section>
-          <div className="wall-left-footer">{supabase && !userId && <button type="button" onClick={() => setIsSignedIn(false)}>Sign in</button>}<button type="button" onClick={() => navigate('Settings')}>Settings</button><span>· Community guidelines · Privacy</span></div>
-        </aside>
-
-        <main className="wall-center">
-          <header className="topbar wall-topbar">
-            <label className="search-wrap">
-              <span aria-hidden="true">⌕</span>
-              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
-              {query && <button type="button" className="clear-search" onClick={() => setQuery('')} aria-label="Clear search">×</button>}
-            </label>
-            <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => { setChatSection('Notifications'); setNotificationsOpen(!notificationsOpen) }}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
-          </header>
-          <section className="wall-events" aria-label="Community events">
-            <div className="wall-event-heading"><div><h2>{event.title}</h2><small>{event.detail}</small></div><div className="wall-event-controls"><button type="button" aria-label="Previous event" onClick={() => setEventIndex((eventIndex + events.length - 1) % events.length)}>‹</button><button type="button" aria-label="Next event" onClick={() => setEventIndex((eventIndex + 1) % events.length)}>›</button>{isAdmin && <button type="button" className="event-create" onClick={() => setModal({ type: 'create-event' })}>＋</button>}</div></div>
-            <div className="wall-event-track">
-              <div className="wall-event-feature-viewport">
-                <div className="wall-event-feature-track" style={{ transform: `translateX(-${(eventIndex % events.length) * 100}%)` }}>
-                  {events.map((slide) => <article key={slide.title} className="wall-event-feature" style={{ backgroundImage: `linear-gradient(0deg, rgba(30,22,20,.72), transparent 72%), url("${slide.image}")` }}>
-                    <span className="wall-event-tag">✦ {slide.tag}</span><span className="wall-event-date">{slide.date.split('\n').map((line) => <span key={line}>{line}</span>)}</span><p>{slide.detail.split(' · ')[0]}</p>
-                  </article>)}
-                </div>
-              </div>
-              <article className="wall-event-side"><img src={events[(eventIndex + 1) % events.length].image} alt="" /><small>THIS WEEK · 2 PM</small><strong>{events[(eventIndex + 1) % events.length].title}</strong><span>{events[(eventIndex + 1) % events.length].detail}</span></article>
-            </div>
-            <div className="wall-event-dots" aria-hidden="true">{events.map((slide, index) => <span key={slide.title} className={index === eventIndex % events.length ? 'active' : ''} />)}</div>
-          </section>
-          <div className="wall-feed-scroll">
-            {renderComposer()}
-            <section className="feed" aria-label="Post feed">
-              {filteredPosts.length ? filteredPosts.map(renderPost) : <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try another search.' : 'Share an update to get the conversation started.'}</p></div>}
-            </section>
-          </div>
-        </main>
-
-        <aside className="wall-right">
-          <section className="mini-card wall-friend-suggestions">
-            <div className="section-head"><h3>People you may know</h3><button type="button" onClick={() => setChatSection('Friends')}>See all</button></div>
-            <div className="suggested-friends">
-              {visibleSuggestions.slice(0, 4).map((friend) => (
-                <article className="suggested-friend" key={friend.name}>
-                  <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span><strong>{friend.name}</strong><button type="button" onClick={() => sendFriendRequest(friend.name)}>{friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}</button>
-                </article>
-              ))}
-              {!visibleSuggestions.length && <p className="wall-muted">No people match your search.</p>}
-            </div>
-          </section>
-          <section className="wall-chat-card">
-            <header className="wall-chat-heading">
-              <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' : chatName[0]}</span>
-              <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? currentChat : chatName}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : chatSection === 'Notifications' ? 'Your latest activity' : 'Messages and conversations'}</small></span>
-              <button type="button" aria-label="More chat options">•••</button>
-            </header>
-            {chatSection === 'Notifications' ? (
-              <div className="wall-notification-list">
-                {notifications.map((item) => <button type="button" key={item.id} className={item.read ? '' : 'unread'} onClick={() => markNotificationRead(item.id)}>{item.text}<small>{item.time}</small></button>)}
-                <button type="button" className="wall-mark-read" onClick={markNotificationsRead}>Mark all as read</button>
-              </div>
-            ) : chatSection === 'Friends' ? (
-              <div className="wall-chat-friends">{people.filter((friend) => friend.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.name} onClick={() => openFriendChat(friend)}><span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span><i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} /></button>)}</div>
-            ) : chatSection === 'Groups' && !selectedGroup ? (
-              <div className="wall-chat-friends">{communities.filter((group) => joinedCommunities.includes(group.name) && `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.name} onClick={() => openGroupChat(group)}><span className="wall-group-icon" style={{ background: group.tone }}>✦</span><span>{group.name}<small>{group.members} members</small></span></button>)}</div>
-            ) : (
-              <>
-                <div className="wall-chat-messages" aria-live="polite">
-                  {(chatSection === 'World' ? (messages.World || []) : chatMessages).map((message, index) => <div key={`${message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} · {message.time}</small><p>{message.text}</p></div>)}
-                  {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
-                </div>
-                <form className="wall-chat-form" onSubmit={(event) => {
-                  sendMessage(event)
-                }}>
-                  <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${chatName}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
-                  <button type="submit" aria-label="Send message">↑</button>
-                </form>
-                <p className="wall-chat-note">A shared space, a little kindness, a lot of good conversations.</p>
-              </>
-            )}
-            <nav className="wall-chat-tabs" aria-label="Community sections">
-              {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() => {
-                setChatSection(label)
-                if (label === 'World') setCurrentChat('World')
-                if (label === 'Groups') setCurrentGroupChat('')
-                if (label === 'Inbox') setCurrentChat('Anya')
-                if (label === 'Notifications') markNotificationsRead()
-              }}><span>{icon}</span>{label}</button>)}
-            </nav>
-          </section>
-          <p className="wall-right-footer">Local community. Real connections.</p>
-        </aside>
-      </div>
-    )
+  const acceptFriendRequest = async (request) => {
+    if (!supabase || !userId){
+      showToast('Sign in to accept friend requests.')
+      return
+    }
+    const { error } = await supabase.rpc('accept_community_friend_request', { request_id: request.requestId })
+    if (error){
+      showToast(`Could not accept ${request.name}’s friend request: ${error.message}`)
+      return
+    }
+    const friend = people.find((person) => person.id === request.id)
+    const acceptedFriend = { ...request, status: 'online' }
+    setFriendsList((current) => current.some((item) => item.id === request.id)
+      ? current
+      : [...current, friend || acceptedFriend])
+    setIncomingFriendRequests((current) => current.filter((item) => item.requestId !== request.requestId))
+    showToast(`You and ${request.name} are now friends.`)
   }
 
+  const openInbox = async () => {
+    setInboxSelected(false)
+    if (!supabase || !userId) {
+      setInboxConversations(people.filter((person) => (messages[person.name] || []).length))
+      return
+    }
+    const { data: directMessages, error } = await supabase
+      .from('messages')
+      .select('sender_id, recipient_id, sender_name, body, created_at')
+      .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+      .not('recipient_id', 'is', null)
+      .not('deleted_for', 'cs', `{${userId}}`)
+      .order('created_at', { ascending: false })
+      .limit(100)
+    if (error) {
+      showToast(`Could not load your inbox: ${error.message}`)
+      return
+    }
+    const latestByPerson = new Map()
+    for (const message of directMessages) {
+      const otherId = message.sender_id === userId ? message.recipient_id : message.sender_id
+      if (!latestByPerson.has(otherId)) {
+        const person = people.find((item) => item.id === otherId)
+        latestByPerson.set(otherId, {
+          ...(person || { id: otherId, name: message.sender_name || 'Community member', color: '#bd8f75' }),
+          lastMessage: message.body,
+        })
+      }
+    }
+    setInboxConversations([...latestByPerson.values()])
+  }
+
+  const openProfile = (person) => {
+    setProfileTarget(person?.id === userId || person?.name === profileName ? null : person)
+    setActivePage('Profile')
+    setQuery('')
+    setNotificationsOpen(false)
+    setOpenMenu(null)
+  }
+
+  const renderWall = () => (
+    <Community
+      profileName={profileName}
+      communities={communities}
+      joinedCommunities={joinedCommunities}
+      discoverGroupIds={discoverGroupIds}
+      people={people}
+      friendsList={friendsList}
+      incomingFriendRequests={incomingFriendRequests}
+      friendRequests={friendRequests}
+      query={query}
+      setQuery={setQuery}
+      messages={messages}
+      chatSection={chatSection}
+      currentChat={currentChat}
+      currentGroupChat={currentGroupChat}
+      notifications={notifications}
+      unreadCount={unreadCount}
+      events={events}
+      eventIndex={eventIndex}
+      isAdmin={isAdmin}
+      userId={userId}
+      composer={renderComposer()}
+      renderPost={renderPost}
+      filteredPosts={filteredPosts}
+      messageDraft={messageDraft}
+      setMessageDraft={setMessageDraft}
+      setChatSection={setChatSection}
+      setCurrentChat={setCurrentChat}
+      setCurrentGroupChat={setCurrentGroupChat}
+      setEventIndex={setEventIndex}
+      setModal={setModal}
+      navigate={navigate}
+      toggleJoin={toggleJoin}
+      sendMessage={sendMessage}
+      sendFriendRequest={sendFriendRequest}
+      acceptFriendRequest={acceptFriendRequest}
+      openGroupChat={openGroupChat}
+      markNotificationRead={markNotificationRead}
+      markNotificationsRead={markNotificationsRead}
+      onProfileClick={openProfile}
+      onGroupAction={(group) => setModal({ type: 'group-options', group })}
+      onDeleteChat={(friendName) => setModal({ type: 'delete-chat', friendName })}
+      onViewInbox={openInbox}
+      onSelectInboxChat={(friend) => {
+        setInboxSelected(true)
+        openFriendChat(friend)
+      }}
+      inboxConversations={inboxConversations}
+      inboxSelected={inboxSelected}
+      toast={toast}
+      setIsSignedIn={setIsSignedIn}
+      profileContent={activePage === 'Profile' ? renderProfile() : null}
+    />
+  )
   const markNotificationsRead = async () => {
     setNotifications((current) => current.map((item) => ({ ...item, read: true })))
     if (supabase && userId){
@@ -862,10 +957,10 @@ function App(){
   const renderPost = (post) => (
     <article key={post.id} className="post-card">
       <div className="post-header">
-        <div className="avatar small" style={{ background: post.accent }}>{post.author.slice(0, 1)}</div>
+        <ProfileAvatar person={{ id: post.authorId, name: post.author, handle: post.handle, color: post.accent }} onClick={openProfile} />
         <div>
           <div className="author-row">
-            <strong>{post.author}</strong>
+            <button type="button" className="profile-name-link" onClick={() => openProfile({ id: post.authorId, name: post.author, handle: post.handle, color: post.accent })}>{post.author}</button>
             {!post.mine && <span className="verified" aria-label="Verified">✓</span>}
           </div>
           <small>{post.handle} · {post.time}</small>
@@ -964,40 +1059,6 @@ function App(){
     </>
   )
 
-  const renderCommunities = () => {
-    const term = query.trim().toLowerCase()
-    const visibleCommunities = communities.filter((community) => `${community.name} ${community.description}`.toLowerCase().includes(term))
-    return (
-      <>
-        <div className="section-title">
-          <div><h2>Communities</h2><p>Find your people and join the conversation.</p></div>
-          <button className="primary-btn compact" type="button" onClick={() => setModal({ type: 'create-community' })}>＋ Create</button>
-        </div>
-        <div className="community-grid">
-          {visibleCommunities.map((community) => {
-            const member = joinedCommunities.includes(community.name)
-            return (
-              <article className="community-card" key={community.name}>
-                <div className="community-cover" style={{ background: `linear-gradient(135deg, ${community.tone}, #fff3e4)` }}>
-                  <span>✦</span>
-                </div>
-                <div className="community-card-body">
-                  <h3>{community.name}</h3>
-                  <p>{community.description}</p>
-                  <div className="community-card-footer">
-                    <small>{community.members} members</small>
-                    <button className={member ? 'secondary-btn joined' : 'secondary-btn'} type="button" onClick={() => toggleJoin(community.name)}>{member ? 'Joined ✓' : 'Join'}</button>
-                  </div>
-                </div>
-              </article>
-            )
-          })}
-          {!visibleCommunities.length && <div className="empty-state"><h3>No communities found</h3><p>Try another search term.</p></div>}
-        </div>
-      </>
-    )
-  }
-
   const renderMessages = () => {
     const chatMessages = messages[currentChat] || []
     return (
@@ -1006,7 +1067,7 @@ function App(){
         <section className="messages-layout">
           <div className="conversation-list">
             {people.map((friend) => (
-              <button type="button" key={friend.name} className={currentChat === friend.name ? 'conversation active' : 'conversation'} onClick={() => setCurrentChat(friend.name)}>
+              <button type="button" key={friend.name} className={currentChat === friend.name ? 'conversation active' : 'conversation'} onClick={() => openFriendChat(friend)}>
                 <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span>
                 <span><strong>{friend.name}</strong><small>{(messages[friend.name] || []).at(-1)?.text || friend.status}</small></span>
                 <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />
@@ -1068,27 +1129,30 @@ function App(){
     </>
   )
 
-  const renderProfile = () => (
-    <>
-      <section className="profile-page-cover">
-        <div className="cover-art"><span>Good things grow together</span></div>
-        <div className="profile-page-heading">
-          <div className="avatar profile-page-avatar avatar-olive">A</div>
-          <div><h2>{profileName}</h2><p>@amanda · Colombo, Sri Lanka</p></div>
-          <button className="secondary-btn" type="button" onClick={() => {
+  const renderProfile = () => {
+    const viewedPostCount = profileTarget?.id
+      ? posts.filter((post) => post.authorId === profileTarget.id).length
+      : profileTarget
+        ? posts.filter((post) => post.author === profileTarget.name).length
+        : posts.filter((post) => post.mine).length
+    return (
+      <ProfilePage
+        profileTarget={profileTarget}
+        profileName={profileName}
+        userId={userId}
+        postCount={viewedPostCount}
+        friendsList={friendsList}
+        filteredPosts={filteredPosts}
+        renderPost={renderPost}
+        onEditProfile={() => {
             setProfileDraft(profileName)
             setModal({ type: 'edit-profile' })
-          }}>Edit profile</button>
-        </div>
-        <p className="profile-bio">Finding good people, good places and little reasons to smile. 🌿</p>
-        <div className="profile-numbers"><span><strong>{posts.filter((post) => post.mine).length + 18}</strong> posts</span><span><strong>86k</strong> followers</span><span><strong>132</strong> following</span></div>
-      </section>
-      <div className="section-title profile-feed-title"><div><h2>Your posts</h2><p>Updates you have shared with your community.</p></div></div>
-      <section className="feed">
-        {filteredPosts.length ? filteredPosts.map(renderPost) : <div className="empty-state"><h3>No posts yet</h3><p>Write your first update from the home feed.</p><button type="button" className="secondary-btn" onClick={() => navigate('Home')}>Go to Home</button></div>}
-      </section>
-    </>
-  )
+        }}
+        onHome={() => navigate('Home')}
+        onProfileClick={openProfile}
+      />
+    )
+  }
 
   const pageDetails = {
     Home: ['Good morning, Amanda', 'Your people, places and conversations in one place.'],
@@ -1097,7 +1161,15 @@ function App(){
   }
 
   const renderMain = () => {
-    if (activePage === 'Communities') return renderCommunities()
+    if (activePage === 'Communities') return (
+      <CommunityDirectory
+        communities={communities}
+        joinedCommunities={joinedCommunities}
+        query={query}
+        onCreate={() => setModal({ type: 'create-community' })}
+        onToggleJoin={toggleJoin}
+      />
+    )
     if (activePage === 'Messages') return renderMessages()
     if (activePage === 'Settings') return renderSettings()
     if (activePage === 'Profile') return renderProfile()
@@ -1156,8 +1228,8 @@ function App(){
   }
 
   return (
-    <div className={activePage === 'Home' ? (settings.darkMode ? 'page-shell wall-shell dark-mode' : 'page-shell wall-shell') : (settings.darkMode ? 'page-shell dark-mode' : 'page-shell')}>
-      {activePage === 'Home' ? renderWall() : <div className="social-app">
+    <div className={activePage === 'Home' || activePage === 'Profile' ? (settings.darkMode ? 'page-shell wall-shell dark-mode' : 'page-shell wall-shell') : (settings.darkMode ? 'page-shell dark-mode' : 'page-shell')}>
+      {activePage === 'Home' || activePage === 'Profile' ? renderWall() : <div className="social-app">
         <aside className="sidebar">
           <button type="button" className="brand-wrap" onClick={() => navigate('Home')} aria-label="Go to home">
             <span className="brand-mark">M</span>
@@ -1296,47 +1368,109 @@ function App(){
               </>
             )}
             {modal.type === 'create-community' && (
+              <CreateCommunityForm
+                supabase={supabase}
+                userId={userId}
+                communities={communities}
+                friendsList={friendsList}
+                setCommunities={setCommunities}
+                setJoinedCommunities={setJoinedCommunities}
+                setCurrentGroupChat={setCurrentGroupChat}
+                setChatSection={setChatSection}
+                setDiscoverGroupIds={setDiscoverGroupIds}
+                setModal={setModal}
+                showToast={showToast}
+              />
+            )}
+            {modal.type === 'group-options' && (
               <>
-                <h2>Create a community</h2><p className="modal-intro">Start a new space around something you care about.</p>
+                <h2>{modal.group.name}</h2>
+                <p className="modal-intro">{modal.group.description}</p>
+                {modal.group.invite_link && <label className="field-label">Invite link<input readOnly value={modal.group.invite_link} /></label>}
+                <button className="secondary-btn group-option-button" type="button" onClick={async () => {
+                  const group = modal.group
+                  if (!group.id || !userId){
+                    showToast('Sign in to manage group membership.')
+                    return
+                  }
+                  const { error } = await supabase.from('group_members').delete().eq('group_id', group.id).eq('user_id', userId)
+                  if (error){
+                    showToast(`Could not leave this group: ${error.message}`)
+                    return
+                  }
+                  setJoinedCommunities((current) => current.filter((name) => name !== group.name))
+                  setCurrentGroupChat('')
+                  setModal(null)
+                  showToast(`You left ${group.name}.`)
+                }}>Leave group</button>
+                <button className="secondary-btn group-option-button" type="button" onClick={() => setModal({ type: 'add-group-member', group: modal.group })}>Add friend</button>
+                {modal.group.created_by === userId && <button className="text-action danger-action group-option-button" type="button" onClick={async () => {
+                  const group = modal.group
+                  const { error } = await supabase.rpc('delete_community_group', { target_group_id: group.id })
+                  if (error){
+                    showToast(`Could not delete this group: ${error.message}`)
+                    return
+                  }
+                  setCommunities((current) => current.filter((item) => item.id !== group.id))
+                  setJoinedCommunities((current) => current.filter((name) => name !== group.name))
+                  setCurrentGroupChat('')
+                  setModal(null)
+                  showToast(`${group.name} was deleted.`)
+                }}>Delete group</button>}
+              </>
+            )}
+            {modal.type === 'add-group-member' && (
+              <>
+                <h2>Add a friend</h2><p className="modal-intro">Invite someone to {modal.group.name}.</p>
                 <form onSubmit={async (event) => {
                   event.preventDefault()
                   const formData = new FormData(event.currentTarget)
-                  const name = String(formData.get('community-name') || '').trim()
-                  if (!name){
-                    showToast('Give your community a name first.')
+                  const friendId = String(formData.get('friend-id') || '')
+                  const friend = friendsList.find((person) => person.id === friendId)
+                  if (!friend){
+                    showToast('Choose one of your friends.')
                     return
                   }
-                  if (communities.some((community) => community.name.toLowerCase() === name.toLowerCase())){
-                    showToast('A community with that name already exists.')
+                  const { error } = await supabase.rpc('add_community_group_members', {
+                    target_group_id: modal.group.id,
+                    member_ids: [friend.id],
+                  })
+                  if (error){
+                    showToast(`Could not add ${friend.name} to the group: ${error.message}`)
                     return
                   }
-                  if (supabase && !userId){
-                    showToast('Sign in to create a group.')
-                    return
-                  }
-                  const description = 'A new community, started by you.'
-                  let groupId
-                  if (supabase && userId){
-                    const { data: group, error } = await supabase.from('groups').insert({ name, description, created_by: userId }).select('id').single()
-                    if (error){
-                      showToast(`Could not create your group: ${error.message}`)
-                      return
-                    }
-                    groupId = group.id
-                    const { error: membershipError } = await supabase.from('group_members').insert({ group_id: groupId, user_id: userId })
-                    if (membershipError){
-                      showToast(`Group created, but membership could not be saved: ${membershipError.message}`)
-                      return
-                    }
-                  }
-                  setCommunities((current) => [{ id: groupId, name, members: '1', tone: '#d5bfd9', description }, ...current])
-                  setJoinedCommunities((current) => [...current, name])
                   setModal(null)
-                  showToast(`${name} is ready to grow.`)
+                  showToast(`${friend.name} was added to ${modal.group.name}.`)
                 }}>
-                  <label className="field-label">Community name<input name="community-name" autoFocus placeholder="e.g. Weekend Gardeners" /></label>
-                  <button className="primary-btn modal-submit" type="submit">Create community</button>
+                  <label className="field-label">Friend
+                    <select name="friend-id" required defaultValue="">
+                      <option value="" disabled>Select a friend</option>
+                      {friendsList.map((friend) => <option key={friend.id} value={friend.id}>{friend.name}</option>)}
+                    </select>
+                  </label>
+                  <button className="primary-btn modal-submit" type="submit">Add to group</button>
                 </form>
+              </>
+            )}
+            {modal.type === 'delete-chat' && (
+              <>
+                <h2>Delete conversation?</h2><p className="modal-intro">This removes the conversation with {modal.friendName} from your inbox.</p>
+                <button className="text-action danger-action group-option-button" type="button" onClick={async () => {
+                  const friend = people.find((person) => person.name === modal.friendName)
+                  if (supabase && userId && friend?.id){
+                    const { error } = await supabase.rpc('hide_direct_conversation', { other_user_id: friend.id })
+                    if (error){
+                      showToast(`Could not delete this conversation: ${error.message}`)
+                      return
+                    }
+                  }
+                  setMessages((current) => ({ ...current, [modal.friendName]: [] }))
+                  setInboxConversations((current) => current.filter((person) => person.name !== modal.friendName))
+                  setInboxSelected(false)
+                  setCurrentChat('World')
+                  setModal(null)
+                  showToast('Conversation deleted.')
+                }}>Delete conversation</button>
               </>
             )}
             {modal.type === 'create-event' && isAdmin && (
