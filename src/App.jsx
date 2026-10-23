@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { supabase } from './supabase'
+import { supabase } from '../supabase'
 
 const navigation = [
   { label: 'Home', icon: '⌂' },
