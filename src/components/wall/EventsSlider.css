@@ -1,13 +1,17 @@
+.EventsSlide{
+  width: 100%;
+    box-sizing: border-box;
+}
 .events-section {
   background-color: rgba(223, 213, 214, 1);
   border-radius: 20px;
   padding: 10px;
-  width: 600px;
-  margin: 0 auto;
-  margin-bottom: 20px;
+  width: auto;
+  margin: 0 auto 20px auto;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #222;
   height: 205px;
+  max-width: 700px;
 }
 
 .section-header {

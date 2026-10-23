@@ -15,10 +15,12 @@ function WallMid() {
 
     return ( 
         <div className="mid">
-            <div className="search">
-                <div className="search-icon"><img className="search-icon-img" src="src\assets\dummy-post-square-1.jpg"></img></div>
-                <div className="search-text">Search people, groups and little things you love</div>
-            </div>  
+        
+                <div className="search">
+                    <div className="search-icon"><img className="search-icon-img" src="src\assets\dummy-post-square-1.jpg"></img></div>
+                    <div className="search-text">Search people, groups and little things you love</div>
+                </div>  
+            
 
               
 
