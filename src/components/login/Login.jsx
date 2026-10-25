@@ -1,7 +1,15 @@
+import Register from "./Register";
+import ForgetPassword from './ForgetPassword';
 function Login() {
     return ( 
         <>
-        <h2>Login Page</h2>
+        
+         
+        <Register/>
+        <div className="main">
+            <h2>Welcome to Mahagedara</h2>
+        </div>
+        <ForgetPassword/>
         </>
      );
 }
