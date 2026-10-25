@@ -140,7 +140,6 @@ function Community({
   unreadCount,
   events,
   setEvents,
-  eventIndex,
   isAdmin,
   userId,
   composer,
@@ -151,7 +150,6 @@ function Community({
   setChatSection,
   setCurrentChat,
   setCurrentGroupChat,
-  setEventIndex,
   setModal,
   navigate,
   toggleJoin,
@@ -211,7 +209,6 @@ function Community({
         </section>
         <div className="wall-left-footer">
           {!userId && <button type="button" onClick={onRequestLogin}>Sign in</button>}
-          <button type="button" onClick={() => navigate('Settings')}>Settings</button>
           <span>· Community guidelines · Privacy</span>
         </div>
       </aside>
@@ -234,8 +231,6 @@ function Community({
           userId={userId}
           profileName={profileName}
           showToast={showToast}
-          eventIndex={eventIndex}
-          setEventIndex={setEventIndex}
         />
 
         <div className="wall-feed-scroll">

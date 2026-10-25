@@ -1,27 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '../../../supabase'
 import './Status.css'
 
-function Status({ events, setEvents, isAdmin, userId, profileName, showToast, eventIndex: controlledEventIndex, setEventIndex: setControlledEventIndex }) {
-  const [internalEventIndex, setInternalEventIndex] = useState(0)
-  const eventIndex = controlledEventIndex ?? internalEventIndex
-  const setEventIndex = setControlledEventIndex ?? setInternalEventIndex
+function EventCards({ events, onSelect }) {
+  return events.map((event, index) => (
+    <button
+      type="button"
+      className="wall-event-card"
+      key={`${event.title}-${index}`}
+      style={{ backgroundImage: `linear-gradient(0deg, rgba(10, 6, 18, .84), rgba(10, 6, 18, .08) 78%), url("${event.image}")` }}
+      onClick={() => onSelect(index)}
+    >
+      <span className="wall-event-tag">✦ {event.tag}</span>
+      <span className="wall-event-date">{event.date.split('\n').map((line, lineIndex) => <span key={`${line}-${lineIndex}`}>{line}</span>)}</span>
+      <span className="wall-event-card-copy">
+        <strong>{event.title}</strong>
+        <span>{event.detail}</span>
+      </span>
+    </button>
+  ))
+}
+
+function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) {
   const [createOpen, setCreateOpen] = useState(false)
-  useEffect(() => {
-    if (!events.length) return undefined
-    const intervalId = window.setInterval(() => {
-      setEventIndex((index) => (index + 1) % events.length)
-    }, 6000)
-    return () => window.clearInterval(intervalId)
-  }, [events.length, setEventIndex])
+  const [eventsOpen, setEventsOpen] = useState(false)
+  const [selectedEventIndex, setSelectedEventIndex] = useState(0)
 
   if (!events.length) return null
-  const currentIndex = eventIndex % events.length
-  const event = events[currentIndex]
-  const nextEvent = events[(currentIndex + 1) % events.length]
-  const moveEvent = (direction) => {
-    setEventIndex((index) => (index + direction + events.length) % events.length)
-  }
+
   const publishEvent = async (formEvent) => {
     formEvent.preventDefault()
     const formData = new FormData(formEvent.currentTarget)
@@ -53,10 +59,9 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast, ev
       title,
       detail: `${date} · ${detail || 'Community event'}`,
       date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'),
-      image: events[0].image,
+      image: events[0]?.image || '',
       tag: 'COMMUNITY EVENT',
     }, ...current])
-    setEventIndex(0)
     setCreateOpen(false)
     showToast('Your event is on the community wall.')
   }
@@ -64,41 +69,41 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast, ev
   return (
     <>
       <section className="wall-events" aria-label="Community events">
-        <div className="wall-event-heading">
-          <div><h2>{event.title}</h2><small>{event.detail}</small></div>
-          <div className="wall-event-controls">
-            <button type="button" aria-label="Previous event" onClick={() => moveEvent(-1)}>‹</button>
-            <button type="button" aria-label="Next event" onClick={() => moveEvent(1)}>›</button>
-            {isAdmin && <button type="button" className="event-create" onClick={() => setCreateOpen(true)}>＋</button>}
-          </div>
-        </div>
-        <div className="wall-event-track">
-          <div className="wall-event-feature-viewport">
-            <div className="wall-event-feature-track" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-              {events.map((slide) => (
-                <article
-                  key={slide.title}
-                  className="wall-event-feature"
-                  style={{ backgroundImage: `linear-gradient(0deg, rgba(30,22,20,.72), transparent 72%), url("${slide.image}")` }}
-                >
-                  <span className="wall-event-tag">✦ {slide.tag}</span>
-                  <span className="wall-event-date">{slide.date.split('\n').map((line) => <span key={line}>{line}</span>)}</span>
-                  <p>{slide.detail.split(' · ')[0]}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-          <article className="wall-event-side">
-            <img src={nextEvent.image} alt="" />
-            <small>THIS WEEK · 2 PM</small>
-            <strong>{nextEvent.title}</strong>
-            <span>{nextEvent.detail}</span>
-          </article>
-        </div>
-        <div className="wall-event-dots" aria-hidden="true">
-          {events.map((slide, index) => <span key={slide.title} className={index === currentIndex ? 'active' : ''} />)}
+        <header className="wall-event-heading">
+          <div><h2>Ongoing events</h2><small>See what’s happening in your community</small></div>
+          {isAdmin && <button type="button" className="event-create" onClick={() => setCreateOpen(true)} aria-label="Create event">＋</button>}
+        </header>
+        <div className="wall-event-strip">
+          <EventCards events={events} onSelect={(index) => {
+            setSelectedEventIndex(index)
+            setEventsOpen(true)
+          }} />
         </div>
       </section>
+
+      {eventsOpen && (
+        <section className="wall-event-overlay" aria-label="Community event details">
+          <header className="wall-event-overlay-heading">
+            <div><h2>Community events</h2><p>Scroll sideways to explore what’s happening.</p></div>
+            <button type="button" className="wall-event-overlay-close" onClick={() => setEventsOpen(false)} aria-label="Close events">← Back to posts</button>
+          </header>
+          <div className="wall-event-dialog-strip">
+            <EventCards events={events} onSelect={setSelectedEventIndex} />
+          </div>
+          {events[selectedEventIndex] && (
+            <article className="wall-event-detail">
+              <img src={events[selectedEventIndex].image} alt="" />
+              <div>
+                <span className="wall-event-tag">{events[selectedEventIndex].tag}</span>
+                <h3>{events[selectedEventIndex].title}</h3>
+                <p>{events[selectedEventIndex].detail}</p>
+                <span className="wall-event-detail-date">{events[selectedEventIndex].date.replace('\n', ' ')}</span>
+              </div>
+            </article>
+          )}
+        </section>
+      )}
+
       {createOpen && (
         <div className="modal-backdrop" role="presentation" onClick={() => setCreateOpen(false)}>
           <section className="modal-card" role="dialog" aria-modal="true" onClick={(formEvent) => formEvent.stopPropagation()}>

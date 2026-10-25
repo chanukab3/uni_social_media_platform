@@ -27,25 +27,21 @@ export function PostComposer({
     <form className="composer" onSubmit={submitPost}>
       <div className="avatar small avatar-peach">A</div>
       <div className="composer-fields">
-        <textarea
-          aria-label="Write an update"
-          placeholder="Share an update with your community"
-          value={composerText}
-          onChange={(event) => onComposerTextChange(event.target.value)}
-          rows="1"
-        />
-        {composerImage && (
-          <div className="attachment-preview">
-            <img src={composerImage} alt="Selected post attachment" />
-            <button className="remove-attachment" type="button" onClick={() => {
-              URL.revokeObjectURL(composerImage)
-              onComposerImageChange('')
-              onComposerFileChange(null)
-            }} aria-label="Remove attached image">×</button>
-          </div>
-        )}
-        <div className="composer-tools">
-          <button type="button" className="text-action" onClick={() => fileInputRef.current?.click()}>▧ <span>Photo</span></button>
+        <div className="composer-photo-first">
+          {composerImage && (
+            <div className="attachment-preview">
+              <img src={composerImage} alt="Selected post attachment" />
+              <button className="remove-attachment" type="button" onClick={() => {
+                URL.revokeObjectURL(composerImage)
+                onComposerImageChange('')
+                onComposerFileChange(null)
+                if (fileInputRef.current) fileInputRef.current.value = ''
+              }} aria-label="Remove attached image">×</button>
+            </div>
+          )}
+          <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
+            {composerImage ? 'Change photo' : '＋ Add photo'}
+          </button>
           <input
             ref={fileInputRef}
             className="visually-hidden"
@@ -56,6 +52,7 @@ export function PostComposer({
               if (!file) return
               if (!file.type.startsWith('image/')) {
                 showToast('Choose an image file to attach.')
+                event.target.value = ''
                 return
               }
               if (composerImage.startsWith('blob:')) URL.revokeObjectURL(composerImage)
@@ -63,8 +60,14 @@ export function PostComposer({
               onComposerImageChange(URL.createObjectURL(file))
             }}
           />
-          <span className="composer-hint">Posting to your community</span>
         </div>
+        <textarea
+          aria-label="Write an update"
+          placeholder="Add a caption to your photo..."
+          value={composerText}
+          onChange={(event) => onComposerTextChange(event.target.value)}
+          rows="2"
+        />
       </div>
       <button type="submit" className="primary-btn">Post</button>
     </form>
@@ -268,7 +271,7 @@ function Wall({
             />
           </>
         )}
-        <div className="wall-left-footer">{showSignIn && <button type="button" onClick={onSignIn}>Sign in</button>}<button type="button" onClick={() => onNavigate('Settings')}>Settings</button><span>· Community guidelines · Privacy</span></div>
+        <div className="wall-left-footer">{showSignIn && <button type="button" onClick={onSignIn}>Sign in</button>}<span>· Community guidelines · Privacy</span></div>
       </aside>
 
       <main className="wall-center">
@@ -320,9 +323,9 @@ function Wall({
 
       <aside className="wall-right">
         <section className="mini-card wall-friend-suggestions">
-          <div className="section-head"><h3>People you may know</h3><button type="button" onClick={() => onChatSectionChange('Friends')}>See all</button></div>
+          <div className="section-head"><h3>People you may know</h3></div>
           <div className="suggested-friends">
-            {visibleSuggestions.slice(0, 4).map((friend) => (
+            {visibleSuggestions.map((friend) => (
               <article className="suggested-friend" key={friend.name}>
                 <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span><strong>{friend.name}</strong>
                 <button type="button" onClick={() => onSendFriendRequest(friend.name)}>{friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}</button>

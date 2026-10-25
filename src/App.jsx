@@ -15,7 +15,6 @@ const navigation = [
   { label: 'Communities', icon: '▦' },
   { label: 'Status', icon: '◉' },
   { label: 'Messages', icon: '✉' },
-  { label: 'Settings', icon: '⚙' },
 ]
 
 const startingPosts = [
@@ -121,7 +120,6 @@ function App(){
   const [inboxConversations, setInboxConversations] = useState([])
   const [inboxSelected, setInboxSelected] = useState(false)
   const [profileTarget, setProfileTarget] = useState(null)
-  const [eventIndex, setEventIndex] = useState(0)
   const [events, setEvents] = useState(eventSlides)
   const [friendRequests, setFriendRequests] = useState([])
   const [friendsList, setFriendsList] = useState([])
@@ -140,11 +138,6 @@ function App(){
   })
   const [messageDraft, setMessageDraft] = useState('')
   const [commentDraft, setCommentDraft] = useState('')
-  const [settings, setSettings] = useState({
-    darkMode: false,
-    notifications: true,
-    publicProfile: true,
-  })
   const showToast = useCallback((message) => {
     setToast(message)
   }, [])
@@ -474,7 +467,7 @@ function App(){
   const unreadCount = notifications.filter((item) => !item.read).length
 
   const navigate = (page) => {
-    setActivePage(page)
+    setActivePage(page === 'Profile' ? 'Profile' : 'Home')
     if (page === 'Profile') setProfileTarget(null)
     setQuery('')
     setNotificationsOpen(false)
@@ -870,7 +863,6 @@ function App(){
       unreadCount={unreadCount}
       events={events}
       setEvents={setEvents}
-      eventIndex={eventIndex}
       isAdmin={isAdmin}
       userId={userId}
       composer={renderComposer()}
@@ -881,7 +873,6 @@ function App(){
       setChatSection={setChatSection}
       setCurrentChat={setCurrentChat}
       setCurrentGroupChat={setCurrentGroupChat}
-      setEventIndex={setEventIndex}
       setModal={setModal}
       navigate={navigate}
       toggleJoin={toggleJoin}
@@ -929,10 +920,6 @@ function App(){
         .eq('user_id', userId)
       if (error) showToast(`Could not update notification: ${error.message}`)
     }
-  }
-
-  const updateSetting = (key) => {
-    setSettings((current) => ({ ...current, [key]: !current[key] }))
   }
 
   const signOut = async () => {
@@ -1004,7 +991,7 @@ function App(){
             { name: 'Sami', color: '#9f8da8' },
             { name: 'Lah', color: '#6a7a99' },
           ].map((item) => (
-            <button type="button" key={item.name} className="story" onClick={() => item.isYou ? setActivePage('Status') : setStory(item)}>
+            <button type="button" key={item.name} className="story" onClick={() => item.isYou ? setActivePage('Home') : setStory(item)}>
               <span className="story-ring" style={{ background: item.color }}><span>{item.isYou ? '+' : item.name.slice(0, 1)}</span></span>
               <small>{item.name}</small>
             </button>
@@ -1054,31 +1041,6 @@ function App(){
     )
   }
 
-  const renderSettings = () => (
-    <>
-      <div className="section-title"><div><h2>Settings</h2><p>Make Mahagedara feel like home.</p></div></div>
-      <section className="settings-card">
-        <div className="settings-group">
-          <h3>Appearance</h3>
-          <div className="setting-row"><span><strong>Dark appearance</strong><small>Use a darker color palette.</small></span><button type="button" className={settings.darkMode ? 'switch on' : 'switch'} role="switch" aria-checked={settings.darkMode} onClick={() => updateSetting('darkMode')}><span /></button></div>
-        </div>
-        <div className="settings-group">
-          <h3>Privacy & notifications</h3>
-          <div className="setting-row"><span><strong>Push notifications</strong><small>Get notified about activity and messages.</small></span><button type="button" className={settings.notifications ? 'switch on' : 'switch'} role="switch" aria-checked={settings.notifications} onClick={() => updateSetting('notifications')}><span /></button></div>
-          <div className="setting-row"><span><strong>Public profile</strong><small>Let people find and follow your profile.</small></span><button type="button" className={settings.publicProfile ? 'switch on' : 'switch'} role="switch" aria-checked={settings.publicProfile} onClick={() => updateSetting('publicProfile')}><span /></button></div>
-        </div>
-        <div className="settings-group account-settings">
-          <h3>Account</h3>
-          <div className="setting-row"><span><strong>{profileName}</strong><small>@amanda · Personal profile</small></span><button type="button" className="secondary-btn" onClick={() => {
-            setProfileDraft(profileName)
-            setModal({ type: 'edit-profile' })
-          }}>Edit profile</button></div>
-          <button type="button" className="text-action danger-action" onClick={signOut}>Sign out</button>
-        </div>
-      </section>
-    </>
-  )
-
   const renderProfile = () => {
     const viewedPostCount = profileTarget?.id
       ? posts.filter((post) => post.authorId === profileTarget.id).length
@@ -1094,8 +1056,6 @@ function App(){
         friendsList={friendsList}
         filteredPosts={filteredPosts}
         renderPost={renderPost}
-        darkMode={settings.darkMode}
-        onToggleDarkMode={() => updateSetting('darkMode')}
         onSignOut={signOut}
         onEditProfile={() => {
             setProfileDraft(profileName)
@@ -1124,7 +1084,6 @@ function App(){
       />
     )
     if (activePage === 'Messages') return renderMessages()
-    if (activePage === 'Settings') return renderSettings()
     if (activePage === 'Profile') return renderProfile()
     const [title, subtitle] = pageDetails[activePage] || pageDetails.Home
     return renderFeed(title, subtitle, activePage === 'Home')
@@ -1153,7 +1112,7 @@ function App(){
   if (authPage === 'reset') return <ResetPassword onLogin={() => setAuthPage('login')} />
 
   return (
-    <div className={activePage === 'Home' || activePage === 'Profile' ? (settings.darkMode ? 'page-shell wall-shell dark-mode' : 'page-shell wall-shell') : (settings.darkMode ? 'page-shell dark-mode' : 'page-shell')}>
+    <div className={activePage === 'Home' || activePage === 'Profile' ? 'page-shell wall-shell dark-mode' : 'page-shell dark-mode'}>
       {activePage === 'Home' || activePage === 'Profile' ? renderWall() : <div className="social-app">
         <aside className="sidebar">
           <button type="button" className="brand-wrap" onClick={() => navigate('Home')} aria-label="Go to home">
@@ -1220,7 +1179,7 @@ function App(){
           </section>
 
           <section className="mini-card side-section">
-            <div className="section-head"><h3>Communities</h3><button type="button" onClick={() => navigate('Communities')}>View all</button></div>
+            <div className="section-head"><h3>Communities</h3></div>
             {communities.slice(0, 3).map((community) => (
               <button type="button" key={community.name} className="community-item" onClick={() => navigate('Communities')}>
                 <span className="dot" style={{ background: community.tone }} />
@@ -1429,7 +1388,6 @@ function App(){
                     return
                   }
                   setEvents((current) => [{ title, detail: `${date} · ${detail || 'Community event'}`, date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'), image: eventSlides[0].image, tag: 'COMMUNITY EVENT' }, ...current])
-                  setEventIndex(0)
                   setModal(null)
                   showToast('Your event is on the community wall.')
                 }}>

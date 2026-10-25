@@ -1,14 +1,14 @@
 :root {
-  --bg: #efeae3;
-  --panel: #f8f5f1;
-  --sidebar: #f3efe9;
-  --card: #fffdfb;
-  --text: #2b201c;
-  --muted: #756864;
-  --line: rgba(89, 67, 56, 0.1);
-  --accent: #d99a6f;
-  --accent-dark: #b86b47;
-  --shadow: 0 26px 60px rgba(58, 44, 28, 0.12);
+  --bg: #05030a;
+  --panel: #0a0711;
+  --sidebar: #0b0812;
+  --card: #110b19;
+  --text: #f5edff;
+  --muted: #b8a6cb;
+  --line: rgba(190, 113, 255, 0.2);
+  --accent: #9b42e8;
+  --accent-dark: #c77bff;
+  --shadow: 0 26px 60px rgba(87, 24, 130, 0.28);
 }
 
 * {
@@ -25,9 +25,13 @@ body,
 
 html,
 body {
-  background: linear-gradient(180deg, #f3eee7 0%, #efe7df 100%);
+  background: #05030a;
   color: var(--text);
   font-family: 'Segoe UI', sans-serif;
+}
+
+html {
+  font-size: 17px;
 }
 
 button,
@@ -57,7 +61,7 @@ img {
 .page-shell {
   min-height: 100vh;
   padding: 28px;
-  background: linear-gradient(180deg, #f3eee7 0%, #efe7df 100%);
+  background: #05030a;
   color: var(--text);
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -1921,6 +1925,84 @@ img {
   .profile-page-heading > .secondary-btn {
     margin: 0 0 10px 78px;
   }
+}
+
+.dark-mode .social-app {
+  border-color: var(--line);
+  background: #090610;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 34px rgba(111, 31, 167, 0.14);
+}
+
+.dark-mode .sidebar,
+.dark-mode .right-panel,
+.dark-mode .main-panel,
+.dark-mode .topbar {
+  background: #0a0711;
+}
+
+.dark-mode .mini-card,
+.dark-mode .post-card,
+.dark-mode .community-card,
+.dark-mode .settings-card,
+.dark-mode .profile-summary,
+.dark-mode .messages-layout,
+.dark-mode .notification-popover {
+  border-color: var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), 0 3px 18px rgba(111, 31, 167, 0.1);
+}
+
+.dark-mode .field-label input,
+.dark-mode .field-label textarea,
+.dark-mode .comment-form input,
+.dark-mode .chat-form input,
+.dark-mode .search-wrap input {
+  color: var(--text);
+}
+
+.page-shell.dark-mode.wall-shell .wall-left .mini-card,
+.page-shell.dark-mode.wall-shell .wall-right .mini-card,
+.page-shell.dark-mode.wall-shell .wall-chat-card,
+.page-shell.dark-mode.wall-shell .wall-feed-scroll .composer,
+.page-shell.dark-mode.wall-shell .wall-feed-scroll .post-card,
+.page-shell.dark-mode.wall-shell .wall-profile-identity,
+.page-shell.dark-mode.wall-shell .wall-profile-friends,
+.page-shell.dark-mode.wall-shell .wall-profile-posts .post-card {
+  border-color: rgba(190, 113, 255, 0.2);
+  background: linear-gradient(145deg, #120a1c, #0d0815);
+  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.32), 0 3px 18px rgba(111, 31, 167, 0.12);
+}
+
+.page-shell.dark-mode.wall-shell .wall-left,
+.page-shell.dark-mode.wall-shell .wall-center,
+.page-shell.dark-mode.wall-shell .wall-right,
+.page-shell.dark-mode.wall-shell .wall-topbar,
+.page-shell.dark-mode.wall-shell .wall-profile-view,
+.page-shell.dark-mode.wall-shell .wall-profile-details {
+  background: linear-gradient(145deg, #090610, #0c0714 65%, #100819);
+}
+
+.page-shell.dark-mode.wall-shell .suggested-friend .avatar {
+  border-color: rgba(190, 113, 255, 0.34);
+}
+
+.page-shell.dark-mode button:not(.wall-brand):not(.wall-profile-button):not(.profile-name-link):not(.wall-event-card):not(.profile-avatar-link):not(.avatar) {
+  border-color: rgba(190, 113, 255, 0.32);
+  background: linear-gradient(135deg, #7028a8, #a13fe0);
+  box-shadow: 0 5px 16px rgba(112, 40, 168, 0.2);
+  color: #fff;
+}
+
+.page-shell.dark-mode .nav-item:not(.active) {
+  background: #170e22;
+  box-shadow: none;
+  color: var(--text);
+}
+
+.page-shell.dark-mode .wall-event-overlay-close,
+.page-shell.dark-mode .composer-photo-button,
+.page-shell.dark-mode .wall-feed-scroll .composer > .primary-btn {
+  background: linear-gradient(135deg, #7028a8, #a13fe0);
+  color: #fff;
 }
 
 @media (max-width: 400px) {

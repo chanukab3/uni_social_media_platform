@@ -40,7 +40,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
     <section className="mini-card wall-friend-suggestions">
       <div className="section-head"><h3>People you may know</h3></div>
       <div className="suggested-friends">
-        {suggestions.slice(0, 4).map((friend) => (
+        {suggestions.map((friend) => (
           <article className="suggested-friend" key={friend.id || friend.name}>
             <ProfileAvatar person={friend} onClick={onProfileClick} />
             <button type="button" className="profile-name-link" onClick={() => onProfileClick(friend)}>{friend.name}</button>
@@ -53,7 +53,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, userId, postCount, friendsList, filteredPosts, renderPost, darkMode, onToggleDarkMode, onSignOut, onEditProfile, onHome, onProfileClick }) {
+export function ProfilePage({ profileTarget, profileName, userId, postCount, friendsList, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onProfileClick }) {
   const viewedName = profileTarget?.name || profileName
   const isOwnProfile = !profileTarget || profileTarget.id === userId
   const viewedHandle = isOwnProfile ? '@amanda' : profileTarget?.handle
@@ -84,9 +84,6 @@ export function ProfilePage({ profileTarget, profileName, userId, postCount, fri
         </section>
         {isOwnProfile && (
           <section className="wall-profile-actions" aria-label="Profile settings">
-            <button type="button" className="secondary-btn wall-profile-action" onClick={onToggleDarkMode}>
-              {darkMode ? '☀ Light mode' : '☾ Dark mode'}
-            </button>
             <button type="button" className="secondary-btn wall-profile-action danger-action" onClick={onSignOut}>
               Sign out
             </button>

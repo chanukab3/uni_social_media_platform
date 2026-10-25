@@ -1,98 +1,92 @@
 .wall-events {
   flex: 0 0 auto;
-  padding: 0 16px 8px;
+  padding: 0 16px 12px;
 }
 
 .wall-event-heading {
-  min-height: 34px;
+  min-height: 42px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 0 3px 7px;
+  gap: 12px;
+  padding: 0 2px 9px;
 }
 
 .wall-event-heading h2 {
-  font-size: 0.94rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .wall-event-heading small {
   display: block;
-  margin-top: 2px;
-  color: #776a7a;
-  font-size: 0.61rem;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
 }
 
-.wall-event-controls {
-  display: flex;
-  gap: 6px;
+.wall-event-heading .event-create {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #170e22;
+  color: var(--text);
+  font-size: 1.15rem;
 }
 
-.wall-event-controls button {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: #fff9ff;
-  color: #554465;
-  font-size: 1.05rem;
-  line-height: 1;
-}
-
-.wall-event-controls .event-create {
-  border-radius: 8px;
-  background: #eadbf3;
-  font-size: 0.85rem;
-}
-
-.wall-event-track {
-  height: clamp(128px, 19vh, 165px);
+.wall-event-strip,
+.wall-event-dialog-strip {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(100px, 0.55fr);
-  gap: 9px;
+  grid-auto-columns: minmax(190px, 43%);
+  grid-auto-flow: column;
+  gap: 11px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 2px 2px 10px;
+  scrollbar-color: #71339a #0a0711;
+  scrollbar-width: thin;
 }
 
-.wall-event-feature {
+.wall-event-card {
   position: relative;
-  width: 100%;
-  min-width: 100%;
-  flex: 0 0 100%;
+  min-width: 0;
+  height: 142px;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  align-items: flex-end;
   overflow: hidden;
   padding: 12px;
-  border-radius: 10px;
+  border: 1px solid rgba(190, 113, 255, 0.2);
+  border-radius: 13px;
+  background-color: #170e22;
   background-position: center;
   background-size: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), 0 4px 16px rgba(111, 31, 167, 0.16);
   color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.wall-event-feature-viewport {
-  min-width: 0;
-  overflow: hidden;
-  border-radius: 10px;
-}
-
-.wall-event-feature-track {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+.wall-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.36), 0 4px 20px rgba(161, 55, 218, 0.28);
 }
 
 .wall-event-tag {
   position: absolute;
-  top: 9px;
-  left: 9px;
-  max-width: calc(100% - 65px);
+  top: 10px;
+  left: 10px;
+  max-width: calc(100% - 62px);
   overflow: hidden;
-  padding: 4px 7px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 99px;
-  background: rgba(252, 240, 255, 0.94);
-  color: #523d60;
-  font-size: 0.55rem;
+  background: rgba(10, 6, 18, 0.68);
+  color: #e5c2ff;
+  font-size: 0.68rem;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -102,126 +96,180 @@
   position: absolute;
   top: 9px;
   right: 9px;
-  min-width: 31px;
+  min-width: 38px;
   display: grid;
-  padding: 4px 5px;
-  border-radius: 6px;
-  background: #fff9ff;
-  color: #302737;
-  font-size: 0.52rem;
+  padding: 5px;
+  border: 1px solid rgba(190, 113, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(10, 6, 18, 0.8);
+  color: #f5edff;
+  font-size: 0.67rem;
   font-weight: 800;
   text-align: center;
 }
 
-.wall-event-feature p {
+.wall-event-card-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.wall-event-card-copy strong,
+.wall-event-card-copy > span {
   overflow: hidden;
-  font-size: 0.86rem;
-  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wall-event-side {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  overflow: hidden;
-  padding-bottom: 7px;
-  border-radius: 9px;
-  background: #fff9ff;
+.wall-event-card-copy strong {
+  font-size: 0.94rem;
 }
 
-.wall-event-side img {
+.wall-event-card-copy > span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+}
+
+.wall-event-overlay {
+  position: absolute;
+  z-index: 12;
+  inset: 65px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 22px 18px;
+  border-top: 1px solid rgba(190, 113, 255, 0.24);
+  background: linear-gradient(145deg, #110a1a, #090610 70%);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(111, 31, 167, 0.18);
+}
+
+.wall-event-overlay-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wall-event-overlay-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.3rem;
+}
+
+.wall-event-overlay-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.wall-event-overlay-close {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border: 1px solid rgba(190, 113, 255, 0.28);
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7028a8, #a13fe0);
+  color: #fff;
+  font-size: 0.82rem;
+}
+
+.wall-event-dialog-strip {
+  grid-auto-columns: minmax(220px, 32%);
+  flex: 0 0 auto;
+  padding-bottom: 13px;
+}
+
+.wall-event-dialog-strip .wall-event-card {
+  height: 210px;
+}
+
+.wall-event-detail {
+  min-height: 190px;
+  flex: 1 0 190px;
+  display: grid;
+  grid-template-columns: minmax(130px, 0.7fr) minmax(0, 1.3fr);
+  gap: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(190, 113, 255, 0.22);
+  border-radius: 15px;
+  background: linear-gradient(145deg, #160c22, #0d0815);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32), 0 3px 18px rgba(111, 31, 167, 0.14);
+}
+
+.wall-event-detail > img {
   width: 100%;
-  height: 57%;
+  height: 100%;
+  min-height: 190px;
   object-fit: cover;
 }
 
-.wall-event-side small,
-.wall-event-side strong,
-.wall-event-side > span {
-  margin: 0 8px;
+.wall-event-detail > div {
+  align-self: center;
+  padding: 18px 18px 18px 0;
 }
 
-.wall-event-side small {
-  color: #766a7a;
-  font-size: 0.48rem;
-  font-weight: 700;
+.wall-event-detail .wall-event-tag {
+  position: static;
+  display: inline-block;
+  max-width: 100%;
 }
 
-.wall-event-side strong {
-  overflow: hidden;
-  font-size: 0.65rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.wall-event-side > span {
-  overflow: hidden;
-  color: #766a7a;
-  font-size: 0.54rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.wall-event-dots {
-  height: 11px;
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  gap: 5px;
-}
-
-.wall-event-dots span {
-  width: 6px;
-  height: 4px;
-  border-radius: 99px;
-  background: #d8c4dc;
-  transition: width 0.2s ease;
-}
-
-.wall-event-dots span.active {
-  width: 17px;
-  background: #c9a6d6;
-}
-
-.dark-mode.wall-shell .wall-event-side {
-  border-color: var(--line);
-  background: #322d29;
-}
-
-.dark-mode.wall-shell .wall-event-side strong {
+.wall-event-detail h3 {
+  margin: 12px 0 6px;
   color: var(--text);
+  font-size: 1.25rem;
 }
 
-.dark-mode.wall-shell .wall-event-side small,
-.dark-mode.wall-shell .wall-event-side > span {
+.wall-event-detail p,
+.wall-event-detail-date {
   color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
-.dark-mode.wall-shell .wall-event-heading small {
-  color: var(--muted);
-}
-
-.dark-mode.wall-shell .wall-event-controls button {
-  border-color: var(--line);
-  background: #38312c;
-  color: var(--text);
-}
-
-.dark-mode.wall-shell .wall-event-feature {
-  color: #fff;
-}
-
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   .wall-events {
     padding-right: 11px;
     padding-left: 11px;
   }
 
-  .wall-event-track {
-    height: 136px;
-    grid-template-columns: minmax(0, 1fr) 112px;
+  .wall-event-strip {
+    grid-auto-columns: minmax(210px, 78%);
+  }
+
+  .wall-event-overlay {
+    inset: 58px 0 0;
+    gap: 12px;
+    padding: 14px 12px;
+  }
+
+  .wall-event-dialog-strip {
+    grid-auto-columns: minmax(220px, 85%);
+  }
+
+  .wall-event-dialog-strip .wall-event-card {
+    height: 175px;
+  }
+
+  .wall-event-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .wall-event-detail > img {
+    height: 150px;
+    min-height: 150px;
+  }
+
+  .wall-event-detail > div {
+    padding: 0 15px 16px;
+  }
+
+  .wall-event-overlay-heading {
+    align-items: center;
+  }
+
+  .wall-event-overlay-close {
+    max-width: 120px;
+    white-space: normal;
   }
 }
