@@ -292,12 +292,11 @@
 
 .wall-topbar {
   position: relative;
-  top: auto;
   flex: 0 0 auto;
   gap: 10px;
   padding: 16px 16px 9px;
-  background: #f7eafa;
-  backdrop-filter: none;
+  background: linear-gradient(180deg, #090610 78%, rgba(9, 6, 16, 0.94));
+  backdrop-filter: blur(14px);
 }
 
 .wall-topbar .search-wrap {
@@ -518,9 +517,19 @@
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 2px 16px 18px;
+  padding: 0 0 18px;
   scrollbar-color: #d5bfd9 transparent;
   scrollbar-width: thin;
+}
+
+.wall-feed-scroll > .composer,
+.wall-feed-scroll > .feed {
+  margin-right: 16px;
+  margin-left: 16px;
+}
+
+.wall-feed-scroll > .composer {
+  margin-top: 2px;
 }
 
 .wall-feed-scroll .composer {
@@ -1150,8 +1159,14 @@
   }
 
   .wall-feed-scroll {
-    padding-right: 14px;
-    padding-left: 14px;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .wall-feed-scroll > .composer,
+  .wall-feed-scroll > .feed {
+    margin-right: 14px;
+    margin-left: 14px;
   }
 }
 
@@ -1176,7 +1191,13 @@
   }
 
   .wall-feed-scroll {
-    padding-right: 11px;
-    padding-left: 11px;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .wall-feed-scroll > .composer,
+  .wall-feed-scroll > .feed {
+    margin-right: 11px;
+    margin-left: 11px;
   }
 }

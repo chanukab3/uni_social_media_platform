@@ -43,7 +43,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
         {suggestions.map((friend) => (
           <article className="suggested-friend" key={friend.id || friend.name}>
             <ProfileAvatar person={friend} onClick={onProfileClick} />
-            <button type="button" className="profile-name-link" onClick={() => onProfileClick(friend)}>{friend.name}</button>
+            <strong>{friend.name}</strong>
             <button type="button" onClick={() => sendFriendRequest(friend.name)}>{friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}</button>
           </article>
         ))}

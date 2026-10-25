@@ -275,29 +275,39 @@ function Wall({
       </aside>
 
       <main className="wall-center">
-        <header className="topbar wall-topbar">
-          <label className="search-wrap">
-            <span aria-hidden="true">⌕</span>
-            <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
-            {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
-          </label>
-          <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
-        </header>
         {activePage === 'Profile' ? (
-          <div className="wall-profile-scroll">
-            <Profile {...profileProps} view="posts" />
-          </div>
+          <>
+            <header className="topbar wall-topbar">
+              <label className="search-wrap">
+                <span aria-hidden="true">⌕</span>
+                <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
+                {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
+              </label>
+              <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
+            </header>
+            <div className="wall-profile-scroll">
+              <Profile {...profileProps} view="posts" />
+            </div>
+          </>
         ) : (
           <>
-            <Status
-              events={events}
-              setEvents={setEvents}
-              isAdmin={isAdmin}
-              userId={userId}
-              profileName={profileName}
-              showToast={showToast}
-            />
             <div className="wall-feed-scroll">
+              <header className="topbar wall-topbar">
+                <label className="search-wrap">
+                  <span aria-hidden="true">⌕</span>
+                  <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
+                  {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
+                </label>
+                <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
+              </header>
+              <Status
+                events={events}
+                setEvents={setEvents}
+                isAdmin={isAdmin}
+                userId={userId}
+                profileName={profileName}
+                showToast={showToast}
+              />
               <PostComposer
                 composerText={composerText}
                 composerImage={composerImage}
