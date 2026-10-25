@@ -1,456 +1,353 @@
-/* function Community() {
-    return ( 
-        <>
-        <h2>Community Page</h2>
-        </>
-     );
-}
-*/
+import './community.css'
+import { FriendSuggestions, WallProfileCard } from '../profile/Profile'
 
-
-import { useState } from "react";
-import "./Community.css";
-
-const initialCommunities = [
-  {
-    id: 1,
-    name: "Programming Club",
-    category: "Technology",
-    memberNames: [
-      "Alex Perera",
-      "Sarah Fernando",
-      "Kavindu Silva",
-      "Nethmi Jayasuriya",
-      "Daniel Kumar",
-      "Maya Silva",
-    ],
-    createdBy: "current-user",
-  },
-  {
-    id: 2,
-    name: "University Friends",
-    category: "Social",
-    memberNames: ["Sarah Fernando", "Alex Perera"],
-    createdBy: "user-2",
-  },
-  {
-    id: 3,
-    name: "Gaming Community",
-    category: "Entertainment",
-    memberNames: ["Kavindu Silva", "Daniel Kumar"],
-    createdBy: "user-3",
-  },
-];
-
-const sampleFriends = [
-  { id: 101, name: "Alex Perera" },
-  { id: 102, name: "Sarah Fernando" },
-  { id: 103, name: "Kavindu Silva" },
-  { id: 104, name: "Nethmi Jayasuriya" },
-  { id: 105, name: "Daniel Kumar" },
-];
-
-function Community() {
-  const [communities, setCommunities] = useState(initialCommunities);
-  const [activeView, setActiveView] = useState("world");
-  const [selectedCommunity, setSelectedCommunity] = useState(null);
-
-  const [groupName, setGroupName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Technology");
-
-  const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState("");
-
-  const [friends, setFriends] = useState(sampleFriends);
-const [friendSearch, setFriendSearch] = useState("");
-const [selectedFriends, setSelectedFriends] = useState([]);
-
-const [showChatMenu, setShowChatMenu] = useState(false);
-
-//adding friends to community
-const filteredFriends = friends.filter((friend) =>
-  friend.name.toLowerCase().includes(friendSearch.toLowerCase())
-);
-
-function toggleFriend(friendId) {
-  setSelectedFriends((previous) =>
-    previous.includes(friendId)
-      ? previous.filter((id) => id !== friendId)
-      : [...previous, friendId]
-  );
-}
-
-  function createCommunity(event) {
-    event.preventDefault();
-
-    if (!groupName.trim()) return;
-
-    const newCommunity = {
-      id: Date.now(),
-      name: groupName.trim(),
-      category,
-      description: description.trim(),
-      memberIds: selectedFriends,
-    };
-
-    setCommunities((previous) => [...previous, newCommunity]);
-    setSelectedCommunity(newCommunity);
-    setActiveView("group");
-
-    setGroupName("");
-    setDescription("");
-    setCategory("Technology");
-    setSelectedFriends([]);
-setFriendSearch("");
-  }
-
-  function leaveGroup() {
-  if (!selectedCommunity) return;
-
-  const confirmed = window.confirm(
-    `Are you sure you want to leave "${selectedCommunity.name}"?`
-  );
-
-  if (!confirmed) return;
-
-  setCommunities((previous) =>
-    previous.filter((community) => community.id !== selectedCommunity.id)
-  );
-
-  setSelectedCommunity(null);
-  setActiveView("world");
-  setShowChatMenu(false);
-}
-
-function deleteGroup() {
-  if (!selectedCommunity) return;
-
-  if (selectedCommunity.createdBy !== "current-user") {
-    return;
-  }
-
-  const confirmed = window.confirm(
-    `Delete "${selectedCommunity.name}" for everyone? This cannot be undone.`
-  );
-
-  if (!confirmed) return;
-
-  setCommunities((previous) =>
-    previous.filter((community) => community.id !== selectedCommunity.id)
-  );
-
-  setSelectedCommunity(null);
-  setActiveView("world");
-  setShowChatMenu(false);
-}
-
-  function sendMessage(event) {
-    event.preventDefault();
-
-    if (!messageText.trim()) return;
-
-    const newMessage = {
-      id: Date.now(),
-      text: messageText.trim(),
-      chatId:
-        activeView === "group"
-          ? `group-${selectedCommunity.id}`
-          : "world",
-    };
-
-    setMessages((previous) => [...previous, newMessage]);
-    setMessageText("");
-  }
-
-
-
-  const currentChatId =
-    activeView === "group" && selectedCommunity
-      ? `group-${selectedCommunity.id}`
-      : "world";
-
-  const currentMessages = messages.filter(
-    (message) => message.chatId === currentChatId
-  );
+export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }) {
+  const term = query.trim().toLowerCase()
+  const visibleCommunities = communities.filter((community) => `${community.name} ${community.description}`.toLowerCase().includes(term))
 
   return (
-    <div className="community-page">
-      
-      <aside className="community-sidebar">
-        <h2>Communities</h2>
-
-        <button
-          className="primary-button"
-          onClick={() => setActiveView("create")}
-        >
-          + Create Community
-        </button>
-
-
-
-        <h3>Joined Groups</h3>
-
-        <div className="community-list">
-          {communities.map((community) => (
-            <button
-              key={community.id}
-              className={`community-item ${
-                selectedCommunity?.id === community.id &&
-                activeView === "group"
-                  ? "active"
-                  : ""
-              }`}
-              onClick={() => {
-                setSelectedCommunity(community);
-                setActiveView("group");
-              }}
-            >
-              <span className="community-avatar">
-                {community.name.charAt(0).toUpperCase()}
-              </span>
-
-              <span>{community.name}</span>
-            </button>
-          ))}
-    
-        </div>
-      </aside>
-
-      {/* MIDDLE COLUMN */}
-<main className="community-main">
-  {activeView === "create" && (
-    <section className="content-card">
-      <h1>Create a Community</h1>
-
-      <form onSubmit={createCommunity} className="community-form">
-        <label htmlFor="groupName">Community name</label>
-        <input
-          id="groupName"
-          value={groupName}
-          onChange={(event) => setGroupName(event.target.value)}
-          placeholder="Enter community name"
-          required
-        />
-
-        <label htmlFor="description">Description</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          placeholder="Enter description"
-          rows={4}
-        />
-
-        <label htmlFor="category">Category</label>
-        <select
-          id="category"
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        >
-          <option>Technology</option>
-          <option>Education</option>
-          <option>Social</option>
-          <option>Entertainment</option>
-          <option>Sports</option>
-          <option>Other</option>
-        </select>
-
-        <div className="friend-picker">
-  <label htmlFor="friendSearch">Add friends</label>
-
-  <input
-    id="friendSearch"
-    type="search"
-    placeholder="Search friends..."
-    value={friendSearch}
-    onChange={(event) => setFriendSearch(event.target.value)}
-  />
-
-  <p className="muted-text">
-    {selectedFriends.length} friend(s) selected
-  </p>
-
-  <div className="friend-list">
-    {filteredFriends.map((friend) => {
-      const isSelected = selectedFriends.includes(friend.id);
-
-      return (
-        <button
-          key={friend.id}
-          type="button"
-          className={`friend-item ${isSelected ? "selected" : ""}`}
-          onClick={() => toggleFriend(friend.id)}
-        >
-          <span className="friend-avatar">
-            {friend.name.charAt(0)}
-          </span>
-
-          <span>{friend.name}</span>
-
-          <span className="friend-check">
-            {isSelected ? "✓" : "+"}
-          </span>
-        </button>
-      );
-    })}
-
-    {filteredFriends.length === 0 && (
-      <p className="muted-text">No friends found.</p>
-    )}
-  </div>
-</div>
-        <div className="form-actions">
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={() => setActiveView("world")}
-          >
-            Cancel
-          </button>
-
-          <button type="submit" className="primary-button">
-            Create Community
-          </button>
-        </div>
-      </form>
-    </section>
-  )}
-</main>
-
-
-      {/* RIGHT COLUMN */}
-      <div className="chat-section">
-      <aside className="chat-panel">
-        <div className="chat-header">
-<div className="chat-header">
-  <div className="chat-header-info">
-    <h3>
-      {activeView === "group" && selectedCommunity
-        ? selectedCommunity.name
-        : activeView === "world"
-          ? "World Chat"
-          : "Inbox"}
-    </h3>
-
-    {activeView === "group" && selectedCommunity && (
-<p className="recent-friends">
-  {selectedCommunity.memberNames?.slice(-5).reverse().map((name) => name.split(" ")[0]).join(",") ||
-    "No members yet"}
-</p>
-    )}
-  </div>
-
-  {activeView === "group" && selectedCommunity && (
-    <div className="chat-menu-container">
-      <button
-        type="button"
-        className="chat-menu-button"
-        onClick={() => setShowChatMenu((previous) => !previous)}
-        aria-label="Chat options"
-      >
-        ⋮
-      </button>
-
-      {showChatMenu && (
-        <div className="chat-menu">
-          <button
-            type="button"
-            onClick={() => {
-              setShowChatMenu(false);
-              //Connect to the main search.
-            }}
-          >
-            Add friends
-          </button>
-
-<button
-  type="button"
-  onClick={leaveGroup}
->
-  Leave group
-</button>
-
-          {selectedCommunity.createdBy === "current-user" && (
-            <button
-              type="button"
-              className="delete-group-option"
-              onClick={deleteGroup}
-            >
-              Delete group
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  )}
-</div>
-        </div>
-
-        {activeView === "inbox" ? (
-          <div className="empty-chat">
-            <span className="empty-icon">✉</span>
-            <h3>Your conversations</h3>
-            <p className="muted-text">
-              Your previous friend chats will appear here.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="message-list">
-              {currentMessages.length === 0 ? (
-                <div className="empty-chat">
-                  <span className="empty-icon">💬</span>
-                  <h3>Start a conversation</h3>
-                  <p className="muted-text">
-                    Be the first to send a message.
-                  </p>
+    <>
+      <div className="section-title">
+        <div><h2>Communities</h2><p>Find your people and join the conversation.</p></div>
+        <button className="primary-btn compact" type="button" onClick={onCreate}>＋ Create</button>
+      </div>
+      <div className="community-grid">
+        {visibleCommunities.map((community) => {
+          const member = joinedCommunities.includes(community.name)
+          return (
+            <article className="community-card" key={community.id || community.name}>
+              <div className="community-cover" style={{ background: `linear-gradient(135deg, ${community.tone}, #fff3e4)` }}>
+                <span>✦</span>
+              </div>
+              <div className="community-card-body">
+                <h3>{community.name}</h3>
+                <p>{community.description}</p>
+                <div className="community-card-footer">
+                  <small>{community.members} members</small>
+                  <button className={member ? 'secondary-btn joined' : 'secondary-btn'} type="button" onClick={() => onToggleJoin(community.name)}>{member ? 'Joined ✓' : 'Join'}</button>
                 </div>
-              ) : (
-                currentMessages.map((message) => (
-                  <div className="message-bubble" key={message.id}>
-                    {message.text}
-                  </div>
-                ))
-              )}
-            </div>
-
-            <form className="message-form" onSubmit={sendMessage}>
-              <input
-                value={messageText}
-                onChange={(event) => setMessageText(event.target.value)}
-                placeholder="Write a message..."
-                aria-label="Write a message"
-              />
-
-              <button type="submit" className="send-button">
-                Send
-              </button>
-            </form>
-          </>
-        )}
-      </aside>
-      <div className="chat-navigation">
-    <button
-      className={`secondary-button ${
-        activeView === "inbox" ? "active" : ""
-      }`}
-      onClick={() => setActiveView("inbox")}
-    >
-      Inbox
-    </button>
-
-    <button
-      className={`secondary-button ${
-        activeView === "world" ? "active" : ""
-      }`}
-      onClick={() => setActiveView("world")}
-    >
-      World Chat
-    </button>
-  </div>
-</div>
-    </div>
-  );
+              </div>
+            </article>
+          )
+        })}
+        {!visibleCommunities.length && <div className="empty-state"><h3>No communities found</h3><p>Try another search term.</p></div>}
+      </div>
+    </>
+  )
 }
-export default Community;
+
+export function CreateCommunityForm({
+  supabase,
+  userId,
+  communities,
+  friendsList,
+  setCommunities,
+  setJoinedCommunities,
+  setCurrentGroupChat,
+  setChatSection,
+  setDiscoverGroupIds,
+  setModal,
+  showToast,
+}) {
+  return (
+    <>
+      <h2>Create a community</h2><p className="modal-intro">Start a new space around something you care about.</p>
+      <form onSubmit={async (event) => {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        const name = String(formData.get('community-name') || '').trim()
+        const description = String(formData.get('community-description') || '').trim()
+        const inviteLink = `${window.location.origin}/?invite=${crypto.randomUUID()}`
+        const invitedFriendIds = formData.getAll('group-friend').map(String)
+        if (!name){
+          showToast('Give your community a name first.')
+          return
+        }
+        if (!description){
+          showToast('Add a short description for your community.')
+          return
+        }
+        if (communities.some((community) => community.name.toLowerCase() === name.toLowerCase())){
+          showToast('A community with that name already exists.')
+          return
+        }
+        if (!supabase || !userId){
+          showToast('Sign in to create a group.')
+          return
+        }
+        const { data: group, error } = await supabase.from('groups').insert({
+          name,
+          description,
+          invite_link: inviteLink,
+          created_by: userId,
+        }).select('id').single()
+        if (error){
+          showToast(`Could not create your group: ${error.message}`)
+          return
+        }
+        const memberIds = [...new Set([userId, ...invitedFriendIds])]
+        const { error: membershipError } = await supabase.rpc('add_community_group_members', {
+          target_group_id: group.id,
+          member_ids: memberIds,
+        })
+        if (membershipError){
+          const { error: rollbackError } = await supabase.rpc('delete_community_group', { target_group_id: group.id })
+          const rollbackNote = rollbackError ? ` Cleanup failed: ${rollbackError.message}` : ''
+          showToast(`Could not save the group members: ${membershipError.message}.${rollbackNote}`)
+          return
+        }
+        const createdGroup = { id: group.id, name, members: String(memberIds.length), tone: '#d5bfd9', description, invite_link: inviteLink, created_by: userId }
+        setCommunities((current) => [createdGroup, ...current])
+        setJoinedCommunities((current) => [...current, name])
+        setCurrentGroupChat(name)
+        setChatSection('Groups')
+        setDiscoverGroupIds((current) => [group.id, ...(current || [])].slice(0, 3))
+        setModal(null)
+        showToast(`${name} is ready to grow.`)
+      }}>
+        <label className="field-label">Group name<input name="community-name" autoFocus placeholder="e.g. Weekend Gardeners" required /></label>
+        <label className="field-label">Description<textarea name="community-description" placeholder="What is this group about?" required /></label>
+        <fieldset className="group-invite-picker">
+          <legend>Invite friends (choose up to 5)</legend>
+          {friendsList.slice(0, 5).map((person) => <label key={person.id} className="group-invite-choice">
+            <input type="checkbox" name="group-friend" value={person.id} disabled={!person.id} />
+            <span>{person.name}</span>
+          </label>)}
+        </fieldset>
+        <button className="primary-btn modal-submit" type="submit">Create community</button>
+      </form>
+    </>
+  )
+}
+
+function Community({
+  profileName,
+  communities,
+  joinedCommunities,
+  discoverGroupIds,
+  people,
+  friendsList,
+  incomingFriendRequests,
+  friendRequests,
+  setQuery,
+  query,
+  messages,
+  chatSection,
+  currentChat,
+  currentGroupChat,
+  notifications,
+  unreadCount,
+  events,
+  eventIndex,
+  isAdmin,
+  userId,
+  composer,
+  renderPost,
+  filteredPosts,
+  messageDraft,
+  setMessageDraft,
+  setChatSection,
+  setCurrentChat,
+  setCurrentGroupChat,
+  setEventIndex,
+  setModal,
+  navigate,
+  toggleJoin,
+  sendMessage,
+  sendFriendRequest,
+  acceptFriendRequest,
+  openGroupChat,
+  markNotificationRead,
+  markNotificationsRead,
+  onProfileClick,
+  onGroupAction,
+  onDeleteChat,
+  onViewInbox,
+  onSelectInboxChat,
+  inboxConversations,
+  inboxSelected,
+  toast,
+  setIsSignedIn,
+  profileContent,
+}) {
+  const term = query.trim().toLowerCase()
+  const discoverGroups = communities
+    .filter((group) => !joinedCommunities.includes(group.name))
+    .filter((group) => discoverGroupIds === null || discoverGroupIds.includes(group.id))
+  const joinedGroups = communities.filter((group) => joinedCommunities.includes(group.name))
+  const selectedGroup = communities.find((group) => group.name === currentGroupChat)
+  const currentEvent = events[eventIndex % events.length]
+  const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
+  const activeMessages = messages[conversationKey] || []
+  const isInboxList = chatSection === 'Inbox' && !inboxSelected
+
+  return (
+    <div className="wall-layout">
+      {profileContent ? <div className="wall-profile-view">{profileContent}</div> : <>
+      <aside className="wall-left">
+        <button type="button" className="wall-brand" onClick={() => navigate('Home')}>
+          <span className="brand-mark">M</span><strong>Mahagedara</strong>
+        </button>
+        <WallProfileCard
+          profileId={userId}
+          profileName={profileName}
+          friendsCount={people.length}
+          groupsCount={joinedCommunities.length}
+          onProfileClick={onProfileClick}
+        />
+        <section className="mini-card wall-group-section">
+          <div className="section-head"><h3>Find your circle</h3></div>
+          {discoverGroups.slice(0, 3).map((group, index) => (
+            <article className="wall-group-suggestion" key={group.id || group.name}>
+              <div className={`wall-group-cover group-cover-${index % 2}`} />
+              <strong>{group.name}</strong>
+              <small>{group.members} members · {group.description}</small>
+              <button type="button" className="secondary-btn compact" onClick={() => toggleJoin(group.name)}>Join</button>
+            </article>
+          ))}
+          {!discoverGroups.length && <p className="wall-muted">You’re already part of every community.</p>}
+        </section>
+        <div className="wall-left-footer">
+          {!userId && <button type="button" onClick={() => setIsSignedIn(false)}>Sign in</button>}
+          <button type="button" onClick={() => navigate('Settings')}>Settings</button>
+          <span>· Community guidelines · Privacy</span>
+        </div>
+      </aside>
+
+      <main className="wall-center">
+        <header className="topbar wall-topbar">
+          <label className="search-wrap">
+            <span aria-hidden="true">⌕</span>
+            <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
+          </label>
+          <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => setChatSection('Notifications')}>
+            ♧{unreadCount > 0 && <span className="notification-dot" />}
+          </button>
+        </header>
+
+        <section className="wall-events" aria-label="Community events">
+          {currentEvent && <>
+            <div className="wall-event-heading">
+              <div><h2>{currentEvent.title}</h2><small>{currentEvent.detail}</small></div>
+              <div className="wall-event-controls">
+                <button type="button" aria-label="Previous event" onClick={() => setEventIndex((eventIndex + events.length - 1) % events.length)}>‹</button>
+                <button type="button" aria-label="Next event" onClick={() => setEventIndex((eventIndex + 1) % events.length)}>›</button>
+                {isAdmin && <button type="button" className="event-create" onClick={() => setModal({ type: 'create-event' })}>＋</button>}
+              </div>
+            </div>
+            <div className="wall-event-track">
+              <div className="wall-event-feature-viewport">
+                <div className="wall-event-feature-track" style={{ transform: `translateX(-${(eventIndex % events.length) * 100}%)` }}>
+                  {events.map((slide) => (
+                    <article key={slide.title} className="wall-event-feature" style={{ backgroundImage: `linear-gradient(0deg, rgba(30,22,20,.72), transparent 72%), url("${slide.image}")` }}>
+                      <span className="wall-event-tag">✦ {slide.tag}</span>
+                      <span className="wall-event-date">{slide.date.split('\n').map((line) => <span key={line}>{line}</span>)}</span>
+                      <p>{slide.detail.split(' · ')[0]}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              {events.length > 1 && <article className="wall-event-side">
+                <img src={events[(eventIndex + 1) % events.length].image} alt="" />
+                <small>THIS WEEK · 2 PM</small>
+                <strong>{events[(eventIndex + 1) % events.length].title}</strong>
+                <span>{events[(eventIndex + 1) % events.length].detail}</span>
+              </article>}
+            </div>
+            <div className="wall-event-dots" aria-hidden="true">{events.map((slide, index) => <span key={slide.title} className={index === eventIndex % events.length ? 'active' : ''} />)}</div>
+          </>}
+        </section>
+
+        <div className="wall-feed-scroll">
+          {composer}
+          <section className="feed" aria-label="Post feed">
+            {filteredPosts.length
+              ? filteredPosts.map(renderPost)
+              : <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try another search.' : 'Share an update to get the conversation started.'}</p></div>}
+          </section>
+        </div>
+      </main>
+      </>}
+
+      <aside className="wall-right">
+        <FriendSuggestions
+          people={people}
+          friendsList={friendsList}
+          query={query}
+          friendRequests={friendRequests}
+          sendFriendRequest={sendFriendRequest}
+          onProfileClick={onProfileClick}
+        />
+
+        <section className="wall-chat-card">
+          <header className="wall-chat-heading">
+            <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' : (selectedGroup?.name || currentChat || 'M')[0]}</span>
+            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ? (selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
+            {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
+            {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
+          </header>
+
+          {chatSection === 'Notifications' ? (
+            <div className="wall-notification-list">
+              {notifications.map((item) => <button type="button" key={item.id} className={item.read ? '' : 'unread'} onClick={() => markNotificationRead(item.id)}>{item.text}<small>{item.time}</small></button>)}
+              <button type="button" className="wall-mark-read" onClick={markNotificationsRead}>Mark all as read</button>
+            </div>
+          ) : chatSection === 'Friends' ? (
+            <div className="wall-chat-friends">
+              {incomingFriendRequests.map((request) => <div className="wall-friend-request" key={request.requestId}>
+                <span>{request.name} sent you a friend request.</span>
+                <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
+              </div>)}
+              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onProfileClick(friend)}>
+                <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
+              </button>)}
+              {!friendsList.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
+            </div>
+          ) : chatSection === 'Groups' && !selectedGroup ? (
+            <div className="wall-chat-friends wall-chat-group-list">
+              {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} onClick={() => openGroupChat(group)}>
+                <span className="wall-group-icon" style={{ background: group.tone }}>✦</span><span>{group.name}<small>{group.members} members</small></span>
+              </button>)}
+              {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
+              <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}>＋ Create a group</button>
+            </div>
+          ) : isInboxList ? (
+            <div className="wall-chat-friends">
+              {inboxConversations.map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onSelectInboxChat(friend)}>
+                <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.lastMessage || 'Open conversation'}</small></span>
+              </button>)}
+              {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
+            </div>
+          ) : (
+            <>
+              <div className="wall-chat-messages" aria-live="polite">
+                {(chatSection === 'World' ? (messages.World || []) : activeMessages).map((message, index) => <div key={`${message.id || message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} · {message.time}</small><p>{message.text}</p></div>)}
+                {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+              </div>
+              <form className="wall-chat-form" onSubmit={sendMessage}>
+                <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
+                <button type="submit" aria-label="Send message">↑</button>
+              </form>
+              <p className="wall-chat-note">A shared space, a little kindness, a lot of good conversations.</p>
+            </>
+          )}
+
+          <nav className="wall-chat-tabs" aria-label="Community sections">
+            {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() => {
+              setChatSection(label)
+              if (label === 'World') setCurrentChat('World')
+              if (label === 'Groups') setCurrentGroupChat('')
+              if (label === 'Inbox') onViewInbox()
+              if (label === 'Notifications') markNotificationsRead()
+            }}><span>{icon}</span>{label}</button>)}
+          </nav>
+        </section>
+        <p className="wall-right-footer">Local community. Real connections.</p>
+      </aside>
+      {toast && <div className="toast" role="status">{toast}</div>}
+    </div>
+  )
+}
+
+export default Community

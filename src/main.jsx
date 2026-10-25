@@ -9,6 +9,8 @@ import Status from './components/status/Status.jsx'
 import Register from './components/Register/Register.jsx'
 
 
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
