@@ -1,0 +1,227 @@
+.wall-events {
+  flex: 0 0 auto;
+  padding: 0 16px 8px;
+}
+
+.wall-event-heading {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 3px 7px;
+}
+
+.wall-event-heading h2 {
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.wall-event-heading small {
+  display: block;
+  margin-top: 2px;
+  color: #776a7a;
+  font-size: 0.61rem;
+}
+
+.wall-event-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.wall-event-controls button {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #fff9ff;
+  color: #554465;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.wall-event-controls .event-create {
+  border-radius: 8px;
+  background: #eadbf3;
+  font-size: 0.85rem;
+}
+
+.wall-event-track {
+  height: clamp(128px, 19vh, 165px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(100px, 0.55fr);
+  gap: 9px;
+}
+
+.wall-event-feature {
+  position: relative;
+  width: 100%;
+  min-width: 100%;
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: 12px;
+  border-radius: 10px;
+  background-position: center;
+  background-size: cover;
+  color: #fff;
+}
+
+.wall-event-feature-viewport {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.wall-event-feature-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.wall-event-tag {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  max-width: calc(100% - 65px);
+  overflow: hidden;
+  padding: 4px 7px;
+  border-radius: 99px;
+  background: rgba(252, 240, 255, 0.94);
+  color: #523d60;
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-event-date {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  min-width: 31px;
+  display: grid;
+  padding: 4px 5px;
+  border-radius: 6px;
+  background: #fff9ff;
+  color: #302737;
+  font-size: 0.52rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.wall-event-feature p {
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-event-side {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  padding-bottom: 7px;
+  border-radius: 9px;
+  background: #fff9ff;
+}
+
+.wall-event-side img {
+  width: 100%;
+  height: 57%;
+  object-fit: cover;
+}
+
+.wall-event-side small,
+.wall-event-side strong,
+.wall-event-side > span {
+  margin: 0 8px;
+}
+
+.wall-event-side small {
+  color: #766a7a;
+  font-size: 0.48rem;
+  font-weight: 700;
+}
+
+.wall-event-side strong {
+  overflow: hidden;
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-event-side > span {
+  overflow: hidden;
+  color: #766a7a;
+  font-size: 0.54rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-event-dots {
+  height: 11px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 5px;
+}
+
+.wall-event-dots span {
+  width: 6px;
+  height: 4px;
+  border-radius: 99px;
+  background: #d8c4dc;
+  transition: width 0.2s ease;
+}
+
+.wall-event-dots span.active {
+  width: 17px;
+  background: #c9a6d6;
+}
+
+.dark-mode.wall-shell .wall-event-side {
+  border-color: var(--line);
+  background: #322d29;
+}
+
+.dark-mode.wall-shell .wall-event-side strong {
+  color: var(--text);
+}
+
+.dark-mode.wall-shell .wall-event-side small,
+.dark-mode.wall-shell .wall-event-side > span {
+  color: var(--muted);
+}
+
+.dark-mode.wall-shell .wall-event-heading small {
+  color: var(--muted);
+}
+
+.dark-mode.wall-shell .wall-event-controls button {
+  border-color: var(--line);
+  background: #38312c;
+  color: var(--text);
+}
+
+.dark-mode.wall-shell .wall-event-feature {
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .wall-events {
+    padding-right: 11px;
+    padding-left: 11px;
+  }
+
+  .wall-event-track {
+    height: 136px;
+    grid-template-columns: minmax(0, 1fr) 112px;
+  }
+}
