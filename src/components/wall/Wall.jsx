@@ -2,7 +2,6 @@ function Wall() {
     return ( 
         <>
         <h2>Wall Page</h2>
-        
         </>
      );
 }

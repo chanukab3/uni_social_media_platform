@@ -1,7 +1,7 @@
 function Status() {
     return ( 
         <>
-        <h2>Status Page.</h2>
+        <h2>Status Page</h2>
         </>
      );
 }
