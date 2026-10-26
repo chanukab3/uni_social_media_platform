@@ -14,18 +14,18 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }) {
   )
 }
 
-export function WallProfileCard({ profileId, profileName, friendsCount, groupsCount, onProfileClick }) {
+export function WallProfileCard({ profileId, profileName, profileHandle, friendsCount, groupsCount, onProfileClick, onOpenWallTab }) {
   const currentUser = { id: profileId, name: profileName, color: '#879174' }
   return (
     <section className="mini-card wall-profile">
       <button type="button" className="wall-profile-button" onClick={() => onProfileClick(currentUser)}>
         <span className="avatar large avatar-olive">A</span>
-        <span><strong>{profileName}</strong><small>@amanda.silva</small></span>
+        <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
       </button>
       <p>Finding my people, one coffee and creative project at a time.</p>
       <div className="wall-profile-stats">
-        <span><strong>{friendsCount}</strong><small>Friends</small></span>
-        <span><strong>{groupsCount}</strong><small>Groups</small></span>
+        <button type="button" onClick={() => onOpenWallTab('Friends')}><strong>{friendsCount}</strong><small>Friends</small></button>
+        <button type="button" onClick={() => onOpenWallTab('Groups')}><strong>{groupsCount}</strong><small>Groups</small></button>
         <button type="button" aria-label="View profile" onClick={() => onProfileClick(currentUser)}>↗</button>
       </div>
     </section>
@@ -35,7 +35,10 @@ export function WallProfileCard({ profileId, profileName, friendsCount, groupsCo
 export function FriendSuggestions({ people, friendsList, query, friendRequests, sendFriendRequest, onProfileClick }) {
   const term = query.trim().toLowerCase()
   const friendIds = new Set(friendsList.map((friend) => friend.id))
-  const suggestions = people.filter((person) => !friendIds.has(person.id) && person.name.toLowerCase().includes(term))
+  const suggestions = people.filter((person) =>
+    !friendIds.has(person.id)
+    && person.name.toLowerCase().includes(term)
+  )
   return (
     <section className="mini-card wall-friend-suggestions">
       <div className="section-head"><h3>People you may know</h3></div>
@@ -44,7 +47,9 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
           <article className="suggested-friend" key={friend.id || friend.name}>
             <ProfileAvatar person={friend} onClick={onProfileClick} />
             <strong>{friend.name}</strong>
-            <button type="button" onClick={() => sendFriendRequest(friend.name)}>{friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}</button>
+            <button type="button" disabled={friendRequests.includes(friend.name)} onClick={() => sendFriendRequest(friend.name)}>
+              {friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}
+            </button>
           </article>
         ))}
         {!suggestions.length && <p className="wall-muted">No people match your search.</p>}
@@ -53,10 +58,10 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, userId, postCount, friendsList, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onProfileClick }) {
+export function ProfilePage({ profileTarget, profileName, profileHandle, userId, postCount, friendsList, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onProfileClick }) {
   const viewedName = profileTarget?.name || profileName
   const isOwnProfile = !profileTarget || profileTarget.id === userId
-  const viewedHandle = isOwnProfile ? '@amanda' : profileTarget?.handle
+  const viewedHandle = isOwnProfile ? profileHandle : profileTarget?.handle
   return (
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">

@@ -20,13 +20,10 @@ export default function Register({ onLogin, onRegisterSuccess }) {
     setMessage("");
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanUsername = username.trim();
+    const cleanUsername = username.trim().replace(/\s+/g, " ");
 
-    // Validate username
-    if (!/^[a-zA-Z0-9_]{3,20}$/.test(cleanUsername)) {
-      setError(
-        "Username must be 3–20 characters using letters, numbers, or underscores."
-      );
+    if (cleanUsername.length < 2 || cleanUsername.length > 40) {
+      setError("Your name must be between 2 and 40 characters.");
       return;
     }
 
@@ -56,7 +53,7 @@ export default function Register({ onLogin, onRegisterSuccess }) {
           password,
           options: {
             data: {
-              username: cleanUsername,
+              username: cleanEmail.slice(0, cleanEmail.indexOf("@")),
               display_name: cleanUsername,
             },
           },
@@ -132,7 +129,7 @@ export default function Register({ onLogin, onRegisterSuccess }) {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="register-username">Username</label>
+            <label htmlFor="register-username">Display name</label>
 
             <div className="auth-input-wrap">
               <span aria-hidden="true">♙</span>
@@ -140,18 +137,17 @@ export default function Register({ onLogin, onRegisterSuccess }) {
               <input
                 id="register-username"
                 type="text"
-                placeholder="Choose a username"
-                autoComplete="username"
-                minLength={3}
-                maxLength={20}
-                pattern="[a-zA-Z0-9_]{3,20}"
-                title="Use 3–20 letters, numbers, or underscores."
+                placeholder="Enter your name"
+                autoComplete="name"
+                minLength={2}
+                maxLength={40}
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 required
                 disabled={loading}
               />
             </div>
+            <small className="auth-hint">Your username will be the part of your email before @.</small>
           </div>
 
           <div className="auth-field">

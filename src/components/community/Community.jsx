@@ -123,6 +123,7 @@ export function CreateCommunityForm({
 
 function Community({
   profileName,
+  profileHandle,
   communities,
   joinedCommunities,
   discoverGroupIds,
@@ -157,6 +158,7 @@ function Community({
   sendFriendRequest,
   acceptFriendRequest,
   openGroupChat,
+  onOpenWallTab,
   markNotificationRead,
   markNotificationsRead,
   onProfileClick,
@@ -191,9 +193,11 @@ function Community({
         <WallProfileCard
           profileId={userId}
           profileName={profileName}
-          friendsCount={people.length}
+          profileHandle={profileHandle}
+          friendsCount={friendsList.length}
           groupsCount={joinedCommunities.length}
           onProfileClick={onProfileClick}
+          onOpenWallTab={onOpenWallTab}
         />
         <section className="mini-card wall-group-section">
           <div className="section-head"><h3>Find your circle</h3></div>
@@ -230,6 +234,7 @@ function Community({
             isAdmin={isAdmin}
             userId={userId}
             profileName={profileName}
+            profileHandle={profileHandle}
             showToast={showToast}
           />
           {composer}
@@ -263,7 +268,22 @@ function Community({
 
           {chatSection === 'Notifications' ? (
             <div className="wall-notification-list">
-              {notifications.map((item) => <button type="button" key={item.id} className={item.read ? '' : 'unread'} onClick={() => markNotificationRead(item.id)}>{item.text}<small>{item.time}</small></button>)}
+              {notifications.map((item) => {
+                const request = incomingFriendRequests.find((friendRequest) =>
+                  item.text === `${friendRequest.name} sent you a friend request.`
+                )
+                return (
+                  <article key={item.id} className={item.read ? '' : 'unread'}>
+                    <button type="button" className="wall-notification-item" onClick={() => markNotificationRead(item.id)}>
+                      {item.text}<small>{item.time}</small>
+                    </button>
+                    {request && <button type="button" className="wall-notification-accept" onClick={async () => {
+                      if (await acceptFriendRequest(request)) markNotificationRead(item.id)
+                    }}>Accept request</button>}
+                  </article>
+                )
+              })}
+              {!notifications.length && <p className="wall-muted">You’re all caught up.</p>}
               <button type="button" className="wall-mark-read" onClick={markNotificationsRead}>Mark all as read</button>
             </div>
           ) : chatSection === 'Friends' ? (
@@ -272,10 +292,10 @@ function Community({
                 <span>{request.name} sent you a friend request.</span>
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
-              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onProfileClick(friend)}>
+              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onSelectInboxChat(friend)}>
                 <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
               </button>)}
-              {!friendsList.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
+              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
           ) : chatSection === 'Groups' && !selectedGroup ? (
             <div className="wall-chat-friends wall-chat-group-list">

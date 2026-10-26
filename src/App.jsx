@@ -39,6 +39,7 @@ function App(){
   const [authPage, setAuthPage] = useState('login')
   const [openMenu, setOpenMenu] = useState(null)
   const [profileName, setProfileName] = useState('Amanda Silva')
+  const [profileHandle, setProfileHandle] = useState('')
   const [profileDraft, setProfileDraft] = useState('Amanda Silva')
   const [currentChat, setCurrentChat] = useState('World')
   const [currentGroupChat, setCurrentGroupChat] = useState('')
@@ -111,6 +112,7 @@ function App(){
       }
 
       if (!user) {
+        setPeople([])
         setFriendRequests([])
         setFriendsList([])
         setIncomingFriendRequests([])
@@ -125,7 +127,7 @@ function App(){
         setUserId(user.id)
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('display_name, role')
+          .select('display_name, handle, role')
           .eq('id', user.id)
           .maybeSingle()
         if (!active) return
@@ -138,6 +140,7 @@ function App(){
           return
         }
         if (profile?.display_name) setProfileName(profile.display_name)
+        setProfileHandle(profile?.handle || `@${user.email?.split('@')[0] || ''}`)
         setIsAdmin(profile?.role === 'admin')
       }
 
@@ -373,6 +376,68 @@ function App(){
           ? current
           : [{ id: item.id, text: item.body, time: 'Just now', read: Boolean(item.read_at) }, ...current])
       })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, ({ new: profile }) => {
+        if (!profile.id || profile.id === userId) return
+        setPeople((current) => current.some((person) => person.id === profile.id)
+          ? current
+          : [...current, {
+            id: profile.id,
+            name: profile.display_name,
+            handle: profile.handle || '',
+            status: 'Member',
+            color: personColors[current.length % personColors.length],
+          }])
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'groups' }, ({ new: group }) => {
+        if (!group.id) return
+        setCommunities((current) => current.some((item) => item.id === group.id)
+          ? current
+          : [...current, {
+            id: group.id,
+            name: group.name,
+            description: group.description || '',
+            image_url: group.image_url || '',
+            image_path: group.image_path || '',
+            invite_link: group.invite_link || '',
+            created_by: group.created_by,
+            members: '0',
+            tone: communityTones[current.length % communityTones.length],
+          }])
+        if (group.created_by !== userId) {
+          setDiscoverGroupIds((current) => current === null
+            ? null
+            : [...new Set([group.id, ...current])].slice(0, 3))
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, ({ eventType, new: request, old }) => {
+        if (!userId) return
+        if (eventType === 'INSERT') {
+          if (request.sender_id === userId) {
+            const recipient = people.find((person) => person.id === request.recipient_id)
+            if (recipient) {
+              setFriendRequests((current) => current.includes(recipient.name) ? current : [...current, recipient.name])
+            }
+          } else if (request.recipient_id === userId && request.status === 'pending') {
+            const sender = people.find((person) => person.id === request.sender_id)
+            if (sender) {
+              setIncomingFriendRequests((current) => current.some((item) => item.requestId === request.id)
+                ? current
+                : [...current, { ...sender, requestId: request.id }])
+            }
+          }
+          return
+        }
+        if (eventType === 'UPDATE' && request.status === 'accepted') {
+          const otherUserId = request.sender_id === userId ? request.recipient_id : request.sender_id
+          const friend = people.find((person) => person.id === otherUserId)
+          if (friend) setFriendsList((current) => current.some((item) => item.id === friend.id) ? current : [...current, friend])
+          setIncomingFriendRequests((current) => current.filter((item) => item.requestId !== request.id))
+          setFriendRequests((current) => current.filter((name) => name !== friend?.name))
+        }
+        if (eventType === 'DELETE') {
+          setIncomingFriendRequests((current) => current.filter((item) => item.requestId !== old.id))
+        }
+      })
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR') showToast('Live updates are unavailable. Check Supabase Realtime settings.')
       })
@@ -431,7 +496,7 @@ function App(){
       const { data, error } = await supabase.from('posts').insert({
         author_id: userId,
         author_name: profileName,
-        handle: '@amanda',
+        handle: profileHandle,
         body: text,
         image_url: imageUrl || null,
       }).select('id').single()
@@ -445,7 +510,7 @@ function App(){
       id: postId,
       authorId: userId,
       author: profileName,
-      handle: '@amanda',
+      handle: profileHandle,
       time: 'just now',
       text,
       image: imageUrl,
@@ -702,6 +767,19 @@ function App(){
       showToast('Sign in to connect with people.')
       return
     }
+    if (person && friendsList.some((friend) => friend.id === person.id)) {
+      showToast(`You and ${name} are already friends.`)
+      return
+    }
+    if (friendRequests.includes(name)) {
+      showToast(`You have already sent ${name} a friend request.`)
+      return
+    }
+    if (person && incomingFriendRequests.some((request) => request.id === person.id)) {
+      showToast(`${name} has already sent you a request. Accept it from Friends or Notifications.`)
+      setChatSection('Friends')
+      return
+    }
     if (supabase && userId && person?.id){
       const { error } = await supabase.from('friend_requests').insert({
         sender_id: userId,
@@ -720,20 +798,21 @@ function App(){
   const acceptFriendRequest = async (request) => {
     if (!supabase || !userId){
       showToast('Sign in to accept friend requests.')
-      return
+      return false
     }
     const { error } = await supabase.rpc('accept_community_friend_request', { request_id: request.requestId })
     if (error){
       showToast(`Could not accept ${request.name}’s friend request: ${error.message}`)
-      return
+      return false
     }
     const friend = people.find((person) => person.id === request.id)
-    const acceptedFriend = { ...request, status: 'online' }
+    const acceptedFriend = { ...request, status: 'Member' }
     setFriendsList((current) => current.some((item) => item.id === request.id)
       ? current
       : [...current, friend || acceptedFriend])
     setIncomingFriendRequests((current) => current.filter((item) => item.requestId !== request.requestId))
     showToast(`You and ${request.name} are now friends.`)
+    return true
   }
 
   const openInbox = async () => {
@@ -779,6 +858,7 @@ function App(){
   const renderWall = () => (
     <Community
       profileName={profileName}
+      profileHandle={profileHandle}
       communities={communities}
       joinedCommunities={joinedCommunities}
       discoverGroupIds={discoverGroupIds}
@@ -813,6 +893,10 @@ function App(){
       sendFriendRequest={sendFriendRequest}
       acceptFriendRequest={acceptFriendRequest}
       openGroupChat={openGroupChat}
+      onOpenWallTab={(tab) => {
+        setChatSection(tab)
+        if (tab === 'Groups') setCurrentGroupChat('')
+      }}
       markNotificationRead={markNotificationRead}
       markNotificationsRead={markNotificationsRead}
       onProfileClick={openProfile}
@@ -864,6 +948,7 @@ function App(){
       }
     }
     setUserId(null)
+    setProfileHandle('')
     setIsAdmin(false)
     setAuthPage('login')
   }
@@ -968,6 +1053,7 @@ function App(){
       <ProfilePage
         profileTarget={profileTarget}
         profileName={profileName}
+        profileHandle={profileHandle}
         userId={userId}
         postCount={viewedPostCount}
         friendsList={friendsList}
@@ -1048,7 +1134,7 @@ function App(){
 
           <button type="button" className="mini-card profile-card" onClick={() => navigate('Profile')}>
             <div className="avatar large avatar-rose">A</div>
-            <span><strong>{profileName}</strong><small>@amanda</small></span>
+            <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
             <span className="badge">Pro</span>
           </button>
           <div className="sidebar-footer"><span className="online-dot" /> Your community is better with you.</div>
@@ -1069,7 +1155,20 @@ function App(){
                 {notificationsOpen && (
                   <div className="notification-popover">
                     <div className="popover-heading"><strong>Notifications</strong><button type="button" onClick={markNotificationsRead}>Mark all read</button></div>
-                    {notifications.map((item) => <div key={item.id} className={item.read ? 'notification-item' : 'notification-item unread'}><span className="notification-avatar">✦</span><p>{item.text}<small>{item.time}</small></p></div>)}
+                    {notifications.map((item) => {
+                      const request = incomingFriendRequests.find((friendRequest) =>
+                        item.text === `${friendRequest.name} sent you a friend request.`
+                      )
+                      return (
+                        <div key={item.id} className={item.read ? 'notification-item' : 'notification-item unread'}>
+                          <span className="notification-avatar">✦</span>
+                          <p>{item.text}<small>{item.time}</small></p>
+                          {request && <button type="button" onClick={async () => {
+                            if (await acceptFriendRequest(request)) markNotificationRead(item.id)
+                          }}>Accept</button>}
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -1085,7 +1184,7 @@ function App(){
             <div className="cover" />
             <div className="profile-info">
               <div className="avatar large avatar-olive">A</div>
-              <h2>{profileName}</h2><p>@amanda</p>
+              <h2>{profileName}</h2><p>{profileHandle}</p>
               <button type="button" className="profile-link" onClick={() => navigate('Profile')}>View profile <span>→</span></button>
             </div>
             <div className="stats-grid">
@@ -1148,7 +1247,7 @@ function App(){
                   showToast('Profile updated.')
                 }}>
                   <label className="field-label">Display name<input autoFocus value={profileDraft} onChange={(event) => setProfileDraft(event.target.value)} /></label>
-                  <label className="field-label">Username<input value="@amanda" readOnly /></label>
+                  <label className="field-label">Username<input value={profileHandle} readOnly /></label>
                   <button className="primary-btn modal-submit" type="submit">Save changes</button>
                 </form>
               </>
@@ -1279,7 +1378,7 @@ function App(){
                   const { error } = await supabase.from('posts').insert({
                     author_id: userId,
                     author_name: profileName,
-                    handle: '@amanda',
+                    handle: profileHandle,
                     body: detail,
                     is_event: true,
                     event_title: title,

@@ -23,7 +23,7 @@ function EventCards({ events, onSelect }) {
   ))
 }
 
-function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) {
+function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle, showToast }) {
   const [createOpen, setCreateOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
   const [selectedEventIndex, setSelectedEventIndex] = useState(0)
@@ -45,7 +45,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) 
     const { error } = await supabase.from('posts').insert({
       author_id: userId,
       author_name: profileName,
-      handle: '@amanda',
+      handle: profileHandle,
       body: detail,
       is_event: true,
       event_title: title,

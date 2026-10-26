@@ -122,9 +122,13 @@
   border-top: 1px solid rgba(88, 59, 88, 0.1);
 }
 
-.wall-profile-stats > span {
+.wall-profile-stats > button:not(:last-child) {
   display: grid;
   gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
 }
 
 .wall-profile-stats strong {
@@ -135,6 +139,10 @@
   margin-left: auto;
   background: transparent;
   font-size: 1rem;
+}
+
+.wall-profile-stats > button:not(:last-child) {
+  font-size: inherit;
 }
 
 .wall-group-section {
@@ -880,7 +888,17 @@
   min-height: 0;
   flex: 1;
   padding: 8px;
-  overflow: hidden;
+  overflow-y: auto;
+}
+
+.wall-notification-list article {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(88, 59, 88, 0.1);
+}
+
+.wall-notification-list article.unread {
+  border-radius: 6px;
+  background: #f3e7f4;
 }
 
 .wall-notification-list button {
@@ -891,6 +909,21 @@
   background: transparent;
   font-size: 0.62rem;
   text-align: left;
+}
+
+.wall-notification-list button.wall-notification-item {
+  padding: 4px 0;
+  border: 0;
+}
+
+.wall-notification-list button.wall-notification-accept {
+  width: auto;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #eadcf0;
+  color: #604875;
+  font-size: 0.58rem;
 }
 
 .wall-notification-list button.unread {
@@ -1094,6 +1127,14 @@
   color: var(--text);
 }
 
+.dark-mode.wall-shell .wall-notification-list article.unread {
+  background: #40372f;
+}
+
+.dark-mode.wall-shell .wall-notification-list button.wall-notification-accept {
+  background: #574862;
+  color: var(--text);
+}
 .dark-mode.wall-shell .wall-event-feature {
   color: #fff;
 }
