@@ -16,7 +16,7 @@ function EventCards({ events, onSelect }) {
         : 'linear-gradient(0deg, rgba(10, 6, 18, .84), rgba(10, 6, 18, .08) 78%)' }}
       onClick={() => onSelect(index)}
     >
-      <span className="wall-event-tag">✦ {event.tag}</span>
+      
       <span className="wall-event-date">{event.date.split('\n').map((line, lineIndex) => <span key={`${line}-${lineIndex}`}>{line}</span>)}</span>
       <span className="wall-event-card-copy">
         <strong>{event.title}</strong>

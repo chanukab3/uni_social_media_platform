@@ -21,20 +21,20 @@
 
 .wall-event-heading small {
   display: block;
-  margin-top: 3px;
+  
   color: var(--muted);
   font-size: 0.76rem;
 }
 
 .wall-event-heading .event-create {
-  width: 34px;
-  height: 34px;
+  width: 29px;
+  height: 25px;
   flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #170e22;
   color: var(--text);
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 .wall-event-strip,
@@ -46,7 +46,7 @@
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   padding: 2px 2px 10px;
-  scrollbar-color: #71339a #0a0711;
+  scrollbar-color: #9c92a3 #0a0711;
   scrollbar-width: thin;
 }
 
@@ -85,7 +85,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 99px;
   background: rgba(10, 6, 18, 0.68);
-  color: #e5c2ff;
+  color: #e3d5ee;
   font-size: 0.68rem;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -174,20 +174,21 @@
 }
 
 .wall-event-dialog-strip {
-  grid-auto-columns: minmax(220px, 32%);
+  grid-auto-columns: minmax(190px, 32%);
   flex: 0 0 auto;
   padding-bottom: 13px;
 }
 
 .wall-event-dialog-strip .wall-event-card {
-  height: 210px;
+  height: 130px;
+  justify-content: center;
 }
 
 .wall-event-detail {
   min-height: 190px;
-  flex: 1 0 190px;
+  flex: 1 0 250px;
   display: grid;
-  grid-template-columns: minmax(130px, 0.7fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 1fr);
   gap: 18px;
   overflow: hidden;
   border: 1px solid rgba(190, 113, 255, 0.22);
@@ -237,7 +238,7 @@
 .dark-mode.wall-shell .wall-event-date {
   border-color: rgba(255, 255, 255, 0.14);
   background: rgba(18, 18, 18, 0.82);
-  color: #d0a8ff;
+  color: #ede1fb;
 }
 
 .dark-mode.wall-shell .wall-event-overlay {
@@ -252,7 +253,7 @@
 
 .dark-mode.wall-shell .wall-event-heading .event-create {
   border: 0;
-  background: #bb86fc;
+  background: #684b8a;
   color: #17121f;
 }
 
@@ -292,8 +293,8 @@
   }
 
   .wall-event-detail > img {
-    height: 150px;
-    min-height: 150px;
+    width: 300px;
+    min-height: 50px;
   }
 
   .wall-event-detail > div {

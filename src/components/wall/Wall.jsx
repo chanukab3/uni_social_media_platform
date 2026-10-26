@@ -116,7 +116,7 @@ export function PostCard({
         <div>
           <div className="author-row">
             <button type="button" className="profile-name-link" onClick={() => onProfileClick({ id: post.authorId, name: post.author, handle: post.handle, color: post.accent, avatarUrl: post.avatarUrl })}>{post.author}</button>
-            {!post.mine && <span className="verified" aria-label="Verified">✓</span>}
+            {!post.mine && <span className="verified" aria-label="Verified"></span>}
           </div>
           <small>{post.handle} · {post.time}</small>
         </div>
@@ -440,7 +440,7 @@ function Wall({
             ))}
           </nav>
         </section>
-        <p className="wall-right-footer">Local community. Real connections.</p>
+
       </aside>
     </div>
   )

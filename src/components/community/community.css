@@ -264,6 +264,7 @@
 
 .wall-create-group {
   width: 100%;
+  bottom: 0;
   padding: 9px 0 2px;
   border-top: 1px solid rgba(88, 59, 88, 0.1);
   margin-top: 3px;
@@ -775,10 +776,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
   padding: 10px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .wall-message {
@@ -943,8 +947,11 @@
 }
 
 .wall-chat-friends {
+  min-height: 0;
   flex: 1;
   padding: 7px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .wall-chat-friends button {
@@ -978,6 +985,41 @@
   color: #827586;
   font-size: 0.57rem;
   text-align: center;
+}
+
+.wall-notification-list {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.dark-mode.wall-shell .wall-chat-tabs button.active,
+.dark-mode.wall-shell .wall-chat-friends button:hover,
+.page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
+.page-shell.dark-mode.wall-shell .wall-chat-friends button:hover {
+  border-color: var(--line);
+  background: #292929;
+  color: var(--accent-dark);
+  box-shadow: none;
+}
+
+.dark-mode.wall-shell .share-recipient,
+.page-shell.dark-mode.wall-shell .share-recipient,
+.dark-mode.wall-shell .group-invite-choice,
+.page-shell.dark-mode.wall-shell .group-invite-choice {
+  background: #222;
+  color: var(--text);
+}
+
+.share-recipient input[type="checkbox"],
+.group-invite-choice input[type="checkbox"] {
+  color-scheme: dark;
+  accent-color: var(--accent);
+}
+
+.share-recipient:has(input:checked),
+.group-invite-choice:has(input:checked) {
+  background: rgba(187, 134, 252, 0.12);
+  border-color: rgba(187, 134, 252, 0.35);
 }
 
 .wall-group-cover[src] {

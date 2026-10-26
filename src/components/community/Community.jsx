@@ -296,15 +296,15 @@ function Community({
                 <span>{request.name} sent you a friend request.</span>
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
-              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onSelectInboxChat(friend)}>
+              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} className={inboxSelected && currentChat === friend.name ? 'selected' : ''} onClick={() => onSelectInboxChat(friend)}>
                 <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
               </button>)}
               {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
           ) : chatSection === 'Groups' && !selectedGroup ? (
             <div className="wall-chat-friends wall-chat-group-list">
-              {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} onClick={() => openGroupChat(group)}>
-                <span className="wall-group-icon" style={{ background: group.tone }}>✦</span><span>{group.name}<small>{group.members} members</small></span>
+              {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
+                <span className="wall-group-icon" style={{ background: group.tone }}></span><span>{group.name}<small>{group.members} members</small></span>
               </button>)}
               {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
               <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}>＋ Create a group</button>
@@ -344,7 +344,6 @@ function Community({
             }}><span>{icon}</span>{label}</button>)}
           </nav>
         </section>
-        <p className="wall-right-footer">Local community. Real connections.</p>
       </aside>
       {toast && <div className="toast" role="status">{toast}</div>}
     </div>

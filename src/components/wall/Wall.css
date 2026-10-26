@@ -129,13 +129,13 @@
 
 .wall-feed-scroll .composer-fields .attachment-preview img {
   width: 100%;
-  max-height: 180px;
+  max-height: 150px;
   object-fit: cover;
 }
 
 .wall-feed-scroll .composer textarea {
-  min-height: 52px;
-  padding: 10px 11px;
+  min-height: 25px;
+  padding: 5px 11px;
   border: 1px solid rgba(190, 113, 255, 0.17);
   border-radius: 9px;
   background: #333235;
@@ -544,7 +544,7 @@
   overflow: hidden;
   border: 1px solid rgba(88, 59, 88, 0.13);
   border-radius: 13px;
-  background: #fff9ff;
+
 }
 
 .wall-chat-heading {
@@ -602,10 +602,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
   padding: 10px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .wall-message {
@@ -745,8 +748,11 @@
 }
 
 .wall-chat-friends {
+  min-height: 0;
   flex: 1;
   padding: 7px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .wall-chat-friends button {
@@ -780,6 +786,11 @@
   color: #827586;
   font-size: 0.57rem;
   text-align: center;
+}
+
+.wall-notification-list {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .dark-mode.wall-shell .wall-layout,

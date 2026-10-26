@@ -1512,7 +1512,7 @@ function App(){
                       )
                       return (
                         <div key={item.id} className={item.read ? 'notification-item' : 'notification-item unread'}>
-                          <span className="notification-avatar">✦</span>
+                          <span className="notification-avatar"></span>
                           <p>{item.text}<small>{item.time}</small></p>
                           {request && <button type="button" onClick={async () => {
                             if (await acceptFriendRequest(request)) markNotificationRead(item.id)
