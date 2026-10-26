@@ -19,6 +19,7 @@ const navigation = [
 
 const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
 const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
+const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
 function App(){
   const [activePage, setActivePage] = useState('Home')
@@ -40,6 +41,7 @@ function App(){
   const [openMenu, setOpenMenu] = useState(null)
   const [profileName, setProfileName] = useState('Amanda Silva')
   const [profileHandle, setProfileHandle] = useState('')
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('')
   const [profileDraft, setProfileDraft] = useState('Amanda Silva')
   const [currentChat, setCurrentChat] = useState('World')
   const [currentGroupChat, setCurrentGroupChat] = useState('')
@@ -56,6 +58,11 @@ function App(){
   const [messages, setMessages] = useState({})
   const [messageDraft, setMessageDraft] = useState('')
   const [commentDraft, setCommentDraft] = useState('')
+  const [commentsByPost, setCommentsByPost] = useState({})
+  const [expandedCommentPosts, setExpandedCommentPosts] = useState([])
+  const [commentsHasMore, setCommentsHasMore] = useState({})
+  const [loadingComments, setLoadingComments] = useState({})
+  const [shareRecipientIds, setShareRecipientIds] = useState([])
   const showToast = useCallback((message) => {
     setToast(message)
   }, [])
@@ -121,18 +128,29 @@ function App(){
         setInboxConversations([])
         setInboxSelected(false)
         setMessages({})
+        setProfilePhotoUrl('')
+        setIsAdmin(false)
       }
 
       if (user){
         setUserId(user.id)
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('display_name, handle, role')
+          .select('display_name, handle, role, avatar_url, is_banned')
           .eq('id', user.id)
           .maybeSingle()
         if (!active) return
         if (profileError){
           showToast(`Could not load your profile: ${profileError.message}`)
+          return
+        }
+        if (profile?.is_banned) {
+          showToast('This account has been banned. Contact a community administrator.')
+          const { error: signOutError } = await supabase.auth.signOut()
+          if (signOutError) showToast(`Could not end the banned session: ${signOutError.message}`)
+          if (!active) return
+          setUserId(null)
+          setAuthPage('login')
           return
         }
         if (supabase && !userId){
@@ -141,6 +159,7 @@ function App(){
         }
         if (profile?.display_name) setProfileName(profile.display_name)
         setProfileHandle(profile?.handle || `@${user.email?.split('@')[0] || ''}`)
+        setProfilePhotoUrl(profile?.avatar_url || '')
         setIsAdmin(profile?.role === 'admin')
       }
 
@@ -188,6 +207,7 @@ function App(){
           title: post.event_title,
           detail: `${post.event_date ? new Date(post.event_date).toLocaleDateString() : 'Community event'} · ${post.body || 'Join your neighbors'}`,
           date: post.event_date ? new Date(post.event_date).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n') : 'SOON',
+          id: post.id,
           image: post.image_url || '',
           tag: 'COMMUNITY EVENT',
         }))
@@ -240,7 +260,7 @@ function App(){
 
       const { data: profiles, error: peopleError } = await supabase
         .from('profiles')
-        .select('id, display_name, handle')
+        .select('id, display_name, handle, avatar_url, is_banned')
         .neq('id', user?.id || '00000000-0000-0000-0000-000000000000')
       if (!active) return
       if (peopleError) showToast(`Could not load people suggestions: ${peopleError.message}`)
@@ -249,6 +269,8 @@ function App(){
           id: person.id,
           name: person.display_name,
           handle: person.handle || '',
+          avatarUrl: person.avatar_url || '',
+          isBanned: Boolean(person.is_banned),
           status: 'Member',
           color: personColors[index % personColors.length],
         }))
@@ -384,9 +406,39 @@ function App(){
             id: profile.id,
             name: profile.display_name,
             handle: profile.handle || '',
+            avatarUrl: profile.avatar_url || '',
+            isBanned: Boolean(profile.is_banned),
             status: 'Member',
             color: personColors[current.length % personColors.length],
           }])
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, ({ new: profile }) => {
+        if (!profile.id) return
+        if (profile.id === userId) {
+          if (profile.avatar_url) setProfilePhotoUrl(profile.avatar_url)
+          if (profile.is_banned) {
+            showToast('Your account has been banned by a community administrator.')
+            supabase.auth.signOut().then(({ error }) => {
+              if (error) showToast(`Could not end your banned session: ${error.message}`)
+              setUserId(null)
+              setAuthPage('login')
+            })
+          }
+          return
+        }
+        const updatedPerson = (person) => person.id === profile.id
+          ? { ...person, avatarUrl: profile.avatar_url || '', isBanned: Boolean(profile.is_banned) }
+          : person
+        setPeople((current) => current.map(updatedPerson))
+        if (profile.is_banned) {
+          setFriendsList((current) => current.filter((person) => person.id !== profile.id))
+          setInboxConversations((current) => current.filter((person) => person.id !== profile.id))
+          setIncomingFriendRequests((current) => current.filter((person) => person.id !== profile.id))
+        } else {
+          setFriendsList((current) => current.map(updatedPerson))
+          setInboxConversations((current) => current.map(updatedPerson))
+          setIncomingFriendRequests((current) => current.map(updatedPerson))
+        }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'groups' }, ({ new: group }) => {
         if (!group.id) return
@@ -479,9 +531,14 @@ function App(){
       showToast('Write an update or add a photo before posting.')
       return false
     }
+    if (composerFile && (!supportedPhotoTypes.has(composerFile.type) || composerFile.size >= 5_000_000)) {
+      showToast('Choose one image smaller than 5 MB.')
+      return false
+    }
 
     let postId = Date.now()
     let imageUrl = composerImage
+    let uploadedImagePath = ''
     if (supabase && userId){
       if (composerFile){
         const safeName = composerFile.name.replace(/[^a-zA-Z0-9.-]/g, '-')
@@ -491,6 +548,7 @@ function App(){
           showToast(`Could not upload your photo: ${uploadError.message}`)
           return false
         }
+        uploadedImagePath = imagePath
         imageUrl = supabase.storage.from('post-images').getPublicUrl(imagePath).data.publicUrl
       }
       const { data, error } = await supabase.from('posts').insert({
@@ -501,6 +559,13 @@ function App(){
         image_url: imageUrl || null,
       }).select('id').single()
       if (error){
+        if (uploadedImagePath) {
+          const { error: cleanupError } = await supabase.storage.from('post-images').remove([uploadedImagePath])
+          if (cleanupError) {
+            showToast(`Could not publish your post: ${error.message}. The uploaded photo also could not be removed: ${cleanupError.message}`)
+            return false
+          }
+        }
         showToast(`Could not publish your post: ${error.message}`)
         return false
       }
@@ -561,23 +626,97 @@ function App(){
       showToast('Sign in to comment on posts.')
       return
     }
+    let comment
     if (supabase && userId && typeof postId === 'string'){
-      const { error } = await supabase.from('post_comments').insert({
+      const { data, error } = await supabase.from('post_comments').insert({
         post_id: postId,
         author_id: userId,
         author_name: profileName,
         body: text,
-      })
+      }).select('id, author_name, body, created_at').single()
       if (error){
         showToast(`Could not add your comment: ${error.message}`)
         return
       }
+      comment = {
+        id: data.id,
+        author: data.author_name,
+        text: data.body,
+        createdAt: data.created_at,
+      }
+    } else {
+      comment = { id: crypto.randomUUID(), author: profileName, text, createdAt: new Date().toISOString() }
     }
+    setCommentsByPost((current) => ({
+      ...current,
+      [postId]: [...(current[postId] || []), comment],
+    }))
     setPosts((current) => current.map((post) => post.id === postId
-      ? { ...post, comments: [...post.comments, { author: profileName, text }] }
+      ? { ...post, commentCount: post.commentCount + 1 }
       : post))
+    setExpandedCommentPosts((current) => current.includes(postId) ? current : [...current, postId])
     setCommentDraft('')
     showToast('Comment added.')
+  }
+
+  const toggleComments = async (postId) => {
+    if (expandedCommentPosts.includes(postId)) {
+      setExpandedCommentPosts((current) => current.filter((id) => id !== postId))
+      return
+    }
+    setExpandedCommentPosts((current) => [...current, postId])
+    if (!supabase || typeof postId !== 'string' || commentsByPost[postId]) return
+    setLoadingComments((current) => ({ ...current, [postId]: true }))
+    const { data, error } = await supabase
+      .from('post_comments')
+      .select('id, author_name, body, created_at')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: false })
+      .limit(4)
+    setLoadingComments((current) => ({ ...current, [postId]: false }))
+    if (error) {
+      showToast(`Could not load comments: ${error.message}`)
+      return
+    }
+    const latestComments = [...data].reverse().map((comment) => ({
+      id: comment.id,
+      author: comment.author_name,
+      text: comment.body,
+      createdAt: comment.created_at,
+    }))
+    setCommentsByPost((current) => ({ ...current, [postId]: latestComments }))
+    setCommentsHasMore((current) => ({ ...current, [postId]: data.length === 4 }))
+  }
+
+  const loadOlderComments = async (postId) => {
+    if (!supabase || typeof postId !== 'string' || loadingComments[postId]) return
+    const currentComments = commentsByPost[postId] || []
+    const oldestComment = currentComments[0]
+    if (!oldestComment) return
+    setLoadingComments((current) => ({ ...current, [postId]: true }))
+    const { data, error } = await supabase
+      .from('post_comments')
+      .select('id, author_name, body, created_at')
+      .eq('post_id', postId)
+      .lt('created_at', oldestComment.createdAt)
+      .order('created_at', { ascending: false })
+      .limit(20)
+    setLoadingComments((current) => ({ ...current, [postId]: false }))
+    if (error) {
+      showToast(`Could not load older comments: ${error.message}`)
+      return
+    }
+    const olderComments = [...data].reverse().map((comment) => ({
+      id: comment.id,
+      author: comment.author_name,
+      text: comment.body,
+      createdAt: comment.created_at,
+    }))
+    setCommentsByPost((current) => ({
+      ...current,
+      [postId]: [...olderComments, ...(current[postId] || [])],
+    }))
+    setCommentsHasMore((current) => ({ ...current, [postId]: data.length === 20 }))
   }
 
   const toggleSave = (postId) => {
@@ -587,18 +726,57 @@ function App(){
     showToast(isSaved ? 'Post removed from your saved items.' : 'Post saved for later.')
   }
 
-  const sharePost = async (post) => {
-    const shareText = `${post.author} on Mahagedara: ${post.text}`
-    try {
-      if (navigator.clipboard?.writeText){
-        await navigator.clipboard.writeText(shareText)
-        showToast('Post text copied to clipboard.')
-      } else {
-        setModal({ type: 'share', post })
-      }
-    } catch {
-      setModal({ type: 'share', post })
+  const sharePost = (post) => {
+    setShareRecipientIds([])
+    setModal({ type: 'share', post })
+  }
+
+  const sendSharedPost = async () => {
+    if (!shareRecipientIds.length) {
+      showToast('Choose at least one friend or group.')
+      return
     }
+    const shareText = `Shared a post by ${modal.post.author}: ${modal.post.text || 'Photo'}${modal.post.image ? `\n${modal.post.image}` : ''}`
+    const messagesToSend = shareRecipientIds.map((selectedId) => {
+      const [type, id] = selectedId.split(':')
+      return {
+        sender_id: userId,
+        sender_name: profileName,
+        body: shareText,
+        ...(type === 'friend' ? { recipient_id: id } : { group_id: id }),
+      }
+    })
+    if (supabase && userId) {
+      const { error } = await supabase.from('messages').insert(messagesToSend)
+      if (error) {
+        showToast(`Could not share the post: ${error.message}`)
+        return
+      }
+    } else if (supabase) {
+      showToast('Sign in to share a post.')
+      return
+    } else {
+      setMessages((current) => {
+        const updated = { ...current }
+        shareRecipientIds.forEach((selectedId) => {
+          const [type, id] = selectedId.split(':')
+          const recipient = type === 'friend'
+            ? friendsList.find((friend) => friend.id === id)
+            : communities.find((group) => group.id === id)
+          const conversationKey = type === 'friend' ? recipient?.name : `group:${id}`
+          if (!conversationKey) return
+          updated[conversationKey] = [...(updated[conversationKey] || []), {
+            from: profileName,
+            text: shareText,
+            time: 'now',
+          }]
+        })
+        return updated
+      })
+    }
+    setModal(null)
+    setShareRecipientIds([])
+    showToast('Post shared.')
   }
 
   const toggleJoin = async (name) => {
@@ -855,10 +1033,145 @@ function App(){
     setOpenMenu(null)
   }
 
+  const uploadProfilePhoto = async (file) => {
+    if (!file || !supportedPhotoTypes.has(file.type) || file.size >= 1_000_000) {
+      showToast('Choose one image smaller than 1 MB.')
+      return false
+    }
+    if (!supabase || !userId) {
+      showToast('Sign in to add a profile photo.')
+      return false
+    }
+    const extension = file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
+    const imagePath = `${userId}/${crypto.randomUUID()}.${extension}`
+    const { error: uploadError } = await supabase.storage
+      .from('profile-photos')
+      .upload(imagePath, file, { upsert: false, contentType: file.type })
+    if (uploadError) {
+      showToast(`Could not upload your profile photo: ${uploadError.message}`)
+      return false
+    }
+    const imageUrl = supabase.storage.from('profile-photos').getPublicUrl(imagePath).data.publicUrl
+    const { error: profileError } = await supabase.from('profiles')
+      .update({ avatar_url: imageUrl })
+      .eq('id', userId)
+      .select('id')
+      .single()
+    if (profileError) {
+      const { error: removeError } = await supabase.storage.from('profile-photos').remove([imagePath])
+      if (removeError) showToast(`Could not save your profile photo, and its upload could not be removed: ${removeError.message}`)
+      else showToast(`Could not save your profile photo: ${profileError.message}`)
+      return false
+    }
+    setProfilePhotoUrl(imageUrl)
+    setPeople((current) => current.map((person) => person.id === userId ? { ...person, avatarUrl: imageUrl } : person))
+    showToast('Your profile photo was updated.')
+    return true
+  }
+
+  const deletePost = async (post) => {
+    if (supabase && typeof post.id === 'string') {
+      if (isAdmin) {
+        const { error } = await supabase.rpc('admin_delete_post', { target_post_id: post.id })
+        if (error) {
+          showToast(`Could not delete this post: ${error.message}`)
+          return
+        }
+      } else if (userId) {
+        const { data, error } = await supabase.from('posts').delete()
+          .eq('id', post.id)
+          .eq('author_id', userId)
+          .select('id')
+          .maybeSingle()
+        if (error) {
+          showToast(`Could not delete your post: ${error.message}`)
+          return
+        }
+        if (!data) {
+          showToast('You do not have permission to delete this post.')
+          return
+        }
+      } else {
+        showToast('Sign in to delete your post.')
+        return
+      }
+    }
+    setPosts((current) => current.filter((item) => item.id !== post.id))
+    setOpenMenu(null)
+    showToast('Post deleted.')
+  }
+
+  const deleteEvent = async (event) => {
+    if (!isAdmin || !supabase || !event.id) {
+      showToast('Only admins can delete published events.')
+      return false
+    }
+    const { error } = await supabase.rpc('admin_delete_event', { target_event_id: event.id })
+    if (error) {
+      showToast(`Could not delete this event: ${error.message}`)
+      return false
+    }
+    setEvents((current) => current.filter((item) => item.id !== event.id))
+    showToast('Event deleted.')
+    return true
+  }
+
+  const banUser = async (person) => {
+    if (!isAdmin || !person.id || person.id === userId) {
+      showToast('You cannot change this account’s ban status.')
+      return
+    }
+    const shouldBan = !person.isBanned
+    const action = shouldBan ? 'ban' : 'unban'
+    if (!window.confirm(`Are you sure you want to ${action} ${person.name}?`)) return
+    const { error } = await supabase.rpc('admin_set_user_banned', {
+      target_user_id: person.id,
+      should_ban: shouldBan,
+    })
+    if (error) {
+      showToast(`Could not ${action} this user: ${error.message}`)
+      return
+    }
+    setPeople((current) => current.map((user) => user.id === person.id
+      ? { ...user, isBanned: shouldBan }
+      : user))
+    if (shouldBan) {
+      setFriendsList((current) => current.filter((friend) => friend.id !== person.id))
+      setInboxConversations((current) => current.filter((friend) => friend.id !== person.id))
+      setIncomingFriendRequests((current) => current.filter((request) => request.id !== person.id))
+    }
+    showToast(shouldBan ? `${person.name} has been banned.` : `${person.name} has been unbanned.`)
+  }
+
+  const deleteGroup = async (group) => {
+    if (!isAdmin || !supabase || !group.id) {
+      showToast('Only admins can delete published groups.')
+      return false
+    }
+    if (!window.confirm(`Delete ${group.name} and its group messages?`)) return false
+    const { error } = await supabase.rpc('admin_delete_group', { target_group_id: group.id })
+    if (error) {
+      showToast(`Could not delete this group: ${error.message}`)
+      return false
+    }
+    setCommunities((current) => current.filter((item) => item.id !== group.id))
+    setJoinedCommunities((current) => current.filter((name) => name !== group.name))
+    setMessages((current) => {
+      const next = { ...current }
+      delete next[`group:${group.id}`]
+      return next
+    })
+    if (currentGroupChat === group.name) setCurrentGroupChat('')
+    setModal(null)
+    showToast(`${group.name} was deleted.`)
+    return true
+  }
+
   const renderWall = () => (
     <Community
       profileName={profileName}
       profileHandle={profileHandle}
+      profilePhotoUrl={profilePhotoUrl}
       communities={communities}
       joinedCommunities={joinedCommunities}
       discoverGroupIds={discoverGroupIds}
@@ -900,6 +1213,7 @@ function App(){
       markNotificationRead={markNotificationRead}
       markNotificationsRead={markNotificationsRead}
       onProfileClick={openProfile}
+      onDeleteEvent={deleteEvent}
       onGroupAction={(group) => setModal({ type: 'group-options', group })}
       onDeleteChat={(friendName) => setModal({ type: 'delete-chat', friendName })}
       onViewInbox={openInbox}
@@ -949,6 +1263,7 @@ function App(){
     }
     setUserId(null)
     setProfileHandle('')
+    setProfilePhotoUrl('')
     setIsAdmin(false)
     setAuthPage('login')
   }
@@ -957,6 +1272,8 @@ function App(){
     <PostComposer
       composerText={composerText}
       composerImage={composerImage}
+      profileName={profileName}
+      profilePhotoUrl={profilePhotoUrl}
       onComposerTextChange={setComposerText}
       onComposerImageChange={setComposerImage}
       onComposerFileChange={setComposerFile}
@@ -968,17 +1285,25 @@ function App(){
   const renderPost = (post) => (
     <PostCard
       key={post.id}
-      post={post}
+      post={{
+        ...post,
+        avatarUrl: post.authorId === userId
+          ? profilePhotoUrl
+          : people.find((person) => person.id === post.authorId)?.avatarUrl || '',
+      }}
       openMenu={openMenu}
       savedPosts={savedPosts}
       commentDraft={commentDraft}
+      canModerate={isAdmin}
+      comments={commentsByPost[post.id] || []}
+      commentsExpanded={expandedCommentPosts.includes(post.id)}
+      commentsHasMore={Boolean(commentsHasMore[post.id])}
+      commentsLoading={Boolean(loadingComments[post.id])}
+      onToggleComments={toggleComments}
+      onLoadOlderComments={loadOlderComments}
       onSetOpenMenu={setOpenMenu}
       onToggleSave={toggleSave}
-      onDelete={() => {
-        setPosts((current) => current.filter((item) => item.id !== post.id))
-        setOpenMenu(null)
-        showToast('Your post was deleted.')
-      }}
+      onDelete={() => deletePost(post)}
       onReport={() => {
         setOpenMenu(null)
         showToast('Thanks. This post has been reported for review.')
@@ -1018,14 +1343,16 @@ function App(){
           <div className="conversation-list">
             {people.map((friend) => (
               <button type="button" key={friend.name} className={currentChat === friend.name ? 'conversation active' : 'conversation'} onClick={() => openFriendChat(friend)}>
-                <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span>
+                <span className="avatar small" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                 <span><strong>{friend.name}</strong><small>{(messages[friend.name] || []).at(-1)?.text || friend.status}</small></span>
                 {(friend.status === 'online' || friend.status === 'away') && <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />}
               </button>
             ))}
           </div>
           <div className="chat-panel">
-            <div className="chat-heading"><span className="avatar tiny avatar-olive">{currentChat[0]}</span><div><strong>{currentChat}</strong><small>{people.find((friend) => friend.name === currentChat)?.status}</small></div></div>
+            <div className="chat-heading"><span className="avatar tiny avatar-olive">{people.find((friend) => friend.name === currentChat)?.avatarUrl
+              ? <img src={people.find((friend) => friend.name === currentChat).avatarUrl} alt="" />
+              : currentChat[0]}</span><div><strong>{currentChat}</strong><small>{people.find((friend) => friend.name === currentChat)?.status}</small></div></div>
             <div className="chat-messages">
               {chatMessages.map((message, index) => (
                 <div key={`${currentChat}-${index}`} className={message.from === profileName ? 'message-bubble own' : 'message-bubble'}>
@@ -1054,6 +1381,7 @@ function App(){
         profileTarget={profileTarget}
         profileName={profileName}
         profileHandle={profileHandle}
+        profilePhotoUrl={profilePhotoUrl}
         userId={userId}
         postCount={viewedPostCount}
         friendsList={friendsList}
@@ -1066,6 +1394,12 @@ function App(){
         }}
         onHome={() => navigate('Home')}
         onProfileClick={openProfile}
+        isAdmin={isAdmin}
+        people={people}
+        onBanUser={banUser}
+        onUploadProfilePhoto={uploadProfilePhoto}
+        communities={communities}
+        onDeleteGroup={deleteGroup}
       />
     )
   }
@@ -1133,7 +1467,7 @@ function App(){
           </nav>
 
           <button type="button" className="mini-card profile-card" onClick={() => navigate('Profile')}>
-            <div className="avatar large avatar-rose">A</div>
+            <div className="avatar large avatar-rose">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName[0]}</div>
             <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
             <span className="badge">Pro</span>
           </button>
@@ -1173,7 +1507,7 @@ function App(){
                 )}
               </div>
               <button className="icon-button" type="button" aria-label="Open messages" onClick={() => navigate('Messages')}>✉</button>
-              <button className="avatar small avatar-olive top-avatar" type="button" aria-label="Open your profile" onClick={() => navigate('Profile')}>A</button>
+              <button className="avatar small avatar-olive top-avatar" type="button" aria-label="Open your profile" onClick={() => navigate('Profile')}>{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName[0]}</button>
             </div>
           </header>
           <div className="main-content">{renderMain()}</div>
@@ -1183,7 +1517,7 @@ function App(){
           <section className="profile-summary">
             <div className="cover" />
             <div className="profile-info">
-              <div className="avatar large avatar-olive">A</div>
+              <div className="avatar large avatar-olive">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName[0]}</div>
               <h2>{profileName}</h2><p>{profileHandle}</p>
               <button type="button" className="profile-link" onClick={() => navigate('Profile')}>View profile <span>→</span></button>
             </div>
@@ -1212,7 +1546,7 @@ function App(){
                 openFriendChat(friend)
                 navigate('Messages')
               }}>
-                <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span>
+                <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                 <span className="friend-meta"><strong>{friend.name}</strong><small>{friend.status}</small></span>
                 {(friend.status === 'online' || friend.status === 'away') && <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />}
               </button>
@@ -1289,9 +1623,11 @@ function App(){
                   showToast(`You left ${group.name}.`)
                 }}>Leave group</button>
                 <button className="secondary-btn group-option-button" type="button" onClick={() => setModal({ type: 'add-group-member', group: modal.group })}>Add friend</button>
-                {modal.group.created_by === userId && <button className="text-action danger-action group-option-button" type="button" onClick={async () => {
+                {(isAdmin || modal.group.created_by === userId) && <button className="text-action danger-action group-option-button" type="button" onClick={async () => {
                   const group = modal.group
-                  const { error } = await supabase.rpc('delete_community_group', { target_group_id: group.id })
+                  const { error } = isAdmin
+                    ? await supabase.rpc('admin_delete_group', { target_group_id: group.id })
+                    : await supabase.rpc('delete_community_group', { target_group_id: group.id })
                   if (error){
                     showToast(`Could not delete this group: ${error.message}`)
                     return
@@ -1401,12 +1737,40 @@ function App(){
             )}
             {modal.type === 'share' && (
               <>
-                <h2>Share this post</h2><p className="modal-intro">Copy the post text and share it with your friends.</p>
-                <textarea className="share-copy" readOnly value={`${modal.post.author} on Mahagedara: ${modal.post.text}`} />
-                <button className="primary-btn modal-submit" type="button" onClick={() => {
-                  setModal(null)
-                  showToast('Select and copy the post text to share it.')
-                }}>Done</button>
+                <h2>Share this post</h2><p className="modal-intro">Choose friends and groups to share it with.</p>
+                <div className="share-recipient-list">
+                  <strong>Friends</strong>
+                  {friendsList.filter((friend) => friend.id).map((friend) => {
+                    const recipientId = `friend:${friend.id}`
+                    return <label className="share-recipient" key={recipientId}>
+                      <input
+                        type="checkbox"
+                        checked={shareRecipientIds.includes(recipientId)}
+                        onChange={() => setShareRecipientIds((current) => current.includes(recipientId)
+                          ? current.filter((id) => id !== recipientId)
+                          : [...current, recipientId])}
+                      />
+                      <span>{friend.name}</span>
+                    </label>
+                  })}
+                  {!friendsList.some((friend) => friend.id) && <p className="wall-muted">No friends available to share with.</p>}
+                  <strong>Groups</strong>
+                  {communities.filter((group) => joinedCommunities.includes(group.name) && group.id).map((group) => {
+                    const recipientId = `group:${group.id}`
+                    return <label className="share-recipient" key={recipientId}>
+                      <input
+                        type="checkbox"
+                        checked={shareRecipientIds.includes(recipientId)}
+                        onChange={() => setShareRecipientIds((current) => current.includes(recipientId)
+                          ? current.filter((id) => id !== recipientId)
+                          : [...current, recipientId])}
+                      />
+                      <span>{group.name}</span>
+                    </label>
+                  })}
+                  {!communities.some((group) => joinedCommunities.includes(group.name) && group.id) && <p className="wall-muted">No joined groups available to share with.</p>}
+                </div>
+                <button className="primary-btn modal-submit" type="button" onClick={sendSharedPost}>Share post</button>
               </>
             )}
           </section>

@@ -23,7 +23,7 @@ function EventCards({ events, onSelect }) {
   ))
 }
 
-function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle, showToast }) {
+function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle, showToast, onDeleteEvent }) {
   const [createOpen, setCreateOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
   const [selectedEventIndex, setSelectedEventIndex] = useState(0)
@@ -42,7 +42,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       showToast('Sign in with your Supabase account to publish an event.')
       return
     }
-    const { error } = await supabase.from('posts').insert({
+    const { data, error } = await supabase.from('posts').insert({
       author_id: userId,
       author_name: profileName,
       handle: profileHandle,
@@ -50,12 +50,13 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       is_event: true,
       event_title: title,
       event_date: new Date(`${date}T12:00:00`).toISOString(),
-    })
+    }).select('id').single()
     if (error) {
       showToast(`Could not publish your event: ${error.message}`)
       return
     }
     setEvents((current) => [{
+      id: data.id,
       title,
       detail: `${date} · ${detail || 'Community event'}`,
       date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'),
@@ -100,6 +101,14 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
                 <h3>{events[selectedEventIndex].title}</h3>
                 <p>{events[selectedEventIndex].detail}</p>
                 <span className="wall-event-detail-date">{events[selectedEventIndex].date.replace('\n', ' ')}</span>
+                {isAdmin && events[selectedEventIndex].id && onDeleteEvent && <button
+                  className="text-action danger-action event-delete-button"
+                  type="button"
+                  onClick={async () => {
+                    const event = events[selectedEventIndex]
+                    if (await onDeleteEvent(event)) setEventsOpen(false)
+                  }}
+                >Delete event</button>}
               </div>
             </article>
           )}

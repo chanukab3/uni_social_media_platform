@@ -2,8 +2,9 @@
   grid-column: 1 / 3;
   min-width: 0;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
-  background: #f7eafa;
+  background: #171717;
 }
 
 .wall-profile-columns {
@@ -11,15 +12,16 @@
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(215px, 0.68fr) minmax(390px, 1.35fr);
+  overflow: hidden;
 }
 
 .wall-profile-details,
 .wall-profile-posts {
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #d5bfd9 transparent;
+  scrollbar-color: #555 transparent;
 }
 
 .wall-profile-details {
@@ -42,16 +44,27 @@
 .wall-profile-identity,
 .wall-profile-friends {
   padding: 14px;
-  border: 1px solid rgba(88, 59, 88, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 10px;
-  background: #fff9ff;
+  background: #222;
+}
+
+.profile-identity-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .wall-profile-avatar {
   width: 58px;
   height: 58px;
-  margin-bottom: 11px;
+  flex: 0 0 auto;
+  margin: 0;
   font-size: 1.2rem;
+}
+
+.profile-identity-name {
+  min-width: 0;
 }
 
 .wall-profile-identity h2 {
@@ -61,7 +74,7 @@
 
 .wall-profile-identity > p {
   margin: 4px 0;
-  color: #766b7a;
+  color: #a7a7a7;
   font-size: 0.7rem;
 }
 
@@ -76,12 +89,30 @@
   font-size: 0.68rem;
 }
 
+.profile-controls,
+.profile-account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-account-actions {
+  flex-wrap: nowrap;
+}
+
+.profile-photo-hint {
+  display: block;
+  margin-top: 7px;
+  color: #a7a7a7;
+  font-size: 0.63rem;
+}
+
 .wall-profile-numbers {
   display: flex;
-  gap: 24px;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid rgba(88, 59, 88, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .wall-profile-numbers span {
@@ -95,7 +126,7 @@
 
 .wall-profile-numbers small,
 .wall-profile-friends button small {
-  color: #766b7a;
+  color: #a7a7a7;
   font-size: 0.63rem;
 }
 
@@ -125,6 +156,25 @@
   gap: 8px;
 }
 
+.admin-profile-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-management-modal {
+  max-height: min(80vh, 640px);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-management-list {
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  margin-top: 16px;
+  padding-right: 4px;
+}
+
 .wall-profile-action {
   width: 100%;
   min-height: 34px;
@@ -138,6 +188,8 @@
 }
 
 .wall-profile-posts {
+  display: flex;
+  flex-direction: column;
   padding: 17px 16px;
 }
 
@@ -157,7 +209,10 @@
 }
 
 .wall-profile-posts .feed {
+  min-height: 0;
+  overflow-y: auto;
   gap: 10px;
+  padding-right: 4px;
 }
 
 .wall-profile-posts .post-card {
@@ -169,14 +224,14 @@
 
 .dark-mode.wall-shell .wall-profile-view,
 .dark-mode.wall-shell .wall-profile-details {
-  background: #282320;
+  background: #171717;
 }
 
 .dark-mode.wall-shell .wall-profile-identity,
 .dark-mode.wall-shell .wall-profile-friends,
 .dark-mode.wall-shell .wall-profile-posts .post-card {
   border-color: var(--line);
-  background: #322d29;
+  background: #222;
 }
 
 .dark-mode.wall-shell .wall-profile-identity > p,
@@ -195,31 +250,43 @@
 @media (max-width: 860px) {
   .wall-profile-view {
     grid-column: auto;
-    overflow: visible;
+    height: 100%;
+    overflow: hidden;
   }
 
   .wall-profile-columns {
-    height: auto;
-    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   }
 
   .wall-profile-details {
-    overflow: visible;
     padding: 10px 14px;
-    border-right: 0;
+    border-right: 1px solid var(--line);
   }
 
   .wall-profile-posts {
-    height: min(850px, 100dvh);
-    min-height: 630px;
+    height: 100%;
+    min-height: 0;
     padding: 14px;
   }
 }
 
 @media (max-width: 520px) {
+  .wall-profile-columns {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .wall-profile-details {
+    gap: 8px;
+    max-height: none;
+    overflow: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 10px;
+  }
+
   .wall-profile-posts {
-    height: 100dvh;
-    min-height: 620px;
-    padding: 12px;
+    padding: 10px;
   }
 }

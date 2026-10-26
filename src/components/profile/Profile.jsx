@@ -1,6 +1,8 @@
+import { useRef, useState } from 'react'
 import './profile.css'
 
 export function ProfileAvatar({ person, className = 'avatar small', onClick }) {
+  const avatarUrl = person.avatarUrl || person.avatar_url
   return (
     <button
       type="button"
@@ -9,17 +11,17 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }) {
       aria-label={`View ${person.name}'s profile`}
       onClick={() => onClick(person)}
     >
-      {person.name?.[0] || '?'}
+      {avatarUrl ? <img src={avatarUrl} alt="" /> : person.name?.[0] || '?'}
     </button>
   )
 }
 
-export function WallProfileCard({ profileId, profileName, profileHandle, friendsCount, groupsCount, onProfileClick, onOpenWallTab }) {
-  const currentUser = { id: profileId, name: profileName, color: '#879174' }
+export function WallProfileCard({ profileId, profileName, profileHandle, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }) {
+  const currentUser = { id: profileId, name: profileName, avatarUrl: profilePhotoUrl, color: '#879174' }
   return (
     <section className="mini-card wall-profile">
       <button type="button" className="wall-profile-button" onClick={() => onProfileClick(currentUser)}>
-        <span className="avatar large avatar-olive">A</span>
+        <span className="avatar large avatar-olive">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</span>
         <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
       </button>
       <p>Finding my people, one coffee and creative project at a time.</p>
@@ -58,7 +60,9 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, userId, postCount, friendsList, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onProfileClick }) {
+export function ProfilePage({ profileTarget, profileName, profileHandle, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }) {
+  const photoInputRef = useRef(null)
+  const [adminPanel, setAdminPanel] = useState('')
   const viewedName = profileTarget?.name || profileName
   const isOwnProfile = !profileTarget || profileTarget.id === userId
   const viewedHandle = isOwnProfile ? profileHandle : profileTarget?.handle
@@ -67,33 +71,44 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, userId,
       <aside className="wall-profile-details">
         <button type="button" className="wall-profile-back" onClick={onHome}>← Back to wall</button>
         <section className="wall-profile-identity">
-          <div className="avatar wall-profile-avatar avatar-olive">{viewedName[0]}</div>
-          <h2>{viewedName}</h2>
-          <p>{viewedHandle || ''}</p>
-          <p className="wall-profile-bio">Finding good people, good places and little reasons to smile.</p>
-          {isOwnProfile && <button className="secondary-btn" type="button" onClick={onEditProfile}>Edit profile</button>}
-          <div className="wall-profile-numbers">
-            <span><strong>{postCount}</strong><small>Posts</small></span>
-            <span><strong>{friendsList.length}</strong><small>Friends</small></span>
+          <div className="profile-identity-heading">
+            <div className="avatar wall-profile-avatar avatar-olive">{(isOwnProfile ? profilePhotoUrl : profileTarget?.avatarUrl || profileTarget?.avatar_url)
+              ? <img src={isOwnProfile ? profilePhotoUrl : profileTarget?.avatarUrl || profileTarget?.avatar_url} alt="" />
+              : viewedName[0]}</div>
+            <div className="profile-identity-name">
+              <h2>{viewedName}</h2>
+              <p>{viewedHandle || ''}</p>
+            </div>
           </div>
+          <p className="wall-profile-bio">Finding good people, good places and little reasons to smile.</p>
+          {isOwnProfile && <>
+            <div className="profile-controls">
+              <button className="secondary-btn" type="button" onClick={() => photoInputRef.current?.click()}>{profilePhotoUrl ? 'Change photo' : 'Add profile photo'}</button>
+              <input
+                ref={photoInputRef}
+                className="visually-hidden"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                aria-label="Choose a profile photo smaller than 1 MB"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0]
+                  if (file) await onUploadProfilePhoto(file)
+                  event.target.value = ''
+                }}
+              />
+              <div className="profile-account-actions">
+                <button className="secondary-btn" type="button" onClick={onEditProfile}>Edit profile</button>
+                <button className="secondary-btn danger-action" type="button" onClick={onSignOut}>Sign out</button>
+              </div>
+            </div>
+            <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB</small>
+          </>}
+          <div className="wall-profile-numbers"><span><strong>{postCount}</strong><small>Posts</small></span></div>
         </section>
-        <section className="wall-profile-friends">
-          <h3>{isOwnProfile ? 'Your friends' : 'Friends'}</h3>
-          {friendsList.slice(0, 8).map((friend) => (
-            <button type="button" key={friend.id || friend.name} onClick={() => onProfileClick(friend)}>
-              <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span>
-              <span>{friend.name}<small>{friend.status}</small></span>
-            </button>
-          ))}
-          {!friendsList.length && <p className="wall-muted">Accepted friends will appear here.</p>}
-        </section>
-        {isOwnProfile && (
-          <section className="wall-profile-actions" aria-label="Profile settings">
-            <button type="button" className="secondary-btn wall-profile-action danger-action" onClick={onSignOut}>
-              Sign out
-            </button>
-          </section>
-        )}
+        {isAdmin && isOwnProfile && <section className="admin-profile-actions" aria-label="Admin controls">
+          <button className="secondary-btn" type="button" onClick={() => setAdminPanel('users')}>Manage users</button>
+          <button className="secondary-btn" type="button" onClick={() => setAdminPanel('groups')}>Manage groups</button>
+        </section>}
       </aside>
       <main className="wall-profile-posts">
         <header className="wall-profile-posts-heading">
@@ -105,6 +120,33 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, userId,
             : <div className="empty-state"><h3>No posts yet</h3><p>{isOwnProfile ? 'Write your first update from the home feed.' : 'This person has not shared any posts yet.'}</p>{isOwnProfile && <button type="button" className="secondary-btn" onClick={onHome}>Go to Home</button>}</div>}
         </section>
       </main>
+      {adminPanel && (
+        <div className="modal-backdrop" role="presentation" onClick={() => setAdminPanel('')}>
+          <section className="modal-card admin-management-modal" role="dialog" aria-modal="true" aria-labelledby="admin-management-title" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={() => setAdminPanel('')} aria-label="Close admin management">×</button>
+            <h2 id="admin-management-title">{adminPanel === 'users' ? 'Manage users' : 'Manage groups'}</h2>
+            {adminPanel === 'users' ? (
+              <div className="admin-management-list">
+                {people.map((person) => <div className="admin-user-row" key={person.id}>
+                  <span>{person.name}</span>
+                  <button type="button" className={person.isBanned ? 'text-action' : 'text-action danger-action'} onClick={() => onBanUser(person)}>{person.isBanned ? 'Unban' : 'Ban'}</button>
+                </div>)}
+                {!people.length && <p className="wall-muted">No other users to manage.</p>}
+              </div>
+            ) : (
+              <div className="admin-management-list">
+                {communities.map((group) => <div className="admin-user-row" key={group.id}>
+                  <span>{group.name}</span>
+                  <button type="button" className="text-action danger-action" onClick={async () => {
+                    if (await onDeleteGroup(group)) setAdminPanel('')
+                  }}>Delete</button>
+                </div>)}
+                {!communities.length && <p className="wall-muted">No groups to manage.</p>}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   )
 }

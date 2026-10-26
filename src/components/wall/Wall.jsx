@@ -4,6 +4,8 @@ import Profile, { ProfileAvatar } from '../profile/Profile'
 import Status from '../status/Status'
 import './Wall.css'
 
+const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
 function formatCount(count) {
   return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : count
 }
@@ -11,6 +13,8 @@ function formatCount(count) {
 export function PostComposer({
   composerText,
   composerImage,
+  profileName,
+  profilePhotoUrl,
   onComposerTextChange,
   onComposerImageChange,
   onComposerFileChange,
@@ -25,7 +29,7 @@ export function PostComposer({
 
   return (
     <form className="composer" onSubmit={submitPost}>
-      <div className="avatar small avatar-peach">A</div>
+      <div className="avatar small avatar-peach">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</div>
       <div className="composer-fields">
         <div className="composer-photo-first">
           {composerImage && (
@@ -42,16 +46,22 @@ export function PostComposer({
           <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
             {composerImage ? 'Change photo' : '＋ Add photo'}
           </button>
+          <small className="composer-photo-limit">One photo · max 5 MB</small>
           <input
             ref={fileInputRef}
             className="visually-hidden"
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             onChange={(event) => {
               const file = event.target.files?.[0]
               if (!file) return
-              if (!file.type.startsWith('image/')) {
-                showToast('Choose an image file to attach.')
+              if (!supportedPhotoTypes.has(file.type)) {
+                showToast('Choose a JPG, PNG, WebP, or GIF photo.')
+                event.target.value = ''
+                return
+              }
+              if (file.size >= 5_000_000) {
+                showToast('Choose one image smaller than 5 MB.')
                 event.target.value = ''
                 return
               }
@@ -79,6 +89,13 @@ export function PostCard({
   openMenu,
   savedPosts,
   commentDraft,
+  comments = [],
+  commentsExpanded = false,
+  commentsHasMore = false,
+  commentsLoading = false,
+  canModerate = false,
+  onToggleComments,
+  onLoadOlderComments,
   onSetOpenMenu,
   onToggleSave,
   onDelete,
@@ -93,12 +110,12 @@ export function PostCard({
     <article className="post-card">
       <div className="post-header">
         <ProfileAvatar
-          person={{ id: post.authorId, name: post.author, handle: post.handle, color: post.accent }}
+          person={{ id: post.authorId, name: post.author, handle: post.handle, color: post.accent, avatarUrl: post.avatarUrl }}
           onClick={onProfileClick}
         />
         <div>
           <div className="author-row">
-            <button type="button" className="profile-name-link" onClick={() => onProfileClick({ id: post.authorId, name: post.author, handle: post.handle, color: post.accent })}>{post.author}</button>
+            <button type="button" className="profile-name-link" onClick={() => onProfileClick({ id: post.authorId, name: post.author, handle: post.handle, color: post.accent, avatarUrl: post.avatarUrl })}>{post.author}</button>
             {!post.mine && <span className="verified" aria-label="Verified">✓</span>}
           </div>
           <small>{post.handle} · {post.time}</small>
@@ -108,7 +125,7 @@ export function PostCard({
           {openMenu === post.id && (
             <div className="post-menu">
               <button type="button" onClick={() => onToggleSave(post.id)}>{savedPosts.includes(post.id) ? 'Remove saved post' : 'Save post'}</button>
-              {post.mine
+              {post.mine || canModerate
                 ? <button type="button" onClick={() => onDelete(post.id)}>Delete post</button>
                 : <button type="button" onClick={onReport}>Report post</button>}
             </div>
@@ -125,18 +142,27 @@ export function PostCard({
         <button type="button" className={post.liked ? 'post-action liked' : 'post-action'} onClick={() => onToggleLike(post.id)} aria-pressed={post.liked}>
           <span aria-hidden="true">{post.liked ? '♥' : '♡'}</span> {formatCount(post.likes)}
         </button>
-        <button type="button" className="post-action" onClick={() => document.getElementById(`comment-${post.id}`)?.focus()}>
-          <span aria-hidden="true">▢</span> {formatCount(post.commentCount + post.comments.length)}
+        <button type="button" className="post-action" onClick={() => onToggleComments(post.id)} aria-expanded={commentsExpanded}>
+          <span aria-hidden="true">▢</span> {formatCount(post.commentCount)}
         </button>
         <button type="button" className="post-action" onClick={() => onShare(post)}>
           <span aria-hidden="true">↗</span> {formatCount(post.shares)}
         </button>
       </div>
-      {post.comments.length > 0 && (
-        <div className="comment-list">
-          {post.comments.map((comment, index) => (
-            <p key={`${post.id}-${index}`}><strong>{comment.author}</strong> {comment.text}</p>
+      {commentsExpanded && (
+        <div className="comment-list" onScroll={(event) => {
+          if (event.currentTarget.scrollTop <= 12 && commentsHasMore && !commentsLoading) {
+            onLoadOlderComments(post.id)
+          }
+        }}>
+          {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
+            {commentsLoading ? 'Loading comments…' : 'Load older comments'}
+          </button>}
+          {comments.map((comment) => (
+            <p key={comment.id}><strong>{comment.author}</strong> {comment.text}</p>
           ))}
+          {commentsLoading && <p className="wall-muted">Loading comments…</p>}
+          {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
         </div>
       )}
       <form className="comment-form" onSubmit={(event) => onAddComment(event, post.id)}>
@@ -154,7 +180,23 @@ export function PostCard({
   )
 }
 
-export function PostFeed({ posts, query, openMenu, savedPosts, commentDraft, postActions, onCommentDraftChange, onProfileClick, emptyState }) {
+export function PostFeed({
+  posts,
+  query,
+  openMenu,
+  savedPosts,
+  commentDraft,
+  commentsByPost,
+  expandedCommentPosts,
+  commentsHasMore,
+  loadingComments,
+  onToggleComments,
+  onLoadOlderComments,
+  postActions,
+  onCommentDraftChange,
+  onProfileClick,
+  emptyState,
+}) {
   return (
     <section className="feed" aria-label="Post feed">
       {posts.length
@@ -165,6 +207,12 @@ export function PostFeed({ posts, query, openMenu, savedPosts, commentDraft, pos
             openMenu={openMenu}
             savedPosts={savedPosts}
             commentDraft={commentDraft}
+            comments={commentsByPost[post.id] || []}
+            commentsExpanded={expandedCommentPosts.includes(post.id)}
+            commentsHasMore={Boolean(commentsHasMore[post.id])}
+            commentsLoading={Boolean(loadingComments[post.id])}
+            onToggleComments={onToggleComments}
+            onLoadOlderComments={onLoadOlderComments}
             onSetOpenMenu={postActions.setOpenMenu}
             onToggleSave={postActions.toggleSave}
             onDelete={postActions.deletePost}
@@ -222,6 +270,12 @@ function Wall({
   openMenu,
   savedPosts,
   commentDraft,
+  commentsByPost,
+  expandedCommentPosts,
+  commentsHasMore,
+  loadingComments,
+  onToggleComments,
+  onLoadOlderComments,
   postActions,
   onCommentDraftChange,
   composerText,
@@ -323,6 +377,12 @@ function Wall({
                 openMenu={openMenu}
                 savedPosts={savedPosts}
                 commentDraft={commentDraft}
+                commentsByPost={commentsByPost}
+                expandedCommentPosts={expandedCommentPosts}
+                commentsHasMore={commentsHasMore}
+                loadingComments={loadingComments}
+                onToggleComments={onToggleComments}
+                onLoadOlderComments={onLoadOlderComments}
                 postActions={postActions}
                 onCommentDraftChange={onCommentDraftChange}
               />

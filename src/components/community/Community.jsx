@@ -124,6 +124,7 @@ export function CreateCommunityForm({
 function Community({
   profileName,
   profileHandle,
+  profilePhotoUrl,
   communities,
   joinedCommunities,
   discoverGroupIds,
@@ -162,6 +163,7 @@ function Community({
   markNotificationRead,
   markNotificationsRead,
   onProfileClick,
+  onDeleteEvent,
   onGroupAction,
   onDeleteChat,
   onViewInbox,
@@ -194,6 +196,7 @@ function Community({
           profileId={userId}
           profileName={profileName}
           profileHandle={profileHandle}
+          profilePhotoUrl={profilePhotoUrl}
           friendsCount={friendsList.length}
           groupsCount={joinedCommunities.length}
           onProfileClick={onProfileClick}
@@ -236,6 +239,7 @@ function Community({
             profileName={profileName}
             profileHandle={profileHandle}
             showToast={showToast}
+            onDeleteEvent={onDeleteEvent}
           />
           {composer}
           <section className="feed" aria-label="Post feed">
@@ -293,7 +297,7 @@ function Community({
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
               {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onSelectInboxChat(friend)}>
-                <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
+                <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
               </button>)}
               {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
@@ -307,9 +311,13 @@ function Community({
             </div>
           ) : isInboxList ? (
             <div className="wall-chat-friends">
-              {inboxConversations.map((friend) => <button type="button" key={friend.id || friend.name} onClick={() => onSelectInboxChat(friend)}>
-                <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.lastMessage || 'Open conversation'}</small></span>
-              </button>)}
+              {inboxConversations.map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
+                <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
+                  <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
+                  <span>{friend.name}<small>{friend.lastMessage || 'Open profile'}</small></span>
+                </button>
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
+              </div>)}
               {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
             </div>
           ) : (

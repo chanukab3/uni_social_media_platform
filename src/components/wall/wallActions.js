@@ -1,5 +1,7 @@
 import { supabase } from '../../../supabase'
 
+const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
 export function createWallActions({
   activePage,
   chatSection,
@@ -40,6 +42,10 @@ export function createWallActions({
     const text = composerText.trim()
     if (!text && !composerImage) {
       showToast('Write an update or add a photo before posting.')
+      return false
+    }
+    if (composerFile && (!supportedPhotoTypes.has(composerFile.type) || composerFile.size >= 5_000_000)) {
+      showToast('Choose one JPG, PNG, WebP, or GIF photo smaller than 5 MB.')
       return false
     }
 

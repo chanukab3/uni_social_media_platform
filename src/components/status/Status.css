@@ -227,6 +227,35 @@
   line-height: 1.5;
 }
 
+.dark-mode.wall-shell .wall-event-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: #242424;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+.dark-mode.wall-shell .wall-event-tag,
+.dark-mode.wall-shell .wall-event-date {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(18, 18, 18, 0.82);
+  color: #d0a8ff;
+}
+
+.dark-mode.wall-shell .wall-event-overlay {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #171717;
+}
+
+.dark-mode.wall-shell .wall-event-detail {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #222;
+}
+
+.dark-mode.wall-shell .wall-event-heading .event-create {
+  border: 0;
+  background: #03dac5;
+  color: #071816;
+}
+
 @media (max-width: 600px) {
   .wall-events {
     padding-right: 11px;
