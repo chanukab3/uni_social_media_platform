@@ -10,11 +10,13 @@ import Status from './components/status/Status.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <App/>
+    
+    {/*<App />
     <Login />
     <Wall/>
     <Profile />
     <Community/>
-    <Status/>
+    <Status/>*/}
   </StrictMode>,
 )
