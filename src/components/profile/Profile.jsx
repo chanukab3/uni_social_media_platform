@@ -60,7 +60,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }) {
+export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }) {
   const photoInputRef = useRef(null)
   const [adminPanel, setAdminPanel] = useState('')
   const viewedName = profileTarget?.name || profileName
@@ -80,7 +80,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
               <p>{viewedHandle || ''}</p>
             </div>
           </div>
-          <p className="wall-profile-bio">Finding good people, good places and little reasons to smile.</p>
+          {profileBio && <p className="wall-profile-bio">{profileBio}</p>}
           {isOwnProfile && <>
             <div className="profile-controls">
               <button className="secondary-btn" type="button" onClick={() => photoInputRef.current?.click()}>{profilePhotoUrl ? 'Change photo' : 'Add profile photo'}</button>

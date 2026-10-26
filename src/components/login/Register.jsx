@@ -147,9 +147,7 @@ export default function Register({ onLogin, onRegisterSuccess }) {
                 disabled={loading}
               />
             </div>
-            <small className="auth-hint">Your username will be the part of your email before @.</small>
           </div>
-
           <div className="auth-field">
             <label htmlFor="register-password">Password</label>
 
@@ -198,29 +196,18 @@ export default function Register({ onLogin, onRegisterSuccess }) {
             </p>
           )}
 
-          <div className="auth-actions">
-            <button
-              type="button"
-              className="auth-button auth-secondary"
-              onClick={onLogin}
-              disabled={loading}
-            >
+          <button
+            type="submit"
+            className="auth-button auth-primary auth-full-button"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Register"}
+          </button>
+          <p className="auth-switch">
+            Already have an account?{" "}
+            <button type="button" className="auth-link" onClick={onLogin} disabled={loading}>
               Login
             </button>
-
-            <button
-              type="submit"
-              className="auth-button auth-primary"
-              disabled={loading}
-            >
-              {loading ? "Creating account..." : "Register →"}
-            </button>
-          </div>
-
-          <p className="auth-terms">
-            By registering, you agree to our{" "}
-            <a href="/terms">Terms</a> and{" "}
-            <a href="/privacy">Privacy Policy</a>.
           </p>
         </form>
       </section>

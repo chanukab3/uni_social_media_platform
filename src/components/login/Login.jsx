@@ -111,23 +111,19 @@ export default function Login({
             <p className="auth-error" role="alert">{error}</p>
           )}
 
-          <div className="auth-actions">
-            <button
-              type="submit"
-              className="auth-button auth-primary"
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Login →"}
-            </button>
-
-            <button
-              type="button"
-              className="auth-button auth-secondary"
-              onClick={onRegister}
-            >
+          <button
+            type="submit"
+            className="auth-button auth-primary auth-full-button"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+          <p className="auth-switch">
+            Don&apos;t have an account?{" "}
+            <button type="button" className="auth-link" onClick={onRegister}>
               Register
             </button>
-          </div>
+          </p>
         </form>
       </section>
 

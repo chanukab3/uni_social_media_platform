@@ -41,8 +41,10 @@ function App(){
   const [openMenu, setOpenMenu] = useState(null)
   const [profileName, setProfileName] = useState('Amanda Silva')
   const [profileHandle, setProfileHandle] = useState('')
+  const [profileBio, setProfileBio] = useState('')
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('')
   const [profileDraft, setProfileDraft] = useState('Amanda Silva')
+  const [profileBioDraft, setProfileBioDraft] = useState('')
   const [currentChat, setCurrentChat] = useState('World')
   const [currentGroupChat, setCurrentGroupChat] = useState('')
   const [chatSection, setChatSection] = useState('World')
@@ -136,7 +138,7 @@ function App(){
         setUserId(user.id)
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('display_name, handle, role, avatar_url, is_banned')
+          .select('display_name, handle, role, avatar_url, bio, is_banned')
           .eq('id', user.id)
           .maybeSingle()
         if (!active) return
@@ -159,6 +161,7 @@ function App(){
         }
         if (profile?.display_name) setProfileName(profile.display_name)
         setProfileHandle(profile?.handle || `@${user.email?.split('@')[0] || ''}`)
+        setProfileBio(profile?.bio || '')
         setProfilePhotoUrl(profile?.avatar_url || '')
         setIsAdmin(profile?.role === 'admin')
       }
@@ -260,7 +263,7 @@ function App(){
 
       const { data: profiles, error: peopleError } = await supabase
         .from('profiles')
-        .select('id, display_name, handle, avatar_url, is_banned')
+        .select('id, display_name, handle, avatar_url, bio, is_banned')
         .neq('id', user?.id || '00000000-0000-0000-0000-000000000000')
       if (!active) return
       if (peopleError) showToast(`Could not load people suggestions: ${peopleError.message}`)
@@ -270,6 +273,7 @@ function App(){
           name: person.display_name,
           handle: person.handle || '',
           avatarUrl: person.avatar_url || '',
+          bio: person.bio || '',
           isBanned: Boolean(person.is_banned),
           status: 'Member',
           color: personColors[index % personColors.length],
@@ -407,6 +411,7 @@ function App(){
             name: profile.display_name,
             handle: profile.handle || '',
             avatarUrl: profile.avatar_url || '',
+            bio: profile.bio || '',
             isBanned: Boolean(profile.is_banned),
             status: 'Member',
             color: personColors[current.length % personColors.length],
@@ -416,6 +421,8 @@ function App(){
         if (!profile.id) return
         if (profile.id === userId) {
           if (profile.avatar_url) setProfilePhotoUrl(profile.avatar_url)
+          if (profile.display_name) setProfileName(profile.display_name)
+          setProfileBio(profile.bio || '')
           if (profile.is_banned) {
             showToast('Your account has been banned by a community administrator.')
             supabase.auth.signOut().then(({ error }) => {
@@ -427,7 +434,14 @@ function App(){
           return
         }
         const updatedPerson = (person) => person.id === profile.id
-          ? { ...person, avatarUrl: profile.avatar_url || '', isBanned: Boolean(profile.is_banned) }
+          ? {
+            ...person,
+            name: profile.display_name || person.name,
+            handle: profile.handle || person.handle,
+            avatarUrl: profile.avatar_url || '',
+            bio: profile.bio || '',
+            isBanned: Boolean(profile.is_banned),
+          }
           : person
         setPeople((current) => current.map(updatedPerson))
         if (profile.is_banned) {
@@ -1263,6 +1277,7 @@ function App(){
     }
     setUserId(null)
     setProfileHandle('')
+    setProfileBio('')
     setProfilePhotoUrl('')
     setIsAdmin(false)
     setAuthPage('login')
@@ -1381,6 +1396,7 @@ function App(){
         profileTarget={profileTarget}
         profileName={profileName}
         profileHandle={profileHandle}
+        profileBio={profileTarget ? profileTarget.bio || '' : profileBio}
         profilePhotoUrl={profilePhotoUrl}
         userId={userId}
         postCount={viewedPostCount}
@@ -1390,6 +1406,7 @@ function App(){
         onSignOut={signOut}
         onEditProfile={() => {
             setProfileDraft(profileName)
+            setProfileBioDraft(profileBio)
             setModal({ type: 'edit-profile' })
         }}
         onHome={() => navigate('Home')}
@@ -1570,18 +1587,24 @@ function App(){
                     return
                   }
                   if (supabase && userId){
-                    const { error } = await supabase.from('profiles').update({ display_name: profileDraft.trim() }).eq('id', userId)
+                    const { error } = await supabase.from('profiles').update({
+                      display_name: profileDraft.trim(),
+                      bio: profileBioDraft.trim(),
+                    }).eq('id', userId)
                     if (error){
                       showToast(`Could not update your profile: ${error.message}`)
                       return
                     }
                   }
                   setProfileName(profileDraft.trim())
+                  setProfileBio(profileBioDraft.trim())
                   setModal(null)
                   showToast('Profile updated.')
                 }}>
                   <label className="field-label">Display name<input autoFocus value={profileDraft} onChange={(event) => setProfileDraft(event.target.value)} /></label>
                   <label className="field-label">Username<input value={profileHandle} readOnly /></label>
+                  <label className="field-label">Bio<textarea rows="4" maxLength="300" placeholder="Tell your community a little about yourself." value={profileBioDraft} onChange={(event) => setProfileBioDraft(event.target.value)} /></label>
+                  <small className="bio-character-count">{profileBioDraft.length}/300</small>
                   <button className="primary-btn modal-submit" type="submit">Save changes</button>
                 </form>
               </>

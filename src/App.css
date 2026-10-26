@@ -8,7 +8,6 @@
   --line: rgba(255, 255, 255, 0.09);
   --accent: #bb86fc;
   --accent-dark: #d0a8ff;
-  --teal: #03dac5;
   --shadow: 0 26px 60px rgba(0, 0, 0, 0.42);
 }
 
@@ -970,13 +969,15 @@ img {
   border-radius: 50%;
   color: #fff;
   font-weight: 700;
+  
 }
 
 .avatar.large {
-  width: 53px;
-  height: 53px;
-  border: 3px solid rgba(255, 255, 255, 0.82);
+  width: 60px;
+  height: 60px;
+  /* border: 3px solid rgba(255, 255, 255, 0.82); */
   font-size: 1.1rem;
+  margin: 5px;
 }
 
 .avatar.small {
@@ -1430,6 +1431,7 @@ img {
 }
 
 .field-label input,
+.field-label textarea,
 .share-copy {
   width: 100%;
   min-height: 42px;
@@ -1443,6 +1445,21 @@ img {
 
 .field-label input[readonly] {
   color: var(--muted);
+}
+
+.field-label textarea {
+  min-height: 92px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.bio-character-count {
+  display: block;
+  margin-top: -8px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-align: right;
 }
 
 .modal-submit {
@@ -1582,7 +1599,6 @@ img {
   --line: rgba(255, 255, 255, 0.09);
   --accent: #bb86fc;
   --accent-dark: #d0a8ff;
-  --teal: #03dac5;
   --shadow: 0 26px 60px rgba(0, 0, 0, 0.42);
   background: var(--bg);
   color: var(--text);
@@ -2189,8 +2205,8 @@ textarea::placeholder {
 .page-shell.dark-mode.wall-shell .wall-event-controls .event-create,
 .page-shell.dark-mode.wall-shell .wall-friend-request button {
   border-color: transparent;
-  background: #03dac5;
-  color: #071816;
+  background: #8558bd;
+  color: #17121f;
 }
 
 .page-shell.dark-mode.wall-shell .wall-profile-button strong,
@@ -2208,8 +2224,8 @@ textarea::placeholder {
 .page-shell.dark-mode.wall-shell .wall-message.own,
 .page-shell.dark-mode.wall-shell .wall-profile-action:not(.danger-action),
 .page-shell.dark-mode.wall-shell .wall-brand .brand-mark {
-  border-color: rgba(187, 134, 252, 0.28);
-  background: rgba(187, 134, 252, 0.15);
+  border-color: rgba(80, 53, 114, 0.28);
+  background: rgba(191, 139, 255, 0.15);
   color: #d0a8ff;
 }
 
@@ -2281,8 +2297,8 @@ textarea::placeholder {
 .dark-mode .wall-chat-form button,
 .dark-mode .wall-event-heading .event-create,
 .dark-mode .event-create {
-  background: var(--teal);
-  color: #071816;
+  background: #bb86fc;
+  color: #17121f;
 }
 
 .dark-mode .wall-chat-tabs button.active,

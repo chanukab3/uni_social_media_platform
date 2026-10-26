@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { supabase } from '../../../supabase'
 import './Status.css'
+
+const supportedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+const maxEventImageSize = 10_000_000
 
 function EventCards({ events, onSelect }) {
   return events.map((event, index) => (
@@ -27,6 +30,14 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
   const [createOpen, setCreateOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
   const [selectedEventIndex, setSelectedEventIndex] = useState(0)
+  const [eventImage, setEventImage] = useState(null)
+  const eventImageInputRef = useRef(null)
+
+  const closeCreateEvent = () => {
+    setCreateOpen(false)
+    setEventImage(null)
+    if (eventImageInputRef.current) eventImageInputRef.current.value = ''
+  }
 
   const publishEvent = async (formEvent) => {
     formEvent.preventDefault()
@@ -38,9 +49,31 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       showToast('Add an event name and date.')
       return
     }
+    if (!isAdmin) {
+      showToast('Only admins can publish community events.')
+      return
+    }
+    if (eventImage && (!supportedImageTypes.has(eventImage.type) || eventImage.size >= maxEventImageSize)) {
+      showToast('Choose one JPG, PNG, WebP, or GIF event image smaller than 10 MB.')
+      return
+    }
     if (!supabase || !userId) {
       showToast('Sign in with your Supabase account to publish an event.')
       return
+    }
+    let imageUrl = ''
+    let uploadedImagePath = ''
+    if (eventImage) {
+      const extension = eventImage.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
+      uploadedImagePath = `${userId}/${crypto.randomUUID()}.${extension}`
+      const { error: uploadError } = await supabase.storage
+        .from('event-images')
+        .upload(uploadedImagePath, eventImage, { upsert: false, contentType: eventImage.type })
+      if (uploadError) {
+        showToast(`Could not upload the event image: ${uploadError.message}`)
+        return
+      }
+      imageUrl = supabase.storage.from('event-images').getPublicUrl(uploadedImagePath).data.publicUrl
     }
     const { data, error } = await supabase.from('posts').insert({
       author_id: userId,
@@ -50,8 +83,16 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       is_event: true,
       event_title: title,
       event_date: new Date(`${date}T12:00:00`).toISOString(),
+      image_url: imageUrl || null,
     }).select('id').single()
     if (error) {
+      if (uploadedImagePath) {
+        const { error: cleanupError } = await supabase.storage.from('event-images').remove([uploadedImagePath])
+        if (cleanupError) {
+          showToast(`Could not publish your event: ${error.message}. The uploaded image could not be removed: ${cleanupError.message}`)
+          return
+        }
+      }
       showToast(`Could not publish your event: ${error.message}`)
       return
     }
@@ -60,10 +101,10 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       title,
       detail: `${date} · ${detail || 'Community event'}`,
       date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'),
-      image: '',
+      image: imageUrl,
       tag: 'COMMUNITY EVENT',
     }, ...current])
-    setCreateOpen(false)
+    closeCreateEvent()
     showToast('Your event is on the community wall.')
   }
 
@@ -116,14 +157,41 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
       )}
 
       {createOpen && (
-        <div className="modal-backdrop" role="presentation" onClick={() => setCreateOpen(false)}>
+        <div className="modal-backdrop" role="presentation" onClick={closeCreateEvent}>
           <section className="modal-card" role="dialog" aria-modal="true" onClick={(formEvent) => formEvent.stopPropagation()}>
-            <button type="button" className="modal-close" onClick={() => setCreateOpen(false)} aria-label="Close dialog">×</button>
+            <button type="button" className="modal-close" onClick={closeCreateEvent} aria-label="Close dialog">×</button>
             <h2>Publish a community event</h2><p className="modal-intro">Only community admins can publish event announcements.</p>
             <form onSubmit={publishEvent}>
               <label className="field-label">Event name<input name="event-title" autoFocus placeholder="e.g. Saturday neighborhood picnic" required /></label>
               <label className="field-label">Date<input name="event-date" type="date" required /></label>
               <label className="field-label">A few details<input name="event-detail" placeholder="Place, time, or what to bring" /></label>
+              <label className="field-label">Event image<input
+                ref={eventImageInputRef}
+                name="event-image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] || null
+                  if (!file) {
+                    setEventImage(null)
+                    return
+                  }
+                  if (!supportedImageTypes.has(file.type)) {
+                    showToast('Choose a JPG, PNG, WebP, or GIF event image.')
+                    event.target.value = ''
+                    setEventImage(null)
+                    return
+                  }
+                  if (file.size >= maxEventImageSize) {
+                    showToast('Choose an event image smaller than 10 MB.')
+                    event.target.value = ''
+                    setEventImage(null)
+                    return
+                  }
+                  setEventImage(file)
+                }}
+              /></label>
+              <small className="event-image-hint">One image · JPG, PNG, WebP, or GIF · max 10 MB</small>
               <button className="primary-btn modal-submit" type="submit">Publish event</button>
             </form>
           </section>

@@ -80,7 +80,7 @@ export default function ForgotPassword({ onLogin }) {
             className="auth-button auth-primary auth-full-button"
             disabled={loading}
           >
-            {loading ? "Sending..." : "Send reset link →"}
+            {loading ? "Sending..." : "Send reset link"}
           </button>
 
           <button
@@ -88,7 +88,7 @@ export default function ForgotPassword({ onLogin }) {
             className="auth-back-link"
             onClick={onLogin}
           >
-            ← login
+            login
           </button>
         </form>
       </section>

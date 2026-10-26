@@ -252,8 +252,15 @@
 
 .dark-mode.wall-shell .wall-event-heading .event-create {
   border: 0;
-  background: #03dac5;
-  color: #071816;
+  background: #bb86fc;
+  color: #17121f;
+}
+
+.event-image-hint {
+  display: block;
+  margin-top: -8px;
+  color: var(--muted);
+  font-size: 0.7rem;
 }
 
 @media (max-width: 600px) {
