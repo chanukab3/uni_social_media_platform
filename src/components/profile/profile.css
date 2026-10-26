@@ -56,8 +56,8 @@
 }
 
 .wall-profile-avatar {
-  width: 58px;
-  height: 58px;
+  width: 75px;
+  height: 75px;
   flex: 0 0 auto;
   margin: 0;
   font-size: 1.2rem;
@@ -67,16 +67,19 @@
   min-width: 0;
 }
 
-.wall-profile-identity h2 {
-  margin: 0;
-  font-size: 1rem;
+.profile-identity-name h2 {
+    font-size: 20px;
+    padding: 0px;
+    margin: 4px;
 }
 
-.wall-profile-identity > p {
-  margin: 4px 0;
-  color: #a7a7a7;
-  font-size: 0.7rem;
+
+.profile-identity-name p {
+    font-size: 14px;
+    padding: 2px;
+    margin: 2px;
 }
+
 
 .wall-profile-identity .wall-profile-bio {
   margin: 12px 0;

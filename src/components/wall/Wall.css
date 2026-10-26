@@ -381,8 +381,8 @@
 }
 
 .wall-profile-button .avatar {
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
 }
 
 .wall-profile-button > span:last-child {
@@ -394,7 +394,7 @@
 
 .wall-profile-button strong {
   overflow: hidden;
-  font-size: 0.8rem;
+  font-size: 1rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
