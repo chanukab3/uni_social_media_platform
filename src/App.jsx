@@ -1,7 +1,14 @@
+import Status from "./components/status/Status";
+import CreateEvent from "./components/status/CreateEvent";
+
 function App() {
   return ( 
+
     <>
-    <h2>Mahagedara</h2>
+
+    <Status/>
+    <CreateEvent/>
+
     </>
    );
 }

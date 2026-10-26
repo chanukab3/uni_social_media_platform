@@ -1,8 +1,18 @@
+import React from "react";
+import WallLeft from "./WallLeft";
+import Right from "./Right";
+import WallMid from "./WallMid";
+
+import "./Wall.css"
+
+
 function Wall() {
     return ( 
-        <>
-        <h2>Wall Page</h2>
-        </>
+        <div className="container">
+            <WallLeft/>
+            <WallMid/>
+            <Right/>
+        </div>
      );
 }
 
