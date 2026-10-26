@@ -1,3 +1,14 @@
+import Status from "./components/status/Status";
+import CreateEvent from "./components/status/CreateEvent";
+
+function App() {
+  return ( 
+
+    <>
+
+    <Status/>
+    <CreateEvent/>
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import { supabase } from '../supabase'

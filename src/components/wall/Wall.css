@@ -1,3 +1,83 @@
+.container{
+    display: grid;
+    grid-template-columns: 22.75% 43.75% 33.5%;
+    height: 100vh;
+    background-color: rgba(223, 213, 214, 1);
+}
+body{
+    background-color: rgba(223, 213, 214, 1);
+}
+
+@media (max-width: 1100px) {
+  .right {
+    display: none;   /* hide sidebar on tablets/mobiles */
+  }
+
+  .container{
+    display: grid;
+    grid-template-columns: 35% 65%;
+    height: 100vh;
+    background-color: rgba(223, 213, 214, 1);
+  }
+
+  .mid{
+    grid-column: 2;
+    background-color: rgba(223, 213, 214, 1);
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+  .w-left{
+    width: 35%;
+  } 
+
+.search{
+    display: flex;
+    grid-template-columns: 40px auto 250px;
+    background-color: #fcf4f6;
+    align-items: center;
+    height: 50px;
+    border-radius: 20px;
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 10px;
+    margin-left: 40%;
+    width: 54.65%;
+    margin-right: 5.35%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 3;
+}
+
+
+.chat-btn {
+  display: flex;
+  grid-template-columns: 50px 200px;
+  height: 50px;
+  width: 150px;
+  background-color: rgb(149, 26, 26);
+  align-items: center;
+  z-index: 3;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.chat-btn-img {
+  display: block;
+  height: 40px;
+    border-radius: 20px;
+  
+}
+.chat-btn-img-div{
+    display: flex;
+}
+.chat-btn-text{
+    display: flex;
+    align-items: center;
+}
+}
 .wall-center {
   position: relative;
   display: flex;

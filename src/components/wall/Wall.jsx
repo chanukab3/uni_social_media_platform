@@ -1,3 +1,19 @@
+import React from "react";
+import WallLeft from "./WallLeft";
+import Right from "./Right";
+import WallMid from "./WallMid";
+
+import "./Wall.css"
+
+
+function Wall() {
+    return ( 
+        <div className="container">
+            <WallLeft/>
+            <WallMid/>
+            <Right/>
+        </div>
+     );
 import { useRef } from 'react'
 import Community from '../community/Community'
 import Profile, { ProfileAvatar } from '../profile/Profile'
