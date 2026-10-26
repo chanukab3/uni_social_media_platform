@@ -17,98 +17,24 @@ const navigation = [
   { label: 'Messages', icon: '✉' },
 ]
 
-const startingPosts = [
-  {
-    id: 1,
-    author: 'Nadun Perera',
-    handle: '@nadun',
-    time: '8 min ago',
-    text: 'Sunrise walk by the lake with my squad. Nothing like a quiet morning to reset the mind.',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-    likes: 2400,
-    comments: [],
-    commentCount: 184,
-    shares: 42,
-    accent: '#d9a172',
-    liked: false,
-    mine: false,
-  },
-  {
-    id: 2,
-    author: 'Maya Silva',
-    handle: '@maya_',
-    time: '24 min ago',
-    text: 'Weekend project update: organizing a community clean-up in Galle Face and inviting everyone to join.',
-    likes: 1800,
-    comments: [],
-    commentCount: 96,
-    shares: 30,
-    accent: '#8ca685',
-    liked: false,
-    mine: false,
-  },
-]
-
-const startingCommunities = [
-  { name: 'Green Living', members: '12.4k', tone: '#b9d8b1', description: 'Small steps for a greener Sri Lanka.' },
-  { name: 'City Makers', members: '8.7k', tone: '#f0c38f', description: 'Ideas and people shaping better cities.' },
-  { name: 'Design Club', members: '5.3k', tone: '#d5bfd9', description: 'A home for curious creatives.' },
-  { name: 'Food & Finds', members: '3.8k', tone: '#e8a78d', description: 'Share a good meal or a local gem.' },
-]
-
-const friends = [
-  { name: 'Anya', status: 'online', color: '#bd8f75' },
-  { name: 'Dilan', status: 'online', color: '#78977f' },
-  { name: 'Ruzu', status: 'away', color: '#a897b4' },
-  { name: 'Kim', status: 'online', color: '#bd9b68' },
-]
-
-const eventSlides = [
-  {
-    title: 'Good things are happening',
-    detail: 'Slow Sunday table · 12 going',
-    date: 'OCT\n24',
-    image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=85',
-    tag: 'THIS WEEKEND',
-  },
-  {
-    title: 'Make a little mess',
-    detail: 'Clay & coffee workshop · 8 going',
-    date: 'OCT\n26',
-    image: 'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=1200&q=85',
-    tag: 'CREATIVE MEETUP',
-  },
-  {
-    title: 'A morning in the hills',
-    detail: 'Ella trail walk · 16 going',
-    date: 'NOV\n02',
-    image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=1200&q=85',
-    tag: 'OUTDOORS',
-  },
-]
-
-const initialNotifications = [
-  { id: 1, text: 'Anya liked your photo.', time: '5 min ago', read: false },
-  { id: 2, text: 'Maya invited you to Green Living.', time: '1 hour ago', read: false },
-  { id: 3, text: 'Dilan started following you.', time: 'Yesterday', read: true },
-]
+const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
+const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
 
 function App(){
   const [activePage, setActivePage] = useState('Home')
-  const [posts, setPosts] = useState(startingPosts)
-  const [communities, setCommunities] = useState(startingCommunities)
-  const [joinedCommunities, setJoinedCommunities] = useState(['Green Living'])
+  const [posts, setPosts] = useState([])
+  const [communities, setCommunities] = useState([])
+  const [joinedCommunities, setJoinedCommunities] = useState([])
   const [discoverGroupIds, setDiscoverGroupIds] = useState(null)
-  const [people, setPeople] = useState(friends)
+  const [people, setPeople] = useState([])
   const [savedPosts, setSavedPosts] = useState([])
   const [query, setQuery] = useState('')
   const [composerText, setComposerText] = useState('')
   const [composerImage, setComposerImage] = useState('')
   const [composerFile, setComposerFile] = useState(null)
-  const [story, setStory] = useState(null)
   const [modal, setModal] = useState(null)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
-  const [notifications, setNotifications] = useState(initialNotifications)
+  const [notifications, setNotifications] = useState([])
   const [toast, setToast] = useState('')
   const [authPage, setAuthPage] = useState('login')
   const [openMenu, setOpenMenu] = useState(null)
@@ -120,22 +46,13 @@ function App(){
   const [inboxConversations, setInboxConversations] = useState([])
   const [inboxSelected, setInboxSelected] = useState(false)
   const [profileTarget, setProfileTarget] = useState(null)
-  const [events, setEvents] = useState(eventSlides)
+  const [events, setEvents] = useState([])
   const [friendRequests, setFriendRequests] = useState([])
   const [friendsList, setFriendsList] = useState([])
   const [incomingFriendRequests, setIncomingFriendRequests] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
-  const [messages, setMessages] = useState({
-    World: [
-      { from: 'Jamie Lee', text: 'Morning, neighbors! Any good coffee spots for a rainy Sunday?', time: '10:20' },
-      { from: 'Maya Chen', text: 'Sunny in Bloom, always. Grab the window seat!', time: '10:34' },
-    ],
-    Anya: [{ from: 'Anya', text: 'Hey! Are you coming to the community meet-up?', time: '10:42' }],
-    Dilan: [{ from: 'Dilan', text: 'Sent you the photos from yesterday.', time: 'Yesterday' }],
-    Ruzu: [{ from: 'Ruzu', text: 'Thanks for the recommendation!', time: 'Yesterday' }],
-    Kim: [{ from: 'Kim', text: 'Let’s catch up soon!', time: 'Monday' }],
-  })
+  const [messages, setMessages] = useState({})
   const [messageDraft, setMessageDraft] = useState('')
   const [commentDraft, setCommentDraft] = useState('')
   const showToast = useCallback((message) => {
@@ -191,6 +108,17 @@ function App(){
       if (!active) return
       if (authError && authError.name !== 'AuthSessionMissingError'){
         showToast(`Could not load your Supabase session: ${authError.message}`)
+      }
+
+      if (!user) {
+        setFriendRequests([])
+        setFriendsList([])
+        setIncomingFriendRequests([])
+        setJoinedCommunities([])
+        setNotifications([])
+        setInboxConversations([])
+        setInboxSelected(false)
+        setMessages({})
       }
 
       if (user){
@@ -257,10 +185,10 @@ function App(){
           title: post.event_title,
           detail: `${post.event_date ? new Date(post.event_date).toLocaleDateString() : 'Community event'} · ${post.body || 'Join your neighbors'}`,
           date: post.event_date ? new Date(post.event_date).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n') : 'SOON',
-          image: post.image_url || eventSlides[0].image,
+          image: post.image_url || '',
           tag: 'COMMUNITY EVENT',
         }))
-        if (remoteEvents.length) setEvents(remoteEvents)
+        setEvents(remoteEvents)
       }
 
       const { data: groupRows, error: groupsError } = await supabase
@@ -283,7 +211,7 @@ function App(){
           invite_link: group.invite_link || '',
           created_by: group.created_by,
           members: String(group.group_members?.[0]?.count ?? 0),
-          tone: startingCommunities[index % startingCommunities.length].tone,
+          tone: communityTones[index % communityTones.length],
         }))
         setCommunities(remoteGroups)
         let memberIds = new Set()
@@ -318,8 +246,8 @@ function App(){
           id: person.id,
           name: person.display_name,
           handle: person.handle || '',
-          status: index % 2 ? 'away' : 'online',
-          color: friends[index % friends.length].color,
+          status: 'Member',
+          color: personColors[index % personColors.length],
         }))
         setPeople(peopleRows)
         if (user){
@@ -359,6 +287,11 @@ function App(){
         }
       } else if (user) {
         setPeople([])
+        setFriendsList([])
+        setIncomingFriendRequests([])
+      }
+      if (!user) {
+        setFriendRequests([])
         setFriendsList([])
         setIncomingFriendRequests([])
       }
@@ -973,7 +906,7 @@ function App(){
     />
   )
 
-  const renderFeed = (title, subtitle, showStories = false) => (
+  const renderFeed = (title, subtitle, showComposer = false) => (
     <>
       <div className="section-title">
         <div>
@@ -982,23 +915,7 @@ function App(){
         </div>
         {activePage === 'Explore' && <span className="feed-label">For you</span>}
       </div>
-      {showStories && (
-        <section className="hero-strip" aria-label="Stories">
-          {[
-            { name: 'Your story', color: '#d88a62', isYou: true },
-            { name: 'Ari', color: '#8ca685' },
-            { name: 'Nim', color: '#c8a27f' },
-            { name: 'Sami', color: '#9f8da8' },
-            { name: 'Lah', color: '#6a7a99' },
-          ].map((item) => (
-            <button type="button" key={item.name} className="story" onClick={() => item.isYou ? setActivePage('Home') : setStory(item)}>
-              <span className="story-ring" style={{ background: item.color }}><span>{item.isYou ? '+' : item.name.slice(0, 1)}</span></span>
-              <small>{item.name}</small>
-            </button>
-          ))}
-        </section>
-      )}
-      {(showStories || activePage === 'Status') && renderComposer()}
+      {(showComposer || activePage === 'Status') && renderComposer()}
       <section className="feed" aria-label="Post feed">
         {filteredPosts.length
           ? filteredPosts.map(renderPost)
@@ -1018,7 +935,7 @@ function App(){
               <button type="button" key={friend.name} className={currentChat === friend.name ? 'conversation active' : 'conversation'} onClick={() => openFriendChat(friend)}>
                 <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span>
                 <span><strong>{friend.name}</strong><small>{(messages[friend.name] || []).at(-1)?.text || friend.status}</small></span>
-                <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />
+                {(friend.status === 'online' || friend.status === 'away') && <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />}
               </button>
             ))}
           </div>
@@ -1198,28 +1115,13 @@ function App(){
               }}>
                 <span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span>
                 <span className="friend-meta"><strong>{friend.name}</strong><small>{friend.status}</small></span>
-                <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />
+                {(friend.status === 'online' || friend.status === 'away') && <i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} />}
               </button>
             ))}
           </section>
           <p className="copyright">© 2026 Mahagedara · Made for community</p>
         </aside>
       </div>}
-
-      {story && (
-        <div className="modal-backdrop" role="presentation" onClick={() => setStory(null)}>
-          <section className="story-viewer" role="dialog" aria-modal="true" aria-label={`${story.name}'s story`} onClick={(event) => event.stopPropagation()}>
-            <button type="button" className="modal-close" onClick={() => setStory(null)} aria-label="Close story">×</button>
-            <div className="story-viewer-art" style={{ background: `linear-gradient(145deg, ${story.color}, #5b5144)` }}><span>{story.name[0]}</span></div>
-            <div className="story-viewer-caption"><strong>{story.name}</strong><p>A little moment from today. ✨</p></div>
-            <button type="button" className="primary-btn" onClick={() => {
-              setStory(null)
-              navigate('Messages')
-              setCurrentChat('Anya')
-            }}>Reply to story</button>
-          </section>
-        </div>
-      )}
 
       {modal && (
         <div className="modal-backdrop" role="presentation" onClick={() => setModal(null)}>
@@ -1387,7 +1289,7 @@ function App(){
                     showToast(`Could not publish your event: ${error.message}`)
                     return
                   }
-                  setEvents((current) => [{ title, detail: `${date} · ${detail || 'Community event'}`, date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'), image: eventSlides[0].image, tag: 'COMMUNITY EVENT' }, ...current])
+                  setEvents((current) => [{ title, detail: `${date} · ${detail || 'Community event'}`, date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'), image: '', tag: 'COMMUNITY EVENT' }, ...current])
                   setModal(null)
                   showToast('Your event is on the community wall.')
                 }}>

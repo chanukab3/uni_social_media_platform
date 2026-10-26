@@ -8,7 +8,9 @@ function EventCards({ events, onSelect }) {
       type="button"
       className="wall-event-card"
       key={`${event.title}-${index}`}
-      style={{ backgroundImage: `linear-gradient(0deg, rgba(10, 6, 18, .84), rgba(10, 6, 18, .08) 78%), url("${event.image}")` }}
+      style={{ backgroundImage: event.image
+        ? `linear-gradient(0deg, rgba(10, 6, 18, .84), rgba(10, 6, 18, .08) 78%), url("${event.image}")`
+        : 'linear-gradient(0deg, rgba(10, 6, 18, .84), rgba(10, 6, 18, .08) 78%)' }}
       onClick={() => onSelect(index)}
     >
       <span className="wall-event-tag">✦ {event.tag}</span>
@@ -25,8 +27,6 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) 
   const [createOpen, setCreateOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
   const [selectedEventIndex, setSelectedEventIndex] = useState(0)
-
-  if (!events.length) return null
 
   const publishEvent = async (formEvent) => {
     formEvent.preventDefault()
@@ -59,7 +59,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) 
       title,
       detail: `${date} · ${detail || 'Community event'}`,
       date: new Date(`${date}T12:00:00`).toLocaleDateString('en', { month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n'),
-      image: events[0]?.image || '',
+      image: '',
       tag: 'COMMUNITY EVENT',
     }, ...current])
     setCreateOpen(false)
@@ -74,10 +74,12 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) 
           {isAdmin && <button type="button" className="event-create" onClick={() => setCreateOpen(true)} aria-label="Create event">＋</button>}
         </header>
         <div className="wall-event-strip">
-          <EventCards events={events} onSelect={(index) => {
-            setSelectedEventIndex(index)
-            setEventsOpen(true)
-          }} />
+          {events.length
+            ? <EventCards events={events} onSelect={(index) => {
+              setSelectedEventIndex(index)
+              setEventsOpen(true)
+            }} />
+            : <p className="wall-muted">No community events yet.</p>}
         </div>
       </section>
 
@@ -92,7 +94,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, showToast }) 
           </div>
           {events[selectedEventIndex] && (
             <article className="wall-event-detail">
-              <img src={events[selectedEventIndex].image} alt="" />
+              {events[selectedEventIndex].image && <img src={events[selectedEventIndex].image} alt="" />}
               <div>
                 <span className="wall-event-tag">{events[selectedEventIndex].tag}</span>
                 <h3>{events[selectedEventIndex].title}</h3>
