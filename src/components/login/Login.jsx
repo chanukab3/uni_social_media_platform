@@ -1,50 +1,50 @@
-import { useState } from "react";
-import { supabase } from "../../../supabase";
+import{ useState } from "react";
+import{ supabase } from "../../../supabase";
 import "./Auth.css";
 
 export default function Login({
   onRegister,
   onForgotPassword,
   onLoginSuccess,
-}) {
+}){
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin(event) {
+  async function handleLogin(event){
     event.preventDefault();
     setError("");
 
-    if (!identifier.trim() || !password) {
+    if(!identifier.trim() || !password){
       setError("Please enter your email address and password.");
       return;
     }
 
-    if (!supabase) {
+    if(!supabase){
       setError("Supabase is not configured. Add your project URL and publishable key.");
       return;
     }
 
     setLoading(true);
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+    try{
+      const{ data, error: authError } = await supabase.auth.signInWithPassword({
         email: identifier.trim().toLowerCase(),
         password,
       });
 
-      if (authError) throw authError;
+      if(authError) throw authError;
 
       onLoginSuccess?.(data.user);
-    } catch (err) {
+    } catch(err){
       setError(err.message || "Unable to log in. Please try again.");
-    } finally {
+    } finally{
       setLoading(false);
     }
   }
-  return (
+  return(
     <main className="auth-page">
       <header className="auth-brand">
         <span className="brand-icon">♧</span>
@@ -92,7 +92,7 @@ export default function Login({
                   showPassword ? "Hide password" : "Show password"
                 }
               >
-                {showPassword ? "Hide" : "Show"}
+               {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function Login({
             </button>
           </div>
 
-          {error && (
+         {error &&(
             <p className="auth-error" role="alert">{error}</p>
           )}
 
@@ -116,7 +116,7 @@ export default function Login({
             className="auth-button auth-primary auth-full-button"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+           {loading ? "Logging in..." : "Login"}
           </button>
           <p className="auth-switch">
             Don&apos;t have an account?{" "}

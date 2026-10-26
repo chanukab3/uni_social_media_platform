@@ -1,24 +1,24 @@
 import './community.css'
-import { FriendSuggestions, WallProfileCard } from '../profile/Profile'
+import{ FriendSuggestions, WallProfileCard } from '../profile/Profile'
 import Status from '../status/Status'
 
-export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }) {
+export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }){
   const term = query.trim().toLowerCase()
   const visibleCommunities = communities.filter((community) => `${community.name} ${community.description}`.toLowerCase().includes(term))
 
-  return (
+  return(
     <>
       <div className="section-title">
         <div><h2>Communities</h2><p>Find your people and join the conversation.</p></div>
         <button className="primary-btn compact" type="button" onClick={onCreate}>＋ Create</button>
       </div>
       <div className="community-grid">
-        {visibleCommunities.map((community) => {
+       {visibleCommunities.map((community) =>{
           const member = joinedCommunities.includes(community.name)
-          return (
+          return(
             <article className="community-card" key={community.id || community.name}>
               <div className="community-cover" style={{ background: `linear-gradient(135deg, ${community.tone}, #fff3e4)` }}>
-                <span>✦</span>
+                <span>+</span>
               </div>
               <div className="community-card-body">
                 <h3>{community.name}</h3>
@@ -31,7 +31,7 @@ export function CommunityDirectory({ communities, joinedCommunities, query, onCr
             </article>
           )
         })}
-        {!visibleCommunities.length && <div className="empty-state"><h3>No communities found</h3><p>Try another search term.</p></div>}
+       {!visibleCommunities.length && <div className="empty-state"><h3>No communities found</h3><p>Try another search term.</p></div>}
       </div>
     </>
   )
@@ -49,55 +49,55 @@ export function CreateCommunityForm({
   setDiscoverGroupIds,
   setModal,
   showToast,
-}) {
-  return (
+}){
+  return(
     <>
       <h2>Create a community</h2><p className="modal-intro">Start a new space around something you care about.</p>
-      <form onSubmit={async (event) => {
+      <form onSubmit={async(event) =>{
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
         const name = String(formData.get('community-name') || '').trim()
         const description = String(formData.get('community-description') || '').trim()
         const inviteLink = `${window.location.origin}/?invite=${crypto.randomUUID()}`
         const invitedFriendIds = formData.getAll('group-friend').map(String)
-        if (!name){
+        if(!name){
           showToast('Give your community a name first.')
           return
         }
-        if (!description){
+        if(!description){
           showToast('Add a short description for your community.')
           return
         }
-        if (communities.some((community) => community.name.toLowerCase() === name.toLowerCase())){
+        if(communities.some((community) => community.name.toLowerCase() === name.toLowerCase())){
           showToast('A community with that name already exists.')
           return
         }
-        if (!supabase || !userId){
+        if(!supabase || !userId){
           showToast('Sign in to create a group.')
           return
         }
-        const { data: group, error } = await supabase.from('groups').insert({
+        const{ data: group, error } = await supabase.from('groups').insert({
           name,
           description,
           invite_link: inviteLink,
           created_by: userId,
         }).select('id').single()
-        if (error){
+        if(error){
           showToast(`Could not create your group: ${error.message}`)
           return
         }
         const memberIds = [...new Set([userId, ...invitedFriendIds])]
-        const { error: membershipError } = await supabase.rpc('add_community_group_members', {
+        const{ error: membershipError } = await supabase.rpc('add_community_group_members',{
           target_group_id: group.id,
           member_ids: memberIds,
         })
-        if (membershipError){
-          const { error: rollbackError } = await supabase.rpc('delete_community_group', { target_group_id: group.id })
+        if(membershipError){
+          const{ error: rollbackError } = await supabase.rpc('delete_community_group',{ target_group_id: group.id })
           const rollbackNote = rollbackError ? ` Cleanup failed: ${rollbackError.message}` : ''
           showToast(`Could not save the group members: ${membershipError.message}.${rollbackNote}`)
           return
         }
-        const createdGroup = { id: group.id, name, members: String(memberIds.length), tone: '#d5bfd9', description, invite_link: inviteLink, created_by: userId }
+        const createdGroup ={ id: group.id, name, members: String(memberIds.length), tone: '#d5bfd9', description, invite_link: inviteLink, created_by: userId }
         setCommunities((current) => [createdGroup, ...current])
         setJoinedCommunities((current) => [...current, name])
         setCurrentGroupChat(name)
@@ -109,8 +109,8 @@ export function CreateCommunityForm({
         <label className="field-label">Group name<input name="community-name" autoFocus placeholder="e.g. Weekend Gardeners" required /></label>
         <label className="field-label">Description<textarea name="community-description" placeholder="What is this group about?" required /></label>
         <fieldset className="group-invite-picker">
-          <legend>Invite friends (choose up to 5)</legend>
-          {friendsList.slice(0, 5).map((person) => <label key={person.id} className="group-invite-choice">
+          <legend>Invite friends(choose up to 5)</legend>
+         {friendsList.slice(0, 5).map((person) => <label key={person.id} className="group-invite-choice">
             <input type="checkbox" name="group-friend" value={person.id} disabled={!person.id} />
             <span>{person.name}</span>
           </label>)}
@@ -174,7 +174,7 @@ function Community({
   showToast,
   onRequestLogin,
   profileContent,
-}) {
+}){
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
@@ -185,9 +185,9 @@ function Community({
   const activeMessages = messages[conversationKey] || []
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
 
-  return (
+  return(
     <div className="wall-layout">
-      {profileContent ? <div className="wall-profile-view">{profileContent}</div> : <>
+     {profileContent ? <div className="wall-profile-view">{profileContent}</div> : <>
       <aside className="wall-left">
         <button type="button" className="wall-brand" onClick={() => navigate('Home')}>
           <span className="brand-mark">M</span><strong>Mahagedara</strong>
@@ -204,18 +204,18 @@ function Community({
         />
         <section className="mini-card wall-group-section">
           <div className="section-head"><h3>Find your circle</h3></div>
-          {discoverGroups.slice(0, 3).map((group, index) => (
+         {discoverGroups.slice(0, 3).map((group, index) =>(
             <article className="wall-group-suggestion" key={group.id || group.name}>
               <div className={`wall-group-cover group-cover-${index % 2}`} />
               <strong>{group.name}</strong>
-              <small>{group.members} members · {group.description}</small>
+              <small>{group.members} members ·{group.description}</small>
               <button type="button" className="secondary-btn compact" onClick={() => toggleJoin(group.name)}>Join</button>
             </article>
           ))}
-          {!discoverGroups.length && <p className="wall-muted">You’re already part of every community.</p>}
+         {!discoverGroups.length && <p className="wall-muted">You’re already part of every community.</p>}
         </section>
         <div className="wall-left-footer">
-          {!userId && <button type="button" onClick={onRequestLogin}>Sign in</button>}
+         {!userId && <button type="button" onClick={onRequestLogin}>Sign in</button>}
           <span>· Community guidelines · Privacy</span>
         </div>
       </aside>
@@ -241,9 +241,9 @@ function Community({
             showToast={showToast}
             onDeleteEvent={onDeleteEvent}
           />
-          {composer}
+         {composer}
           <section className="feed" aria-label="Post feed">
-            {filteredPosts.length
+           {filteredPosts.length
               ? filteredPosts.map(renderPost)
               : <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try another search.' : 'Share an update to get the conversation started.'}</p></div>}
           </section>
@@ -263,68 +263,68 @@ function Community({
 
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
-            <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' : (selectedGroup?.name || currentChat || 'M')[0]}</span>
-            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ? (selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
-            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
-            {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
-            {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
+            <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
+            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ?(inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+           {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
+           {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
+           {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
           </header>
 
-          {chatSection === 'Notifications' ? (
+         {chatSection === 'Notifications' ?(
             <div className="wall-notification-list">
-              {notifications.map((item) => {
+             {notifications.map((item) =>{
                 const request = incomingFriendRequests.find((friendRequest) =>
                   item.text === `${friendRequest.name} sent you a friend request.`
                 )
-                return (
+                return(
                   <article key={item.id} className={item.read ? '' : 'unread'}>
                     <button type="button" className="wall-notification-item" onClick={() => markNotificationRead(item.id)}>
-                      {item.text}<small>{item.time}</small>
+                     {item.text}<small>{item.time}</small>
                     </button>
-                    {request && <button type="button" className="wall-notification-accept" onClick={async () => {
-                      if (await acceptFriendRequest(request)) markNotificationRead(item.id)
+                   {request && <button type="button" className="wall-notification-accept" onClick={async() =>{
+                      if(await acceptFriendRequest(request)) markNotificationRead(item.id)
                     }}>Accept request</button>}
                   </article>
                 )
               })}
-              {!notifications.length && <p className="wall-muted">You’re all caught up.</p>}
+             {!notifications.length && <p className="wall-muted">You’re all caught up.</p>}
               <button type="button" className="wall-mark-read" onClick={markNotificationsRead}>Mark all as read</button>
             </div>
-          ) : chatSection === 'Friends' ? (
+          ) : chatSection === 'Friends' ?(
             <div className="wall-chat-friends">
-              {incomingFriendRequests.map((request) => <div className="wall-friend-request" key={request.requestId}>
+             {incomingFriendRequests.map((request) => <div className="wall-friend-request" key={request.requestId}>
                 <span>{request.name} sent you a friend request.</span>
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
-              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} className={inboxSelected && currentChat === friend.name ? 'selected' : ''} onClick={() => onSelectInboxChat(friend)}>
+             {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} className={inboxSelected && currentChat === friend.name ? 'selected' : ''} onClick={() => onSelectInboxChat(friend)}>
                 <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
               </button>)}
-              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
+             {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
-          ) : chatSection === 'Groups' && !selectedGroup ? (
+          ) : chatSection === 'Groups' && !selectedGroup ?(
             <div className="wall-chat-friends wall-chat-group-list">
-              {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
+             {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
                 <span className="wall-group-icon" style={{ background: group.tone }}></span><span>{group.name}<small>{group.members} members</small></span>
               </button>)}
-              {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
+             {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
               <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}>＋ Create a group</button>
             </div>
-          ) : isInboxList ? (
+          ) : isInboxList ?(
             <div className="wall-chat-friends">
-              {inboxConversations.map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
+             {inboxConversations.map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                   <span>{friend.name}<small>{friend.lastMessage || 'Open profile'}</small></span>
                 </button>
                 <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
               </div>)}
-              {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
+             {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
             </div>
-          ) : (
+          ) :(
             <>
               <div className="wall-chat-messages" aria-live="polite">
-                {(chatSection === 'World' ? (messages.World || []) : activeMessages).map((message, index) => <div key={`${message.id || message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} · {message.time}</small><p>{message.text}</p></div>)}
-                {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+               {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => <div key={`${message.id || message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} ·{message.time}</small><p>{message.text}</p></div>)}
+               {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
@@ -335,17 +335,17 @@ function Community({
           )}
 
           <nav className="wall-chat-tabs" aria-label="Community sections">
-            {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() => {
+           {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
               setChatSection(label)
-              if (label === 'World') setCurrentChat('World')
-              if (label === 'Groups') setCurrentGroupChat('')
-              if (label === 'Inbox') onViewInbox()
-              if (label === 'Notifications') markNotificationsRead()
+              if(label === 'World') setCurrentChat('World')
+              if(label === 'Groups') setCurrentGroupChat('')
+              if(label === 'Inbox') onViewInbox()
+              if(label === 'Notifications') markNotificationsRead()
             }}><span>{icon}</span>{label}</button>)}
           </nav>
         </section>
       </aside>
-      {toast && <div className="toast" role="status">{toast}</div>}
+     {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   )
 }

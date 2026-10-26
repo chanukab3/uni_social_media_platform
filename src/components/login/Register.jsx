@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { supabase } from "../../../supabase";
+import{ useState } from "react";
+import{ supabase } from "../../../supabase";
 import "./Auth.css";
 
-export default function Register({ onLogin, onRegisterSuccess }) {
+export default function Register({ onLogin, onRegisterSuccess }){
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -11,10 +11,10 @@ export default function Register({ onLogin, onRegisterSuccess }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleRegister(event) {
+  async function handleRegister(event){
     event.preventDefault();
 
-    if (loading) return;
+    if(loading) return;
 
     setError("");
     setMessage("");
@@ -22,59 +22,59 @@ export default function Register({ onLogin, onRegisterSuccess }) {
     const cleanEmail = email.trim().toLowerCase();
     const cleanUsername = username.trim().replace(/\s+/g, " ");
 
-    if (cleanUsername.length < 2 || cleanUsername.length > 40) {
+    if(cleanUsername.length < 2 || cleanUsername.length > 40){
       setError("Your name must be between 2 and 40 characters.");
       return;
     }
 
     // Validate email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)){
       setError("Please enter a valid email address.");
       return;
     }
 
     // Validate password
-    if (password.length < 8) {
+    if(password.length < 8){
       setError("Password must contain at least 8 characters.");
       return;
     }
 
-    if (!supabase) {
+    if(!supabase){
       setError("Supabase is not configured. Add your project URL and publishable key.");
       return;
     }
 
     setLoading(true);
 
-    try {
-      const { data, error: authError } =
+    try{
+      const{ data, error: authError } =
         await supabase.auth.signUp({
           email: cleanEmail,
           password,
-          options: {
-            data: {
+          options:{
+            data:{
               username: cleanEmail.slice(0, cleanEmail.indexOf("@")),
               display_name: cleanUsername,
             },
           },
         });
 
-      if (authError) {
+      if(authError){
         const errorText = authError.message.toLowerCase();
 
-        if (
+        if(
           errorText.includes("rate limit") ||
           errorText.includes("too many requests")
-        ) {
+        ){
           throw new Error(
             "Too many registration emails have been requested. Please wait before trying again."
           );
         }
 
-        if (
+        if(
           errorText.includes("already registered") ||
           errorText.includes("already exists")
-        ) {
+        ){
           throw new Error(
             "This email may already be registered. Please try logging in."
           );
@@ -83,22 +83,22 @@ export default function Register({ onLogin, onRegisterSuccess }) {
         throw authError;
       }
 
-      if (data.session) {
+      if(data.session){
         setMessage("Account created successfully.");
         onRegisterSuccess?.(data.user);
-      } else {
+      } else{
         setMessage(
           "Registration submitted. Please check your email to confirm your account."
         );
       }
-    } catch (err) {
+    } catch(err){
       setError(err.message || "Registration failed. Please try again.");
-    } finally {
+    } finally{
       setLoading(false);
     }
   }
 
-  return (
+  return(
     <main className="auth-page">
       <header className="auth-brand">
         <span className="brand-icon">♧</span>
@@ -175,7 +175,7 @@ export default function Register({ onLogin, onRegisterSuccess }) {
                 }
                 disabled={loading}
               >
-                {showPassword ? "Hide" : "Show"}
+               {showPassword ? "Hide" : "Show"}
               </button>
             </div>
 
@@ -184,15 +184,15 @@ export default function Register({ onLogin, onRegisterSuccess }) {
             </small>
           </div>
 
-          {error && (
+         {error &&(
             <p className="auth-error" role="alert">
-              {error}
+             {error}
             </p>
           )}
 
-          {message && (
+         {message &&(
             <p className="auth-success" role="status">
-              {message}
+             {message}
             </p>
           )}
 
@@ -201,7 +201,7 @@ export default function Register({ onLogin, onRegisterSuccess }) {
             className="auth-button auth-primary auth-full-button"
             disabled={loading}
           >
-            {loading ? "Creating account..." : "Register"}
+           {loading ? "Creating account..." : "Register"}
           </button>
           <p className="auth-switch">
             Already have an account?{" "}

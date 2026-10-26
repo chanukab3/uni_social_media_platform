@@ -1,9 +1,9 @@
 .auth-page,
-.auth-page * {
+.auth-page *{
   box-sizing: border-box;
 }
 
-.auth-page {
+.auth-page{
   --auth-bg: #121212;
   --auth-panel: #1b1b1b;
   --auth-field: #252525;
@@ -26,7 +26,7 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-.auth-brand {
+.auth-brand{
   position: absolute;
   top: 30px;
   left: max(5%, calc((100% - 1200px) / 2));
@@ -38,7 +38,7 @@
   font-weight: 700;
 }
 
-.brand-icon {
+.brand-icon{
   display: grid;
   width: 42px;
   height: 42px;
@@ -50,7 +50,7 @@
   color: #fff;
 }
 
-.auth-card {
+.auth-card{
   width: min(520px, 100%);
   padding: 10px 30px;
   border: 1px solid var(--auth-line);
@@ -59,7 +59,7 @@
   box-shadow: 0 22px 68px rgba(0, 0, 0, 0.45), 0 0 32px rgba(187, 134, 252, 0.08);
 }
 
-.auth-card h1 {
+.auth-card h1{
   margin: 10 0 20px;
   color: var(--auth-text);
   font-size: 2.1rem;
@@ -67,11 +67,11 @@
   text-align: center;
 }
 
-.auth-field {
+.auth-field{
   margin-bottom: 20px;
 }
 
-.auth-field label {
+.auth-field label{
   display: block;
   margin-bottom: 8px;
   color: var(--auth-text);
@@ -79,7 +79,7 @@
   font-weight: 600;
 }
 
-.auth-input-wrap {
+.auth-input-wrap{
   display: flex;
   align-items: center;
   gap: 12px;
@@ -91,12 +91,12 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.auth-input-wrap:focus-within {
+.auth-input-wrap:focus-within{
   border-color: rgba(187, 134, 252, 0.75);
   box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.16);
 }
 
-.auth-input-wrap input {
+.auth-input-wrap input{
   width: 100%;
   min-width: 0;
   padding: 15px 0;
@@ -107,13 +107,13 @@
   font-size: 0.95rem;
 }
 
-.auth-input-wrap input::placeholder {
+.auth-input-wrap input::placeholder{
   color: #a7a7a7;
 }
 
 .password-toggle,
 .auth-link,
-.auth-back-link {
+.auth-back-link{
   border: 0;
   background: transparent;
   color: #d0a8ff;
@@ -121,19 +121,19 @@
   font-size: 0.88rem;
 }
 
-.auth-forgot {
+.auth-forgot{
   display: flex;
   justify-content: flex-end;
   margin: -5px 0 6px;
 }
 
-.auth-actions {
+.auth-actions{
   display: flex;
   gap: 12px;
   margin-top: 28px;
 }
 
-.auth-button {
+.auth-button{
   min-height: 48px;
   flex: 1;
   padding: 12px 14px;
@@ -147,83 +147,83 @@
   transition: filter 0.18s ease, transform 0.18s ease;
 }
 
-.auth-button:hover:not(:disabled) {
+.auth-button:hover:not(:disabled){
   filter: brightness(1.15);
   transform: translateY(-1px);
 }
 
-.auth-primary {
+.auth-primary{
   border-color: transparent;
   background: linear-gradient(135deg, #8a5bc2, var(--auth-accent));
   box-shadow: 0 7px 18px rgba(187, 134, 252, 0.18);
   color: #fff;
 }
 
-.auth-actions .auth-button {
+.auth-actions .auth-button{
   border-color: transparent;
   background: linear-gradient(135deg, #8a5bc2, var(--auth-accent));
   box-shadow: 0 7px 18px rgba(187, 134, 252, 0.18);
   color: #fff;
 }
 
-.auth-button:disabled {
+.auth-button:disabled{
   cursor: wait;
   opacity: 0.68;
 }
 
-.auth-full-button {
+.auth-full-button{
   width: 100%;
   margin-top: 10px;
 }
 
-.auth-switch {
+.auth-switch{
   margin: 14px 0 0;
   color: var(--auth-muted);
   font-size: 0.86rem;
   text-align: center;
 }
 
-.auth-switch .auth-link {
+.auth-switch .auth-link{
   padding: 0;
   font-weight: 700;
 }
 
 .auth-hint,
-.auth-terms {
+.auth-terms{
   color: var(--auth-muted);
   font-size: 0.8rem;
 }
 
-.auth-terms {
+.auth-terms{
   margin-top: 22px;
   line-height: 1.7;
   text-align: center;
 }
 
-.auth-terms a {
+.auth-terms a{
   color: #d4a3ff;
 }
 
 .auth-error,
-.auth-success {
+.auth-success{
   font-size: 0.88rem;
   line-height: 1.5;
 }
 
-.auth-error {
+.auth-error{
   color: #ff9db6;
 }
 
-.auth-success {
+.auth-success{
   color: #92dfb2;
 }
 
-.auth-back-link {
+.auth-back-link{
   display: block;
   margin: 20px auto 0;
 }
 
-.auth-footer {
+.auth-footer{
   position: absolute;
   bottom: 28px;
   left: max(5%, calc((100% - 1200px) / 2));
@@ -231,17 +231,17 @@
   font-size: 0.78rem;
 }
 
-@media (max-width: 600px) {
-  .auth-card {
+@media(max-width: 600px){
+  .auth-card{
     padding: 10px;
   }
 
-  .auth-brand {
+  .auth-brand{
     top: 20px;
     left: 20px;
   }
 
-  .auth-actions {
+  .auth-actions{
     gap: 6px;
   }
 }

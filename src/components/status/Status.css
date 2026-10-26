@@ -1,9 +1,9 @@
-.wall-events {
+.wall-events{
   flex: 0 0 auto;
   padding: 0 16px 12px;
 }
 
-.wall-event-heading {
+.wall-event-heading{
   min-height: 42px;
   display: flex;
   align-items: center;
@@ -12,21 +12,21 @@
   padding: 0 2px 9px;
 }
 
-.wall-event-heading h2 {
+.wall-event-heading h2{
   margin: 0;
   color: var(--text);
   font-size: 1.05rem;
   font-weight: 700;
 }
 
-.wall-event-heading small {
+.wall-event-heading small{
   display: block;
   
   color: var(--muted);
   font-size: 0.76rem;
 }
 
-.wall-event-heading .event-create {
+.wall-event-heading .event-create{
   width: 29px;
   height: 25px;
   flex: 0 0 auto;
@@ -38,7 +38,7 @@
 }
 
 .wall-event-strip,
-.wall-event-dialog-strip {
+.wall-event-dialog-strip{
   display: grid;
   grid-auto-columns: minmax(190px, 43%);
   grid-auto-flow: column;
@@ -50,7 +50,7 @@
   scrollbar-width: thin;
 }
 
-.wall-event-card {
+.wall-event-card{
   position: relative;
   min-width: 0;
   height: 142px;
@@ -70,12 +70,12 @@
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.wall-event-card:hover {
+.wall-event-card:hover{
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.36), 0 4px 20px rgba(161, 55, 218, 0.28);
 }
 
-.wall-event-tag {
+.wall-event-tag{
   position: absolute;
   top: 10px;
   left: 10px;
@@ -92,7 +92,7 @@
   white-space: nowrap;
 }
 
-.wall-event-date {
+.wall-event-date{
   position: absolute;
   top: 9px;
   right: 9px;
@@ -108,29 +108,29 @@
   text-align: center;
 }
 
-.wall-event-card-copy {
+.wall-event-card-copy{
   min-width: 0;
   display: grid;
   gap: 4px;
 }
 
 .wall-event-card-copy strong,
-.wall-event-card-copy > span {
+.wall-event-card-copy > span{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wall-event-card-copy strong {
+.wall-event-card-copy strong{
   font-size: 0.94rem;
 }
 
-.wall-event-card-copy > span {
+.wall-event-card-copy > span{
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.75rem;
 }
 
-.wall-event-overlay {
+.wall-event-overlay{
   position: absolute;
   z-index: 12;
   inset: 65px 0 0;
@@ -144,26 +144,26 @@
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(111, 31, 167, 0.18);
 }
 
-.wall-event-overlay-heading {
+.wall-event-overlay-heading{
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
 
-.wall-event-overlay-heading h2 {
+.wall-event-overlay-heading h2{
   margin: 0;
   color: var(--text);
   font-size: 1.3rem;
 }
 
-.wall-event-overlay-heading p {
+.wall-event-overlay-heading p{
   margin: 5px 0 0;
   color: var(--muted);
   font-size: 0.85rem;
 }
 
-.wall-event-overlay-close {
+.wall-event-overlay-close{
   flex: 0 0 auto;
   padding: 9px 12px;
   border: 1px solid rgba(190, 113, 255, 0.28);
@@ -173,18 +173,18 @@
   font-size: 0.82rem;
 }
 
-.wall-event-dialog-strip {
+.wall-event-dialog-strip{
   grid-auto-columns: minmax(190px, 32%);
   flex: 0 0 auto;
   padding-bottom: 13px;
 }
 
-.wall-event-dialog-strip .wall-event-card {
+.wall-event-dialog-strip .wall-event-card{
   height: 130px;
   justify-content: center;
 }
 
-.wall-event-detail {
+.wall-event-detail{
   min-height: 190px;
   flex: 1 0 250px;
   display: grid;
@@ -197,115 +197,115 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32), 0 3px 18px rgba(111, 31, 167, 0.14);
 }
 
-.wall-event-detail > img {
+.wall-event-detail > img{
   width: 100%;
   height: 100%;
   min-height: 190px;
   object-fit: cover;
 }
 
-.wall-event-detail > div {
+.wall-event-detail > div{
   align-self: center;
   padding: 18px 18px 18px 0;
 }
 
-.wall-event-detail .wall-event-tag {
+.wall-event-detail .wall-event-tag{
   position: static;
   display: inline-block;
   max-width: 100%;
 }
 
-.wall-event-detail h3 {
+.wall-event-detail h3{
   margin: 12px 0 6px;
   color: var(--text);
   font-size: 1.25rem;
 }
 
 .wall-event-detail p,
-.wall-event-detail-date {
+.wall-event-detail-date{
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.dark-mode.wall-shell .wall-event-card {
+.dark-mode.wall-shell .wall-event-card{
   border-color: rgba(255, 255, 255, 0.1);
   background-color: #242424;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
 .dark-mode.wall-shell .wall-event-tag,
-.dark-mode.wall-shell .wall-event-date {
+.dark-mode.wall-shell .wall-event-date{
   border-color: rgba(255, 255, 255, 0.14);
   background: rgba(18, 18, 18, 0.82);
   color: #ede1fb;
 }
 
-.dark-mode.wall-shell .wall-event-overlay {
+.dark-mode.wall-shell .wall-event-overlay{
   border-color: rgba(255, 255, 255, 0.1);
   background: #171717;
 }
 
-.dark-mode.wall-shell .wall-event-detail {
+.dark-mode.wall-shell .wall-event-detail{
   border-color: rgba(255, 255, 255, 0.1);
   background: #222;
 }
 
-.dark-mode.wall-shell .wall-event-heading .event-create {
+.dark-mode.wall-shell .wall-event-heading .event-create{
   border: 0;
   background: #684b8a;
   color: #17121f;
 }
 
-.event-image-hint {
+.event-image-hint{
   display: block;
   margin-top: -8px;
   color: var(--muted);
   font-size: 0.7rem;
 }
 
-@media (max-width: 600px) {
-  .wall-events {
+@media(max-width: 600px){
+  .wall-events{
     padding-right: 11px;
     padding-left: 11px;
   }
 
-  .wall-event-strip {
+  .wall-event-strip{
     grid-auto-columns: minmax(210px, 78%);
   }
 
-  .wall-event-overlay {
+  .wall-event-overlay{
     inset: 58px 0 0;
     gap: 12px;
     padding: 14px 12px;
   }
 
-  .wall-event-dialog-strip {
+  .wall-event-dialog-strip{
     grid-auto-columns: minmax(220px, 85%);
   }
 
-  .wall-event-dialog-strip .wall-event-card {
+  .wall-event-dialog-strip .wall-event-card{
     height: 175px;
   }
 
-  .wall-event-detail {
+  .wall-event-detail{
     grid-template-columns: 1fr;
   }
 
-  .wall-event-detail > img {
+  .wall-event-detail > img{
     width: 300px;
     min-height: 50px;
   }
 
-  .wall-event-detail > div {
+  .wall-event-detail > div{
     padding: 0 15px 16px;
   }
 
-  .wall-event-overlay-heading {
+  .wall-event-overlay-heading{
     align-items: center;
   }
 
-  .wall-event-overlay-close {
+  .wall-event-overlay-close{
     max-width: 120px;
     white-space: normal;
   }

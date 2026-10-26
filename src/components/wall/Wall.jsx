@@ -1,12 +1,12 @@
-import { useRef } from 'react'
+import{ useRef } from 'react'
 import Community from '../community/Community'
-import Profile, { ProfileAvatar } from '../profile/Profile'
+import Profile,{ ProfileAvatar } from '../profile/Profile'
 import Status from '../status/Status'
 import './Wall.css'
 
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
-function formatCount(count) {
+function formatCount(count){
   return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : count
 }
 
@@ -20,31 +20,31 @@ export function PostComposer({
   onComposerFileChange,
   onPublish,
   showToast,
-}) {
+}){
   const fileInputRef = useRef(null)
-  const submitPost = async (event) => {
+  const submitPost = async(event) =>{
     const published = await onPublish(event)
-    if (published && fileInputRef.current) fileInputRef.current.value = ''
+    if(published && fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  return (
+  return(
     <form className="composer" onSubmit={submitPost}>
       <div className="avatar small avatar-peach">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</div>
       <div className="composer-fields">
         <div className="composer-photo-first">
-          {composerImage && (
+         {composerImage &&(
             <div className="attachment-preview">
               <img src={composerImage} alt="Selected post attachment" />
-              <button className="remove-attachment" type="button" onClick={() => {
+              <button className="remove-attachment" type="button" onClick={() =>{
                 URL.revokeObjectURL(composerImage)
                 onComposerImageChange('')
                 onComposerFileChange(null)
-                if (fileInputRef.current) fileInputRef.current.value = ''
+                if(fileInputRef.current) fileInputRef.current.value = ''
               }} aria-label="Remove attached image">×</button>
             </div>
           )}
           <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
-            {composerImage ? 'Change photo' : '＋ Add photo'}
+           {composerImage ? 'Change photo' : '＋ Add photo'}
           </button>
           <small className="composer-photo-limit">One photo · max 5 MB</small>
           <input
@@ -52,20 +52,20 @@ export function PostComposer({
             className="visually-hidden"
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={(event) => {
+            onChange={(event) =>{
               const file = event.target.files?.[0]
-              if (!file) return
-              if (!supportedPhotoTypes.has(file.type)) {
+              if(!file) return
+              if(!supportedPhotoTypes.has(file.type)){
                 showToast('Choose a JPG, PNG, WebP, or GIF photo.')
                 event.target.value = ''
                 return
               }
-              if (file.size >= 5_000_000) {
+              if(file.size >= 5_000_000){
                 showToast('Choose one image smaller than 5 MB.')
                 event.target.value = ''
                 return
               }
-              if (composerImage.startsWith('blob:')) URL.revokeObjectURL(composerImage)
+              if(composerImage.startsWith('blob:')) URL.revokeObjectURL(composerImage)
               onComposerFileChange(file)
               onComposerImageChange(URL.createObjectURL(file))
             }}
@@ -105,8 +105,8 @@ export function PostCard({
   onAddComment,
   onCommentDraftChange,
   onProfileClick,
-}) {
-  return (
+}){
+  return(
     <article className="post-card">
       <div className="post-header">
         <ProfileAvatar
@@ -116,53 +116,53 @@ export function PostCard({
         <div>
           <div className="author-row">
             <button type="button" className="profile-name-link" onClick={() => onProfileClick({ id: post.authorId, name: post.author, handle: post.handle, color: post.accent, avatarUrl: post.avatarUrl })}>{post.author}</button>
-            {!post.mine && <span className="verified" aria-label="Verified"></span>}
+           {!post.mine && <span className="verified" aria-label="Verified"></span>}
           </div>
-          <small>{post.handle} · {post.time}</small>
+          <small>{post.handle} ·{post.time}</small>
         </div>
         <div className="post-menu-wrap">
           <button type="button" className="ghost-btn" aria-label={`More options for ${post.author}'s post`} onClick={() => onSetOpenMenu(openMenu === post.id ? null : post.id)}>•••</button>
-          {openMenu === post.id && (
+         {openMenu === post.id &&(
             <div className="post-menu">
               <button type="button" onClick={() => onToggleSave(post.id)}>{savedPosts.includes(post.id) ? 'Remove saved post' : 'Save post'}</button>
-              {post.mine || canModerate
+             {post.mine || canModerate
                 ? <button type="button" onClick={() => onDelete(post.id)}>Delete post</button>
                 : <button type="button" onClick={onReport}>Report post</button>}
             </div>
           )}
         </div>
       </div>
-      {post.text && <p className="post-text">{post.text}</p>}
-      {post.image && (
+     {post.text && <p className="post-text">{post.text}</p>}
+     {post.image &&(
         <div className="photo-frame">
           <img src={post.image} alt={`Photo shared by ${post.author}`} />
         </div>
       )}
       <div className="post-actions">
         <button type="button" className={post.liked ? 'post-action liked' : 'post-action'} onClick={() => onToggleLike(post.id)} aria-pressed={post.liked}>
-          <span aria-hidden="true">{post.liked ? '♥' : '♡'}</span> {formatCount(post.likes)}
+          <span aria-hidden="true">{post.liked ? '♥' : '♡'}</span>{formatCount(post.likes)}
         </button>
         <button type="button" className="post-action" onClick={() => onToggleComments(post.id)} aria-expanded={commentsExpanded}>
-          <span aria-hidden="true">▢</span> {formatCount(post.commentCount)}
+          <span aria-hidden="true">▢</span>{formatCount(post.commentCount)}
         </button>
         <button type="button" className="post-action" onClick={() => onShare(post)}>
-          <span aria-hidden="true">↗</span> {formatCount(post.shares)}
+          <span aria-hidden="true">↗</span>{formatCount(post.shares)}
         </button>
       </div>
-      {commentsExpanded && (
-        <div className="comment-list" onScroll={(event) => {
-          if (event.currentTarget.scrollTop <= 12 && commentsHasMore && !commentsLoading) {
+     {commentsExpanded &&(
+        <div className="comment-list" onScroll={(event) =>{
+          if(event.currentTarget.scrollTop <= 12 && commentsHasMore && !commentsLoading){
             onLoadOlderComments(post.id)
           }
         }}>
-          {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
-            {commentsLoading ? 'Loading comments…' : 'Load older comments'}
+         {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
+           {commentsLoading ? 'Loading comments…' : 'Load older comments'}
           </button>}
-          {comments.map((comment) => (
-            <p key={comment.id}><strong>{comment.author}</strong> {comment.text}</p>
+         {comments.map((comment) =>(
+            <p key={comment.id}><strong>{comment.author}</strong>{comment.text}</p>
           ))}
-          {commentsLoading && <p className="wall-muted">Loading comments…</p>}
-          {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
+         {commentsLoading && <p className="wall-muted">Loading comments…</p>}
+         {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
         </div>
       )}
       <form className="comment-form" onSubmit={(event) => onAddComment(event, post.id)}>
@@ -196,11 +196,11 @@ export function PostFeed({
   onCommentDraftChange,
   onProfileClick,
   emptyState,
-}) {
-  return (
+}){
+  return(
     <section className="feed" aria-label="Post feed">
-      {posts.length
-        ? posts.map((post) => (
+     {posts.length
+        ? posts.map((post) =>(
           <PostCard
             key={post.id}
             post={post}
@@ -284,7 +284,7 @@ function Wall({
   onComposerImageChange,
   onComposerFileChange,
   profileProps,
-}) {
+}){
   const term = query.trim().toLowerCase()
   const selectedGroup = communities.find((group) => group.name === currentGroupChat)
   const chatName = chatSection === 'World'
@@ -295,15 +295,15 @@ function Wall({
   const conversationKey = selectedGroup ? `group:${selectedGroup.id || selectedGroup.name}` : currentChat
   const chatMessages = messages[conversationKey] || []
   const visibleSuggestions = people.filter((friend) => friend.name.toLowerCase().includes(term))
-  return (
+  return(
     <div className="wall-layout">
       <aside className={activePage === 'Profile' ? 'wall-left wall-left-profile' : 'wall-left'}>
         <button type="button" className="wall-brand" onClick={() => onNavigate('Home')}>
           <span className="brand-mark">M</span><strong>Mahagedara</strong>
         </button>
-        {activePage === 'Profile' ? (
-          <Profile {...profileProps} />
-        ) : (
+       {activePage === 'Profile' ?(
+          <Profile{...profileProps} />
+        ) :(
           <>
             <section className="mini-card wall-profile">
               <button type="button" className="wall-profile-button" onClick={() => onNavigate('Profile')}>
@@ -329,28 +329,28 @@ function Wall({
       </aside>
 
       <main className="wall-center">
-        {activePage === 'Profile' ? (
+       {activePage === 'Profile' ?(
           <>
             <header className="topbar wall-topbar">
               <label className="search-wrap">
                 <span aria-hidden="true">⌕</span>
                 <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
-                {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
+               {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
               </label>
               <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
             </header>
             <div className="wall-profile-scroll">
-              <Profile {...profileProps} view="posts" />
+              <Profile{...profileProps} view="posts" />
             </div>
           </>
-        ) : (
+        ) :(
           <>
             <div className="wall-feed-scroll">
               <header className="topbar wall-topbar">
                 <label className="search-wrap">
                   <span aria-hidden="true">⌕</span>
                   <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
-                  {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
+                 {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
                 </label>
                 <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
               </header>
@@ -395,13 +395,13 @@ function Wall({
         <section className="mini-card wall-friend-suggestions">
           <div className="section-head"><h3>People you may know</h3></div>
           <div className="suggested-friends">
-            {visibleSuggestions.map((friend) => (
+           {visibleSuggestions.map((friend) =>(
               <article className="suggested-friend" key={friend.name}>
                 <span className="avatar small" style={{ background: friend.color }}>{friend.name[0]}</span><strong>{friend.name}</strong>
                 <button type="button" onClick={() => onSendFriendRequest(friend.name)}>{friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}</button>
               </article>
             ))}
-            {!visibleSuggestions.length && <p className="wall-muted">No people match your search.</p>}
+           {!visibleSuggestions.length && <p className="wall-muted">No people match your search.</p>}
           </div>
         </section>
         <section className="wall-chat-card">
@@ -410,20 +410,20 @@ function Wall({
             <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? currentChat : chatName}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : chatSection === 'Notifications' ? 'Your latest activity' : 'Messages and conversations'}</small></span>
             <button type="button" aria-label="More chat options">•••</button>
           </header>
-          {chatSection === 'Notifications' ? (
+         {chatSection === 'Notifications' ?(
             <div className="wall-notification-list">
-              {notifications.map((item) => <button type="button" key={item.id} className={item.read ? '' : 'unread'} onClick={() => onMarkNotificationRead(item.id)}>{item.text}<small>{item.time}</small></button>)}
+             {notifications.map((item) => <button type="button" key={item.id} className={item.read ? '' : 'unread'} onClick={() => onMarkNotificationRead(item.id)}>{item.text}<small>{item.time}</small></button>)}
               <button type="button" className="wall-mark-read" onClick={onMarkNotificationsRead}>Mark all as read</button>
             </div>
-          ) : chatSection === 'Friends' ? (
+          ) : chatSection === 'Friends' ?(
             <div className="wall-chat-friends">{people.filter((friend) => friend.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.name} onClick={() => onOpenFriendChat(friend)}><span className="avatar tiny" style={{ background: friend.color }}>{friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span><i className={friend.status === 'online' ? 'online-dot' : 'online-dot away'} /></button>)}</div>
-          ) : chatSection === 'Groups' && !selectedGroup ? (
+          ) : chatSection === 'Groups' && !selectedGroup ?(
             <div className="wall-chat-friends">{communities.filter((group) => joinedCommunities.includes(group.name) && `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.name} onClick={() => onOpenGroupChat(group)}><span className="wall-group-icon" style={{ background: group.tone }}>✦</span><span>{group.name}<small>{group.members} members</small></span></button>)}</div>
-          ) : (
+          ) :(
             <>
               <div className="wall-chat-messages" aria-live="polite">
-                {(chatSection === 'World' ? (messages.World || []) : chatMessages).map((message, index) => <div key={`${message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} · {message.time}</small><p>{message.text}</p></div>)}
-                {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+               {(chatSection === 'World' ?(messages.World || []) : chatMessages).map((message, index) => <div key={`${message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} ·{message.time}</small><p>{message.text}</p></div>)}
+               {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
               </div>
               <form className="wall-chat-form" onSubmit={onSendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${chatName}...`} value={messageDraft} onChange={(event) => onMessageDraftChange(event.target.value)} />
@@ -433,8 +433,8 @@ function Wall({
             </>
           )}
           <nav className="wall-chat-tabs" aria-label="Community sections">
-            {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => (
-              <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() => {
+           {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) =>(
+              <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
                 onSelectChatTab(label)
               }}><span>{icon}</span>{label}</button>
             ))}

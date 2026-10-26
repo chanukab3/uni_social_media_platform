@@ -1,51 +1,51 @@
-import { useState } from "react";
-import { supabase } from "../../../supabase";
+import{ useState } from "react";
+import{ supabase } from "../../../supabase";
 import "./Auth.css";
 
-export default function ForgotPassword({ onLogin }) {
+export default function ForgotPassword({ onLogin }){
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleReset(event) {
+  async function handleReset(event){
     event.preventDefault();
     setError("");
     setMessage("");
 
     const cleanEmail = email.trim().toLowerCase();
 
-    if (!cleanEmail) {
+    if(!cleanEmail){
       setError("Please enter your email address.");
       return;
     }
 
-    if (!supabase) {
+    if(!supabase){
       setError("Supabase is not configured. Add your project URL and publishable key.");
       return;
     }
 
     setLoading(true);
 
-    try {
-      const { error: resetError } =
-        await supabase.auth.resetPasswordForEmail(cleanEmail, {
+    try{
+      const{ error: resetError } =
+        await supabase.auth.resetPasswordForEmail(cleanEmail,{
           redirectTo: window.location.origin,
         });
 
-      if (resetError) throw resetError;
+      if(resetError) throw resetError;
 
       setMessage(
         "If an account exists for this email, check your inbox for reset instructions."
       );
-    } catch (err) {
+    } catch(err){
       setError(err.message || "Unable to send the reset email.");
-    } finally {
+    } finally{
       setLoading(false);
     }
   }
 
-  return (
+  return(
     <main className="auth-page">
       <header className="auth-brand">
         <span className="brand-icon">♧</span>
@@ -72,15 +72,15 @@ export default function ForgotPassword({ onLogin }) {
             </div>
           </div>
 
-          {error && <p className="auth-error" role="alert">{error}</p>}
-          {message && <p className="auth-success" role="status">{message}</p>}
+         {error && <p className="auth-error" role="alert">{error}</p>}
+         {message && <p className="auth-success" role="status">{message}</p>}
 
           <button
             type="submit"
             className="auth-button auth-primary auth-full-button"
             disabled={loading}
           >
-            {loading ? "Sending..." : "Send reset link"}
+           {loading ? "Sending..." : "Send reset link"}
           </button>
 
           <button

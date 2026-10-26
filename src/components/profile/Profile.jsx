@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react'
+import{ useRef, useState } from 'react'
 import './profile.css'
 
-export function ProfileAvatar({ person, className = 'avatar small', onClick }) {
+export function ProfileAvatar({ person, className = 'avatar small', onClick }){
   const avatarUrl = person.avatarUrl || person.avatar_url
-  return (
+  return(
     <button
       type="button"
       className={`${className} profile-avatar-link`}
@@ -11,14 +11,14 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }) {
       aria-label={`View ${person.name}'s profile`}
       onClick={() => onClick(person)}
     >
-      {avatarUrl ? <img src={avatarUrl} alt="" /> : person.name?.[0] || '?'}
+     {avatarUrl ? <img src={avatarUrl} alt="" /> : person.name?.[0] || '?'}
     </button>
   )
 }
 
-export function WallProfileCard({ profileId, profileName, profileHandle, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }) {
-  const currentUser = { id: profileId, name: profileName, avatarUrl: profilePhotoUrl, color: '#879174' }
-  return (
+export function WallProfileCard({ profileId, profileName, profileHandle, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }){
+  const currentUser ={ id: profileId, name: profileName, avatarUrl: profilePhotoUrl, color: '#879174' }
+  return(
     <section className="mini-card wall-profile">
       <button type="button" className="wall-profile-button" onClick={() => onProfileClick(currentUser)}>
         <span className="avatar large avatar-olive">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</span>
@@ -34,39 +34,39 @@ export function WallProfileCard({ profileId, profileName, profileHandle, profile
   )
 }
 
-export function FriendSuggestions({ people, friendsList, query, friendRequests, sendFriendRequest, onProfileClick }) {
+export function FriendSuggestions({ people, friendsList, query, friendRequests, sendFriendRequest, onProfileClick }){
   const term = query.trim().toLowerCase()
   const friendIds = new Set(friendsList.map((friend) => friend.id))
   const suggestions = people.filter((person) =>
     !friendIds.has(person.id)
     && person.name.toLowerCase().includes(term)
   )
-  return (
+  return(
     <section className="mini-card wall-friend-suggestions">
       <div className="section-head"><h3>People you may know</h3></div>
       <div className="suggested-friends">
-        {suggestions.map((friend) => (
+       {suggestions.map((friend) =>(
           <article className="suggested-friend" key={friend.id || friend.name}>
             <ProfileAvatar person={friend} onClick={onProfileClick} />
             <strong>{friend.name}</strong>
             <button type="button" disabled={friendRequests.includes(friend.name)} onClick={() => sendFriendRequest(friend.name)}>
-              {friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}
+             {friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}
             </button>
           </article>
         ))}
-        {!suggestions.length && <p className="wall-muted">No people match your search.</p>}
+       {!suggestions.length && <p className="wall-muted">No people match your search.</p>}
       </div>
     </section>
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }) {
+export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
   const photoInputRef = useRef(null)
   const [adminPanel, setAdminPanel] = useState('')
   const viewedName = profileTarget?.name || profileName
   const isOwnProfile = !profileTarget || profileTarget.id === userId
   const viewedHandle = isOwnProfile ? profileHandle : profileTarget?.handle
-  return (
+  return(
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">
         <button type="button" className="wall-profile-back" onClick={onHome}>← Back to wall</button>
@@ -80,8 +80,8 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
               <p>{viewedHandle || ''}</p>
             </div>
           </div>
-          {profileBio && <p className="wall-profile-bio">{profileBio}</p>}
-          {isOwnProfile && <>
+         {profileBio && <p className="wall-profile-bio">{profileBio}</p>}
+         {isOwnProfile && <>
             <div className="profile-controls">
               <button className="secondary-btn" type="button" onClick={() => photoInputRef.current?.click()}>{profilePhotoUrl ? 'Change photo' : 'Add profile photo'}</button>
               <input
@@ -90,9 +90,9 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 aria-label="Choose a profile photo smaller than 1 MB"
-                onChange={async (event) => {
+                onChange={async(event) =>{
                   const file = event.target.files?.[0]
-                  if (file) await onUploadProfilePhoto(file)
+                  if(file) await onUploadProfilePhoto(file)
                   event.target.value = ''
                 }}
               />
@@ -105,7 +105,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
           </>}
           <div className="wall-profile-numbers"><span><strong>{postCount}</strong><small>Posts</small></span></div>
         </section>
-        {isAdmin && isOwnProfile && <section className="admin-profile-actions" aria-label="Admin controls">
+       {isAdmin && isOwnProfile && <section className="admin-profile-actions" aria-label="Admin controls">
           <button className="secondary-btn" type="button" onClick={() => setAdminPanel('users')}>Manage users</button>
           <button className="secondary-btn" type="button" onClick={() => setAdminPanel('groups')}>Manage groups</button>
         </section>}
@@ -115,33 +115,33 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
           <div><h2>{isOwnProfile ? 'Your posts' : `${viewedName}’s posts`}</h2><p>Updates shared with the community.</p></div>
         </header>
         <section className="feed">
-          {filteredPosts.length
+         {filteredPosts.length
             ? filteredPosts.map(renderPost)
             : <div className="empty-state"><h3>No posts yet</h3><p>{isOwnProfile ? 'Write your first update from the home feed.' : 'This person has not shared any posts yet.'}</p>{isOwnProfile && <button type="button" className="secondary-btn" onClick={onHome}>Go to Home</button>}</div>}
         </section>
       </main>
-      {adminPanel && (
+     {adminPanel &&(
         <div className="modal-backdrop" role="presentation" onClick={() => setAdminPanel('')}>
           <section className="modal-card admin-management-modal" role="dialog" aria-modal="true" aria-labelledby="admin-management-title" onClick={(event) => event.stopPropagation()}>
             <button type="button" className="modal-close" onClick={() => setAdminPanel('')} aria-label="Close admin management">×</button>
             <h2 id="admin-management-title">{adminPanel === 'users' ? 'Manage users' : 'Manage groups'}</h2>
-            {adminPanel === 'users' ? (
+           {adminPanel === 'users' ?(
               <div className="admin-management-list">
-                {people.map((person) => <div className="admin-user-row" key={person.id}>
+               {people.map((person) => <div className="admin-user-row" key={person.id}>
                   <span>{person.name}</span>
                   <button type="button" className={person.isBanned ? 'text-action' : 'text-action danger-action'} onClick={() => onBanUser(person)}>{person.isBanned ? 'Unban' : 'Ban'}</button>
                 </div>)}
-                {!people.length && <p className="wall-muted">No other users to manage.</p>}
+               {!people.length && <p className="wall-muted">No other users to manage.</p>}
               </div>
-            ) : (
+            ) :(
               <div className="admin-management-list">
-                {communities.map((group) => <div className="admin-user-row" key={group.id}>
+               {communities.map((group) => <div className="admin-user-row" key={group.id}>
                   <span>{group.name}</span>
-                  <button type="button" className="text-action danger-action" onClick={async () => {
-                    if (await onDeleteGroup(group)) setAdminPanel('')
+                  <button type="button" className="text-action danger-action" onClick={async() =>{
+                    if(await onDeleteGroup(group)) setAdminPanel('')
                   }}>Delete</button>
                 </div>)}
-                {!communities.length && <p className="wall-muted">No groups to manage.</p>}
+               {!communities.length && <p className="wall-muted">No groups to manage.</p>}
               </div>
             )}
           </section>

@@ -1,5 +1,4 @@
-/* Three-column wall */
-.page-shell.wall-shell {
+.page-shell.wall-shell{
   width: 100%;
   height: 100dvh;
   min-height: 620px;
@@ -8,7 +7,7 @@
   background: #d9cbcb;
 }
 
-.wall-layout {
+.wall-layout{
   width: min(1536px, 100%);
   height: 100%;
   display: grid;
@@ -19,12 +18,12 @@
 
 .wall-left,
 .wall-center,
-.wall-right {
+.wall-right{
   min-width: 0;
   height: 100%;
 }
 
-.wall-left {
+.wall-left{
   display: flex;
   flex-direction: column;
   gap: 13px;
@@ -33,7 +32,7 @@
   background: #f7eafa;
 }
 
-.wall-brand {
+.wall-brand{
   min-height: 39px;
   display: flex;
   align-items: center;
@@ -43,7 +42,7 @@
   text-align: left;
 }
 
-.wall-brand .brand-mark {
+.wall-brand .brand-mark{
   width: 34px;
   height: 34px;
   border-radius: 9px;
@@ -53,24 +52,24 @@
   font-size: 1rem;
 }
 
-.wall-brand strong {
+.wall-brand strong{
   font-size: 1.12rem;
   letter-spacing: -0.035em;
 }
 
 .wall-left .mini-card,
-.wall-right .mini-card {
+.wall-right .mini-card{
   border: 1px solid rgba(88, 59, 88, 0.12);
   border-radius: 14px;
   background: #fff9ff;
   box-shadow: 0 4px 14px rgba(82, 53, 77, 0.035);
 }
 
-.wall-profile {
+.wall-profile{
   padding: 12px;
 }
 
-.wall-profile-button {
+.wall-profile-button{
   width: 100%;
   display: flex;
   align-items: center;
@@ -80,19 +79,19 @@
   text-align: left;
 }
 
-.wall-profile-button .avatar {
+.wall-profile-button .avatar{
   width: 42px;
   height: 42px;
 }
 
-.wall-profile-button > span:last-child {
+.wall-profile-button > span:last-child{
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.wall-profile-button strong {
+.wall-profile-button strong{
   overflow: hidden;
   font-size: 0.8rem;
   text-overflow: ellipsis;
@@ -104,17 +103,17 @@
 .wall-profile-stats small,
 .wall-group-suggestion small,
 .wall-joined-group small,
-.wall-muted {
+.wall-muted{
   color: #766b7a;
   font-size: 0.68rem;
 }
 
-.wall-profile p {
+.wall-profile p{
   margin: 9px 0 10px;
   line-height: 1.45;
 }
 
-.wall-profile-stats {
+.wall-profile-stats{
   display: flex;
   align-items: center;
   gap: 22px;
@@ -122,7 +121,7 @@
   border-top: 1px solid rgba(88, 59, 88, 0.1);
 }
 
-.wall-profile-stats > button:not(:last-child) {
+.wall-profile-stats > button:not(:last-child){
   display: grid;
   gap: 1px;
   margin: 0;
@@ -131,40 +130,40 @@
   text-align: left;
 }
 
-.wall-profile-stats strong {
+.wall-profile-stats strong{
   font-size: 0.81rem;
 }
 
-.wall-profile-stats button {
+.wall-profile-stats button{
   margin-left: auto;
   background: transparent;
   font-size: 1rem;
 }
 
-.wall-profile-stats > button:not(:last-child) {
+.wall-profile-stats > button:not(:last-child){
   font-size: inherit;
 }
 
-.wall-group-section {
+.wall-group-section{
   padding: 11px;
 }
 
 .wall-left .section-head,
-.wall-right .section-head {
+.wall-right .section-head{
   margin-bottom: 8px;
 }
 
 .wall-left .section-head h3,
-.wall-right .section-head h3 {
+.wall-right .section-head h3{
   font-size: 0.77rem;
 }
 
 .wall-left .section-head button,
-.wall-right .section-head button {
+.wall-right .section-head button{
   font-size: 0.67rem;
 }
 
-.wall-group-suggestion {
+.wall-group-suggestion{
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -173,12 +172,12 @@
   padding-bottom: 9px;
 }
 
-.wall-group-suggestion + .wall-group-suggestion {
+.wall-group-suggestion + .wall-group-suggestion{
   padding-top: 8px;
   border-top: 1px solid rgba(88, 59, 88, 0.1);
 }
 
-.wall-group-cover {
+.wall-group-cover{
   grid-column: 1 / -1;
   height: 62px;
   margin-bottom: 2px;
@@ -187,26 +186,26 @@
   background-size: cover;
 }
 
-.group-cover-0 {
+.group-cover-0{
   background-image: url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=600&q=75');
 }
 
-.group-cover-1 {
+.group-cover-1{
   background-image: url('https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=600&q=75');
 }
 
-.wall-group-suggestion > strong {
+.wall-group-suggestion > strong{
   font-size: 0.73rem;
 }
 
-.wall-group-suggestion > small {
+.wall-group-suggestion > small{
   grid-column: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wall-group-suggestion .secondary-btn.compact {
+.wall-group-suggestion .secondary-btn.compact{
   grid-column: 2;
   grid-row: 2;
   min-height: 27px;
@@ -214,16 +213,16 @@
   font-size: 0.65rem;
 }
 
-.wall-muted {
+.wall-muted{
   margin: 6px 0;
 }
 
-.joined-groups {
+.joined-groups{
   flex: 1;
   min-height: 0;
 }
 
-.wall-joined-group {
+.wall-joined-group{
   width: 100%;
   display: flex;
   align-items: center;
@@ -233,7 +232,7 @@
   text-align: left;
 }
 
-.wall-group-icon {
+.wall-group-icon{
   width: 29px;
   height: 29px;
   display: grid;
@@ -245,12 +244,12 @@
   font-size: 0.8rem;
 }
 
-.wall-joined-group > span:nth-child(2) {
+.wall-joined-group > span:nth-child(2){
   min-width: 0;
   flex: 1;
 }
 
-.wall-joined-group strong {
+.wall-joined-group strong{
   display: block;
   overflow: hidden;
   font-size: 0.68rem;
@@ -258,11 +257,11 @@
   white-space: nowrap;
 }
 
-.wall-joined-group small:last-child {
+.wall-joined-group small:last-child{
   font-size: 0.62rem;
 }
 
-.wall-create-group {
+.wall-create-group{
   width: 100%;
   bottom: 0;
   padding: 9px 0 2px;
@@ -275,7 +274,7 @@
   text-align: left;
 }
 
-.wall-left-footer {
+.wall-left-footer{
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -283,14 +282,14 @@
   font-size: 0.61rem;
 }
 
-.wall-left-footer button {
+.wall-left-footer button{
   padding: 0;
   background: transparent;
   color: inherit;
   font-size: inherit;
 }
 
-.wall-center {
+.wall-center{
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -299,7 +298,7 @@
   background: #f7eafa;
 }
 
-.wall-topbar {
+.wall-topbar{
   position: relative;
   flex: 0 0 auto;
   gap: 10px;
@@ -308,22 +307,22 @@
   backdrop-filter: blur(14px);
 }
 
-.wall-topbar .search-wrap {
+.wall-topbar .search-wrap{
   min-height: 38px;
   border-color: rgba(88, 59, 88, 0.12);
   border-radius: 8px;
   background: #fff9ff;
 }
 
-.wall-topbar .search-wrap input {
+.wall-topbar .search-wrap input{
   font-size: 0.71rem;
 }
 
-.wall-topbar .search-wrap > span {
+.wall-topbar .search-wrap > span{
   font-size: 1.1rem;
 }
 
-.wall-icon-button {
+.wall-icon-button{
   position: relative;
   width: 35px;
   height: 35px;
@@ -333,12 +332,12 @@
   background: #fff9ff;
 }
 
-.wall-events {
+.wall-events{
   flex: 0 0 auto;
   padding: 0 16px 8px;
 }
 
-.wall-event-heading {
+.wall-event-heading{
   min-height: 34px;
   display: flex;
   align-items: center;
@@ -347,25 +346,25 @@
   padding: 0 3px 7px;
 }
 
-.wall-event-heading h2 {
+.wall-event-heading h2{
   font-size: 0.94rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
-.wall-event-heading small {
+.wall-event-heading small{
   display: block;
   margin-top: 2px;
   color: #776a7a;
   font-size: 0.61rem;
 }
 
-.wall-event-controls {
+.wall-event-controls{
   display: flex;
   gap: 6px;
 }
 
-.wall-event-controls button {
+.wall-event-controls button{
   width: 25px;
   height: 25px;
   border-radius: 50%;
@@ -375,20 +374,20 @@
   line-height: 1;
 }
 
-.wall-event-controls .event-create {
+.wall-event-controls .event-create{
   border-radius: 8px;
   background: #eadbf3;
   font-size: 0.85rem;
 }
 
-.wall-event-track {
+.wall-event-track{
   height: clamp(128px, 19vh, 165px);
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(100px, 0.55fr);
   gap: 9px;
 }
 
-.wall-event-feature {
+.wall-event-feature{
   position: relative;
   width: 100%;
   min-width: 100%;
@@ -404,20 +403,20 @@
   color: #fff;
 }
 
-.wall-event-feature-viewport {
+.wall-event-feature-viewport{
   min-width: 0;
   overflow: hidden;
   border-radius: 10px;
 }
 
-.wall-event-feature-track {
+.wall-event-feature-track{
   width: 100%;
   height: 100%;
   display: flex;
   transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
-.wall-event-tag {
+.wall-event-tag{
   position: absolute;
   top: 9px;
   left: 9px;
@@ -433,7 +432,7 @@
   white-space: nowrap;
 }
 
-.wall-event-date {
+.wall-event-date{
   position: absolute;
   top: 9px;
   right: 9px;
@@ -448,7 +447,7 @@
   text-align: center;
 }
 
-.wall-event-feature p {
+.wall-event-feature p{
   overflow: hidden;
   font-size: 0.86rem;
   font-weight: 700;
@@ -456,7 +455,7 @@
   white-space: nowrap;
 }
 
-.wall-event-side {
+.wall-event-side{
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -467,7 +466,7 @@
   background: #fff9ff;
 }
 
-.wall-event-side img {
+.wall-event-side img{
   width: 100%;
   height: 57%;
   object-fit: cover;
@@ -475,24 +474,24 @@
 
 .wall-event-side small,
 .wall-event-side strong,
-.wall-event-side > span {
+.wall-event-side > span{
   margin: 0 8px;
 }
 
-.wall-event-side small {
+.wall-event-side small{
   color: #766a7a;
   font-size: 0.48rem;
   font-weight: 700;
 }
 
-.wall-event-side strong {
+.wall-event-side strong{
   overflow: hidden;
   font-size: 0.65rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wall-event-side > span {
+.wall-event-side > span{
   overflow: hidden;
   color: #766a7a;
   font-size: 0.54rem;
@@ -500,7 +499,7 @@
   white-space: nowrap;
 }
 
-.wall-event-dots {
+.wall-event-dots{
   height: 11px;
   display: flex;
   align-items: end;
@@ -508,7 +507,7 @@
   gap: 5px;
 }
 
-.wall-event-dots span {
+.wall-event-dots span{
   width: 6px;
   height: 4px;
   border-radius: 99px;
@@ -516,12 +515,12 @@
   transition: width 0.2s ease;
 }
 
-.wall-event-dots span.active {
+.wall-event-dots span.active{
   width: 17px;
   background: #c9a6d6;
 }
 
-.wall-feed-scroll {
+.wall-feed-scroll{
   min-height: 0;
   flex: 1;
   overflow-y: auto;
@@ -532,16 +531,16 @@
 }
 
 .wall-feed-scroll > .composer,
-.wall-feed-scroll > .feed {
+.wall-feed-scroll > .feed{
   margin-right: 16px;
   margin-left: 16px;
 }
 
-.wall-feed-scroll > .composer {
+.wall-feed-scroll > .composer{
   margin-top: 2px;
 }
 
-.wall-feed-scroll .composer {
+.wall-feed-scroll .composer{
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 9px;
@@ -552,13 +551,13 @@
   background: #fff9ff;
 }
 
-.wall-feed-scroll .composer > .avatar {
+.wall-feed-scroll .composer > .avatar{
   width: 28px;
   height: 28px;
   font-size: 0.67rem;
 }
 
-.wall-feed-scroll .composer textarea {
+.wall-feed-scroll .composer textarea{
   min-height: 30px;
   padding: 6px 8px;
   border: 0;
@@ -569,91 +568,91 @@
 }
 
 .wall-feed-scroll .composer-tools,
-.wall-feed-scroll .composer-hint {
+.wall-feed-scroll .composer-hint{
   display: none;
 }
 
-.wall-feed-scroll .composer > .primary-btn {
+.wall-feed-scroll .composer > .primary-btn{
   min-height: 29px;
   padding: 0 11px;
   border-radius: 7px;
   font-size: 0.65rem;
 }
 
-.wall-feed-scroll .feed {
+.wall-feed-scroll .feed{
   gap: 9px;
 }
 
-.wall-feed-scroll .post-card {
+.wall-feed-scroll .post-card{
   padding: 10px 10px 7px;
   border: 1px solid rgba(88, 59, 88, 0.12);
   border-radius: 10px;
   background: #fff9ff;
 }
 
-.wall-feed-scroll .post-header {
+.wall-feed-scroll .post-header{
   gap: 7px;
 }
 
-.wall-feed-scroll .post-header .avatar {
+.wall-feed-scroll .post-header .avatar{
   width: 29px;
   height: 29px;
   font-size: 0.68rem;
 }
 
-.wall-feed-scroll .author-row strong {
+.wall-feed-scroll .author-row strong{
   font-size: 0.69rem;
 }
 
-.wall-feed-scroll .post-header small {
+.wall-feed-scroll .post-header small{
   font-size: 0.57rem;
 }
 
-.wall-feed-scroll .ghost-btn {
+.wall-feed-scroll .ghost-btn{
   min-width: 23px;
   height: 24px;
 }
 
-.wall-feed-scroll .post-text {
+.wall-feed-scroll .post-text{
   margin: 7px 0;
   font-size: 0.68rem;
   line-height: 1.42;
 }
 
-.wall-feed-scroll .photo-frame {
+.wall-feed-scroll .photo-frame{
   height: clamp(150px, 22vh, 205px);
   border-radius: 7px;
 }
 
-.wall-feed-scroll .post-actions {
+.wall-feed-scroll .post-actions{
   margin-top: 5px;
   padding-top: 3px;
 }
 
-.wall-feed-scroll .post-action {
+.wall-feed-scroll .post-action{
   min-height: 26px;
   font-size: 0.62rem;
 }
 
-.wall-feed-scroll .post-action span {
+.wall-feed-scroll .post-action span{
   font-size: 0.85rem;
 }
 
-.wall-feed-scroll .comment-form {
+.wall-feed-scroll .comment-form{
   padding-top: 4px;
 }
 
-.wall-feed-scroll .comment-form input {
+.wall-feed-scroll .comment-form input{
   padding: 6px 8px;
   border-radius: 8px;
   font-size: 0.65rem;
 }
 
-.wall-feed-scroll .comment-form button {
+.wall-feed-scroll .comment-form button{
   font-size: 0.64rem;
 }
 
-.wall-right {
+.wall-right{
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -662,18 +661,18 @@
   background: #f7eafa;
 }
 
-.wall-friend-suggestions {
+.wall-friend-suggestions{
   flex: 0 0 auto;
   padding: 12px 13px 11px;
 }
 
-.suggested-friends {
+.suggested-friends{
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
 }
 
-.suggested-friend {
+.suggested-friend{
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -682,14 +681,14 @@
   text-align: center;
 }
 
-.suggested-friend .avatar {
+.suggested-friend .avatar{
   width: 31px;
   height: 31px;
   border: 2px solid #f0e3f1;
   font-size: 0.63rem;
 }
 
-.suggested-friend strong {
+.suggested-friend strong{
   max-width: 100%;
   overflow: hidden;
   font-size: 0.59rem;
@@ -697,7 +696,7 @@
   white-space: nowrap;
 }
 
-.suggested-friend button {
+.suggested-friend button{
   width: 100%;
   overflow: hidden;
   padding: 4px 2px;
@@ -710,7 +709,7 @@
   white-space: nowrap;
 }
 
-.wall-chat-card {
+.wall-chat-card{
   min-height: 0;
   flex: 1;
   display: flex;
@@ -721,7 +720,7 @@
   background: #fff9ff;
 }
 
-.wall-chat-heading {
+.wall-chat-heading{
   min-height: 47px;
   display: flex;
   align-items: center;
@@ -730,7 +729,7 @@
   border-bottom: 1px solid rgba(88, 59, 88, 0.1);
 }
 
-.wall-chat-avatar {
+.wall-chat-avatar{
   width: 26px;
   height: 26px;
   display: grid;
@@ -741,37 +740,37 @@
   color: #584768;
 }
 
-.wall-chat-heading > span:nth-child(2) {
+.wall-chat-heading > span:nth-child(2){
   min-width: 0;
   flex: 1;
 }
 
 .wall-chat-heading strong,
-.wall-chat-heading small {
+.wall-chat-heading small{
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.wall-chat-heading strong {
+.wall-chat-heading strong{
   font-size: 0.72rem;
   font-weight: 600;
 }
 
-.wall-chat-heading small {
+.wall-chat-heading small{
   margin-top: 1px;
   color: #776a7a;
   font-size: 0.54rem;
 }
 
-.wall-chat-heading > button {
+.wall-chat-heading > button{
   background: transparent;
   color: #6e6271;
   font-size: 0.7rem;
 }
 
-.wall-chat-messages {
+.wall-chat-messages{
   min-height: 0;
   flex: 1;
   display: flex;
@@ -785,7 +784,7 @@
   scrollbar-width: thin;
 }
 
-.wall-message {
+.wall-message{
   max-width: 92%;
   align-self: flex-start;
   padding: 6px 8px;
@@ -794,32 +793,32 @@
   background: #f6eff6;
 }
 
-.wall-message.own {
+.wall-message.own{
   align-self: flex-end;
   background: #ebdcf1;
 }
 
-.wall-message small {
+.wall-message small{
   display: block;
   margin-bottom: 3px;
   color: #776a7a;
   font-size: 0.51rem;
 }
 
-.wall-message p {
+.wall-message p{
   overflow-wrap: anywhere;
   font-size: 0.63rem;
   line-height: 1.4;
 }
 
-.wall-chat-empty {
+.wall-chat-empty{
   align-self: center;
   color: #776a7a;
   font-size: 0.65rem;
   text-align: center;
 }
 
-.wall-chat-form {
+.wall-chat-form{
   display: flex;
   align-items: center;
   gap: 6px;
@@ -829,7 +828,7 @@
   background: #f0e2f1;
 }
 
-.wall-chat-form input {
+.wall-chat-form input{
   min-width: 0;
   flex: 1;
   padding: 2px 0;
@@ -840,7 +839,7 @@
   font-size: 0.61rem;
 }
 
-.wall-chat-form button {
+.wall-chat-form button{
   width: 24px;
   height: 24px;
   border-radius: 6px;
@@ -849,14 +848,14 @@
   font-size: 0.9rem;
 }
 
-.wall-chat-note {
+.wall-chat-note{
   padding: 5px 8px;
   color: #827586;
   font-size: 0.48rem;
   text-align: center;
 }
 
-.wall-chat-tabs {
+.wall-chat-tabs{
   min-height: 45px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -865,7 +864,7 @@
   border-top: 1px solid rgba(88, 59, 88, 0.12);
 }
 
-.wall-chat-tabs button {
+.wall-chat-tabs button{
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -879,33 +878,33 @@
   font-size: 0.49rem;
 }
 
-.wall-chat-tabs button span {
+.wall-chat-tabs button span{
   font-size: 0.75rem;
 }
 
-.wall-chat-tabs button.active {
+.wall-chat-tabs button.active{
   background: #eadcf0;
   color: #6b4987;
 }
 
-.wall-notification-list {
+.wall-notification-list{
   min-height: 0;
   flex: 1;
   padding: 8px;
   overflow-y: auto;
 }
 
-.wall-notification-list article {
+.wall-notification-list article{
   padding: 4px 6px;
   border-bottom: 1px solid rgba(88, 59, 88, 0.1);
 }
 
-.wall-notification-list article.unread {
+.wall-notification-list article.unread{
   border-radius: 6px;
   background: #f3e7f4;
 }
 
-.wall-notification-list button {
+.wall-notification-list button{
   width: 100%;
   display: block;
   padding: 8px 6px;
@@ -915,12 +914,12 @@
   text-align: left;
 }
 
-.wall-notification-list button.wall-notification-item {
+.wall-notification-list button.wall-notification-item{
   padding: 4px 0;
   border: 0;
 }
 
-.wall-notification-list button.wall-notification-accept {
+.wall-notification-list button.wall-notification-accept{
   width: auto;
   padding: 4px 8px;
   border: 0;
@@ -930,23 +929,23 @@
   font-size: 0.58rem;
 }
 
-.wall-notification-list button.unread {
+.wall-notification-list button.unread{
   border-radius: 6px;
   background: #f3e7f4;
 }
 
-.wall-notification-list small {
+.wall-notification-list small{
   display: block;
   margin-top: 3px;
   color: #786d7b;
   font-size: 0.53rem;
 }
 
-.wall-notification-list .wall-mark-read {
+.wall-notification-list .wall-mark-read{
   color: #604875;
 }
 
-.wall-chat-friends {
+.wall-chat-friends{
   min-height: 0;
   flex: 1;
   padding: 7px;
@@ -954,7 +953,7 @@
   overscroll-behavior: contain;
 }
 
-.wall-chat-friends button {
+.wall-chat-friends button{
   width: 100%;
   display: flex;
   align-items: center;
@@ -966,28 +965,28 @@
   text-align: left;
 }
 
-.wall-chat-friends button:hover {
+.wall-chat-friends button:hover{
   background: #f4eaf5;
 }
 
-.wall-chat-friends button > span:nth-child(2) {
+.wall-chat-friends button > span:nth-child(2){
   flex: 1;
 }
 
-.wall-chat-friends small {
+.wall-chat-friends small{
   display: block;
   color: #786d7b;
   font-size: 0.55rem;
 }
 
-.wall-right-footer {
+.wall-right-footer{
   flex: 0 0 auto;
   color: #827586;
   font-size: 0.57rem;
   text-align: center;
 }
 
-.wall-notification-list {
+.wall-notification-list{
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
@@ -995,7 +994,7 @@
 .dark-mode.wall-shell .wall-chat-tabs button.active,
 .dark-mode.wall-shell .wall-chat-friends button:hover,
 .page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
-.page-shell.dark-mode.wall-shell .wall-chat-friends button:hover {
+.page-shell.dark-mode.wall-shell .wall-chat-friends button:hover{
   border-color: var(--line);
   background: #292929;
   color: var(--accent-dark);
@@ -1005,38 +1004,38 @@
 .dark-mode.wall-shell .share-recipient,
 .page-shell.dark-mode.wall-shell .share-recipient,
 .dark-mode.wall-shell .group-invite-choice,
-.page-shell.dark-mode.wall-shell .group-invite-choice {
+.page-shell.dark-mode.wall-shell .group-invite-choice{
   background: #222;
   color: var(--text);
 }
 
 .share-recipient input[type="checkbox"],
-.group-invite-choice input[type="checkbox"] {
+.group-invite-choice input[type="checkbox"]{
   color-scheme: dark;
   accent-color: var(--accent);
 }
 
 .share-recipient:has(input:checked),
-.group-invite-choice:has(input:checked) {
+.group-invite-choice:has(input:checked){
   background: rgba(187, 134, 252, 0.12);
   border-color: rgba(187, 134, 252, 0.35);
 }
 
-.wall-group-cover[src] {
+.wall-group-cover[src]{
   object-fit: cover;
 }
 
-.profile-avatar-link {
+.profile-avatar-link{
   padding: 0;
   color: #fff;
   text-align: center;
 }
 
-.post-header .profile-avatar-link {
+.post-header .profile-avatar-link{
   flex: 0 0 auto;
 }
 
-.profile-name-link {
+.profile-name-link{
   padding: 0;
   background: transparent;
   color: inherit;
@@ -1044,17 +1043,17 @@
   text-align: left;
 }
 
-.profile-name-link:hover {
+.profile-name-link:hover{
   color: var(--accent-dark);
 }
 
-.group-option-button {
+.group-option-button{
   width: 100%;
   justify-content: center;
   margin-top: 8px;
 }
 
-.wall-friend-request {
+.wall-friend-request{
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1065,7 +1064,7 @@
   font-size: 0.75rem;
 }
 
-.wall-friend-request button {
+.wall-friend-request button{
   padding: 5px 9px;
   border-radius: 999px;
   background: rgba(208, 151, 115, 0.16);
@@ -1074,7 +1073,7 @@
   font-weight: 700;
 }
 
-.group-invite-picker {
+.group-invite-picker{
   display: grid;
   gap: 8px;
   margin: 16px 0;
@@ -1083,14 +1082,14 @@
   border-radius: 14px;
 }
 
-.group-invite-picker legend {
+.group-invite-picker legend{
   padding: 0 5px;
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 700;
 }
 
-.group-invite-choice {
+.group-invite-choice{
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1098,7 +1097,7 @@
   font-size: 0.88rem;
 }
 
-.group-invite-choice input {
+.group-invite-choice input{
   accent-color: var(--accent-dark);
 }
 
@@ -1106,7 +1105,7 @@
 .dark-mode.wall-shell .wall-left,
 .dark-mode.wall-shell .wall-center,
 .dark-mode.wall-shell .wall-right,
-.dark-mode.wall-shell .wall-topbar {
+.dark-mode.wall-shell .wall-topbar{
   background: #282320;
 }
 
@@ -1115,7 +1114,7 @@
 .dark-mode.wall-shell .wall-chat-card,
 .dark-mode.wall-shell .wall-event-side,
 .dark-mode.wall-shell .wall-feed-scroll .composer,
-.dark-mode.wall-shell .wall-feed-scroll .post-card {
+.dark-mode.wall-shell .wall-feed-scroll .post-card{
   border-color: var(--line);
   background: #322d29;
 }
@@ -1123,7 +1122,7 @@
 .dark-mode.wall-shell .wall-topbar .search-wrap,
 .dark-mode.wall-shell .wall-icon-button,
 .dark-mode.wall-shell .wall-event-controls button,
-.dark-mode.wall-shell .suggested-friend button {
+.dark-mode.wall-shell .suggested-friend button{
   border-color: var(--line);
   background: #38312c;
   color: var(--text);
@@ -1134,7 +1133,7 @@
 .dark-mode.wall-shell .wall-joined-group strong,
 .dark-mode.wall-shell .wall-group-suggestion > strong,
 .dark-mode.wall-shell .wall-chat-heading strong,
-.dark-mode.wall-shell .wall-event-side strong {
+.dark-mode.wall-shell .wall-event-side strong{
   color: var(--text);
 }
 
@@ -1150,14 +1149,14 @@
 .dark-mode.wall-shell .wall-chat-heading small,
 .dark-mode.wall-shell .wall-chat-note,
 .dark-mode.wall-shell .wall-left-footer,
-.dark-mode.wall-shell .wall-right-footer {
+.dark-mode.wall-shell .wall-right-footer{
   color: var(--muted);
 }
 
 .dark-mode.wall-shell .wall-chat-form,
 .dark-mode.wall-shell .wall-message,
 .dark-mode.wall-shell .wall-notification-list button.unread,
-.dark-mode.wall-shell .wall-chat-tabs button.active {
+.dark-mode.wall-shell .wall-chat-tabs button.active{
   border-color: var(--line);
   background: #40372f;
   color: var(--text);
@@ -1165,121 +1164,121 @@
 
 .dark-mode.wall-shell .wall-chat-form input,
 .dark-mode.wall-shell .wall-message p,
-.dark-mode.wall-shell .wall-notification-list button {
+.dark-mode.wall-shell .wall-notification-list button{
   color: var(--text);
 }
 
-.dark-mode.wall-shell .wall-notification-list article.unread {
+.dark-mode.wall-shell .wall-notification-list article.unread{
   background: #40372f;
 }
 
-.dark-mode.wall-shell .wall-notification-list button.wall-notification-accept {
+.dark-mode.wall-shell .wall-notification-list button.wall-notification-accept{
   background: #574862;
   color: var(--text);
 }
-.dark-mode.wall-shell .wall-event-feature {
+.dark-mode.wall-shell .wall-event-feature{
   color: #fff;
 }
 
-@media (max-width: 1080px) {
-  .wall-layout {
+@media (max-width: 1080px){
+  .wall-layout{
     grid-template-columns: minmax(190px, 0.62fr) minmax(350px, 1.3fr) minmax(290px, 0.95fr);
   }
 
-  .wall-left {
+  .wall-left{
     padding-right: 10px;
     padding-left: 10px;
   }
 
-  .wall-right {
+  .wall-right{
     padding-right: 10px;
     padding-left: 10px;
   }
 }
 
-@media (max-width: 860px) {
-  .page-shell.wall-shell {
+@media (max-width: 860px){
+  .page-shell.wall-shell{
     height: auto;
     min-height: 100dvh;
     overflow: auto;
   }
 
-  .wall-layout {
+  .wall-layout{
     min-height: 100dvh;
     height: auto;
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .wall-left {
+  .wall-left{
     height: auto;
     overflow: visible;
     padding: 10px 14px;
   }
 
   .wall-group-section,
-  .wall-left-footer {
+  .wall-left-footer{
     display: none;
   }
 
-  .wall-profile {
+  .wall-profile{
     padding: 8px 10px;
   }
 
-  .wall-profile p {
+  .wall-profile p{
     display: none;
   }
 
-  .wall-center {
+  .wall-center{
     height: min(850px, 100dvh);
     min-height: 630px;
     border: 0;
   }
 
-  .wall-right {
+  .wall-right{
     height: min(680px, 80dvh);
     min-height: 480px;
     padding: 10px 14px;
   }
 
-  .wall-feed-scroll {
+  .wall-feed-scroll{
     padding-right: 0;
     padding-left: 0;
   }
 
   .wall-feed-scroll > .composer,
-  .wall-feed-scroll > .feed {
+  .wall-feed-scroll > .feed{
     margin-right: 14px;
     margin-left: 14px;
   }
 }
 
-@media (max-width: 520px) {
-  .wall-center {
+@media (max-width: 520px){
+  .wall-center{
     height: 100dvh;
     min-height: 620px;
   }
 
-  .wall-topbar {
+  .wall-topbar{
     padding: 10px 11px 6px;
   }
 
-  .wall-events {
+  .wall-events{
     padding-right: 11px;
     padding-left: 11px;
   }
 
-  .wall-event-track {
+  .wall-event-track{
     height: 136px;
     grid-template-columns: minmax(0, 1fr) 112px;
   }
 
-  .wall-feed-scroll {
+  .wall-feed-scroll{
     padding-right: 0;
     padding-left: 0;
   }
 
   .wall-feed-scroll > .composer,
-  .wall-feed-scroll > .feed {
+  .wall-feed-scroll > .feed{
     margin-right: 11px;
     margin-left: 11px;
   }

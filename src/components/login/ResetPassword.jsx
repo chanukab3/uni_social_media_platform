@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { supabase } from "../../../supabase";
+import{ useState } from "react";
+import{ supabase } from "../../../supabase";
 import "./Auth.css";
 
-export default function ResetPassword({ onLogin }) {
+export default function ResetPassword({ onLogin }){
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -10,46 +10,46 @@ export default function ResetPassword({ onLogin }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleUpdatePassword(event) {
+  async function handleUpdatePassword(event){
     event.preventDefault();
     setError("");
     setMessage("");
 
-    if (password.length < 8) {
+    if(password.length < 8){
       setError("Password must contain at least 8 characters.");
       return;
     }
 
-    if (password !== confirmPassword) {
+    if(password !== confirmPassword){
       setError("Passwords do not match.");
       return;
     }
 
-    if (!supabase) {
+    if(!supabase){
       setError("Supabase is not configured. Add your project URL and publishable key.");
       return;
     }
 
     setLoading(true);
 
-    try {
-      const { error: updateError } = await supabase.auth.updateUser({
+    try{
+      const{ error: updateError } = await supabase.auth.updateUser({
         password,
       });
 
-      if (updateError) throw updateError;
+      if(updateError) throw updateError;
 
       setMessage("Your password has been updated. You can now log in.");
       setPassword("");
       setConfirmPassword("");
-    } catch (err) {
+    } catch(err){
       setError(err.message || "Unable to update your password.");
-    } finally {
+    } finally{
       setLoading(false);
     }
   }
 
-  return (
+  return(
     <main className="auth-page">
       <header className="auth-brand">
         <span className="brand-icon">♧</span>
@@ -80,7 +80,7 @@ export default function ResetPassword({ onLogin }) {
                 onClick={() => setShowPassword((shown) => !shown)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? "Hide" : "Show"}
+               {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
@@ -102,18 +102,18 @@ export default function ResetPassword({ onLogin }) {
             </div>
           </div>
 
-          {error && <p className="auth-error" role="alert">{error}</p>}
-          {message && <p className="auth-success" role="status">{message}</p>}
+         {error && <p className="auth-error" role="alert">{error}</p>}
+         {message && <p className="auth-success" role="status">{message}</p>}
 
           <button
             type="submit"
             className="auth-button auth-primary auth-full-button"
             disabled={loading}
           >
-            {loading ? "Updating..." : "Update password →"}
+           {loading ? "Updating..." : "Update password →"}
           </button>
 
-          {message && (
+         {message &&(
             <button type="button" className="auth-back-link" onClick={onLogin}>
               ← login
             </button>
