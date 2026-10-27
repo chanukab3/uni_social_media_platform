@@ -32,8 +32,8 @@ function ProfileMid() {
                         <div className="author-info">
                             <img src="src\assets\dummy-post-square-1.jpg" alt="Maya Chen" className="avatar" />
                             <div className="author-details">
-                                <h3 className="author-name">Maya Chen</h3>
-                                <span className="post-meta">Brooklyn creatives &bull; 24 min ago</span>
+                                <h3 className="author-name">S.D Kotikapola</h3>
+                                <span className="post-meta">Brooklyn creatives &bull; 55 min ago</span>
                             </div>
                         </div>
                         <button className="options-btn" aria-label="More options">
@@ -44,7 +44,7 @@ function ProfileMid() {
 
                     <div className="card-body">
                          <p className="post-text">
-                        Our little studio is finally open! A space to make things, meet good people, and embrace a few happy accidents. Come by ☕
+                        Golden Memories from the past
                         </p>
                     </div>
 
@@ -55,8 +55,8 @@ function ProfileMid() {
 
                    
                     <div className="card-stats">
-                        <span className="likes-count">48 neighbors loved this</span>
-                        <span className="comments-count">12 comments</span>
+                        <span className="likes-count">1.1k neighbors loved this</span>
+                        <span className="comments-count">123 comments</span>
                     </div>
 
                 
@@ -81,8 +81,8 @@ function ProfileMid() {
                         <div className="author-info">
                             <img src="src\assets\dummy-post-square-1.jpg" alt="Maya Chen" className="avatar" />
                             <div className="author-details">
-                                <h3 className="author-name">Maya Chen</h3>
-                                <span className="post-meta">Brooklyn creatives &bull; 24 min ago</span>
+                                <h3 className="author-name">S.D Kotikapola</h3>
+                                <span className="post-meta">Brooklyn creatives &bull; 3 weeks ago</span>
                             </div>
                         </div>
                         <button className="options-btn" aria-label="More options">
@@ -104,8 +104,8 @@ function ProfileMid() {
 
                    
                     <div className="card-stats">
-                        <span className="likes-count">48 neighbors loved this</span>
-                        <span className="comments-count">12 comments</span>
+                        <span className="likes-count">69 neighbors loved this</span>
+                        <span className="comments-count">21 comments</span>
                     </div>
 
                 
