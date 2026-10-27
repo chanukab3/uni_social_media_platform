@@ -29,8 +29,8 @@ export default function Login() {
   };
 
   return (<>
-       <Register/>
-       <ForgetPassword/>
+    <Register/>
+    
     <div className="login-container">
       {/* Top Header / Logo */}
       <header className="login-header">
@@ -117,6 +117,7 @@ export default function Login() {
         <p>© 2026 Mahagedara</p>
       </footer>
     </div>
+    <ForgetPassword/>
     </>
   );
 }
