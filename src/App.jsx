@@ -1,4 +1,10 @@
 import{ useCallback, useEffect, useMemo, useState } from 'react'
+import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
+import EmailIcon from '@iconify-react/bitcoin-icons/email-outline'
+import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
+import HomeIcon from '@iconify-react/bitcoin-icons/home-outline'
+import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
+import SunIcon from '@iconify-react/bitcoin-icons/sun-outline'
 import './App.css'
 import{ supabase } from '../supabase'
 import Community,{ CommunityDirectory, CreateCommunityForm } from './components/community/Community'
@@ -10,11 +16,11 @@ import{ ProfilePage } from './components/profile/Profile'
 import{ PostCard, PostComposer } from './components/wall/Wall'
 
 const navigation = [
- { label: 'Home', icon: '⌂' },
- { label: 'Explore', icon: '⌕' },
- { label: 'Communities', icon: '▦' },
- { label: 'Status', icon: '◉' },
- { label: 'Messages', icon: '✉' },
+ { label: 'Home', icon: HomeIcon },
+ { label: 'Explore', icon: SearchIcon },
+ { label: 'Communities', icon: GridIcon },
+ { label: 'Status', icon: SunIcon },
+ { label: 'Messages', icon: EmailIcon },
 ]
 
 const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
@@ -39,11 +45,11 @@ function App(){
   const [toast, setToast] = useState('')
   const [authPage, setAuthPage] = useState('login')
   const [openMenu, setOpenMenu] = useState(null)
-  const [profileName, setProfileName] = useState('Amanda Silva')
+  const [profileName, setProfileName] = useState('')
   const [profileHandle, setProfileHandle] = useState('')
   const [profileBio, setProfileBio] = useState('')
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('')
-  const [profileDraft, setProfileDraft] = useState('Amanda Silva')
+  const [profileDraft, setProfileDraft] = useState('')
   const [profileBioDraft, setProfileBioDraft] = useState('')
   const [currentChat, setCurrentChat] = useState('World')
   const [currentGroupChat, setCurrentGroupChat] = useState('')
@@ -1344,7 +1350,7 @@ function App(){
       <section className="feed" aria-label="Post feed">
        {filteredPosts.length
           ? filteredPosts.map(renderPost)
-          : <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try a different search.' : 'Share an update to get the conversation started.'}</p></div>}
+          : <div className="empty-state"><span></span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try a different search.' : 'Share an update to get the conversation started.'}</p></div>}
       </section>
     </>
   )
@@ -1421,11 +1427,7 @@ function App(){
     )
   }
 
-  const pageDetails ={
-    Home: ['Good morning, Amanda', 'Your people, places and conversations in one place.'],
-    Explore: ['Explore', 'Discover stories and conversations from your community.'],
-    Status: ['Your status', 'Share what is on your mind with your community.'],
-  }
+
 
   const renderMain =() =>{
     if(activePage === 'Communities') return(
@@ -1477,7 +1479,7 @@ function App(){
           <nav className="nav" aria-label="Main navigation">
            {navigation.map((item) =>(
               <button key={item.label} className={activePage === item.label ? 'nav-item active' : 'nav-item'} type="button" onClick={() => navigate(item.label)}>
-                <span className="nav-icon" aria-hidden="true">{item.icon}</span><span>{item.label}</span>
+                <span className="nav-icon" aria-hidden="true"><item.icon className="ui-icon" /></span><span>{item.label}</span>
                {item.label === 'Messages' && <span className="nav-count">2</span>}
               </button>
             ))}
@@ -1494,14 +1496,14 @@ function App(){
         <main className="main-panel">
           <header className="topbar">
             <label className="search-wrap">
-              <span aria-hidden="true">⌕</span>
+              <span aria-hidden="true"><SearchIcon className="ui-icon" /></span>
               <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search friends, posts or places" aria-label="Search friends, posts or places" />
              {query && <button type="button" className="clear-search" onClick={() => setQuery('')} aria-label="Clear search">×</button>}
             </label>
             <div className="top-actions">
               <div className="notification-wrap">
                 <button className="icon-button notification-button" type="button" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} onClick={() => setNotificationsOpen(!notificationsOpen)}>
-                  ♧{unreadCount > 0 && <span className="notification-dot" />}
+                  <BellIcon className="ui-icon" />{unreadCount > 0 && <span className="notification-dot" />}
                 </button>
                {notificationsOpen &&(
                   <div className="notification-popover">
@@ -1523,7 +1525,7 @@ function App(){
                   </div>
                 )}
               </div>
-              <button className="icon-button" type="button" aria-label="Open messages" onClick={() => navigate('Messages')}>✉</button>
+              <button className="icon-button" type="button" aria-label="Open messages" onClick={() => navigate('Messages')}><EmailIcon className="ui-icon" /></button>
               <button className="avatar small avatar-olive top-avatar" type="button" aria-label="Open your profile" onClick={() => navigate('Profile')}>{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName[0]}</button>
             </div>
           </header>

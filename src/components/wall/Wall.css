@@ -8,60 +8,6 @@
   background: #f7eafa;
 }
 
-.wall-topbar{
-  position: relative;
-  flex: 0 0 auto;
-  gap: 10px;
-  padding: 16px 16px 9px;
-  background: linear-gradient(180deg, #090610 78%, rgba(9, 6, 16, 0.94));
-  backdrop-filter: blur(14px);
-}
-
-.wall-topbar .search-wrap{
-  min-height: 38px;
-  border-color: rgba(88, 59, 88, 0.12);
-  border-radius: 8px;
-  background: #fff9ff;
-}
-
-.wall-topbar .search-wrap input{
-  font-size: 0.71rem;
-}
-
-.wall-topbar .search-wrap > span{
-  font-size: 1.1rem;
-}
-
-.wall-icon-button{
-  position: relative;
-  width: 35px;
-  height: 35px;
-  flex: 0 0 auto;
-  border: 1px solid rgba(88, 59, 88, 0.12);
-  border-radius: 9px;
-  background: #fff9ff;
-}
-
-.wall-feed-scroll{
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0 0 18px;
-  scrollbar-color: #d5bfd9 transparent;
-  scrollbar-width: thin;
-}
-
-.wall-feed-scroll > .composer,
-.wall-feed-scroll > .feed{
-  margin-right: 16px;
-  margin-left: 16px;
-}
-
-.wall-feed-scroll > .composer{
-  margin-top: 2px;
-}
-
 .wall-profile-scroll{
   min-height: 0;
   flex: 1;
@@ -105,18 +51,18 @@
 
 .composer-photo-first{
   display: grid;
-  justify-items: start;
+  justify-items: flex-start;
   gap: 8px;
 }
 
 .composer-photo-button{
   min-height: 25px;
-  padding: 0 11px;
+  padding: 5px 11px;
   border: 1px solid rgba(190, 113, 255, 0.28);
   border-radius: 8px;
   background: linear-gradient(135deg, #40195e, #7b2eaa);
   color: #fff;
-  font-size: 0.60rem;
+  font-size: 0.70rem;
 }
 
 .wall-feed-scroll .composer-fields .attachment-preview{
@@ -134,13 +80,13 @@
 }
 
 .wall-feed-scroll .composer textarea{
-  min-height: 25px;
+  min-height: 30px;
   padding: 5px 11px;
   border: 1px solid rgba(190, 113, 255, 0.17);
   border-radius: 9px;
   background: #333235;
   color: var(--text);
-  font-size: 0.88rem;
+  font-size: 0.7rem;
   resize: none;
 }
 
@@ -166,21 +112,6 @@
   }
 }
 
-.wall-feed-scroll .feed{
-  gap: 9px;
-}
-
-.wall-feed-scroll .post-card{
-  padding: 10px 10px 7px;
-  border: 1px solid rgba(88, 59, 88, 0.12);
-  border-radius: 10px;
-  background: #fff9ff;
-}
-
-.wall-feed-scroll .post-header{
-  gap: 7px;
-}
-
 .wall-feed-scroll .post-header .avatar{
   width: 29px;
   height: 29px;
@@ -188,57 +119,10 @@
   margin-bottom: 3px;
 }
 
-.wall-feed-scroll .author-row strong{
-  font-size: 0.69rem;
-}
-
-.wall-feed-scroll .post-header small{
-  font-size: 0.57rem;
-}
-
-.wall-feed-scroll .ghost-btn{
-  min-width: 23px;
-  height: 24px;
-}
-
-.wall-feed-scroll .post-text{
-  margin: 7px 0;
-  font-size: 0.68rem;
-  line-height: 1.42;
-}
-
 .wall-feed-scroll .photo-frame{
   height: clamp(150px, 22vh, 205px);
   border-radius: 7px;
   margin-top: 5px;
-}
-
-.wall-feed-scroll .post-actions{
-  margin-top: 5px;
-  padding-top: 3px;
-}
-
-.wall-feed-scroll .post-action{
-  min-height: 26px;
-  font-size: 0.62rem;
-}
-
-.wall-feed-scroll .post-action span{
-  font-size: 0.85rem;
-}
-
-.wall-feed-scroll .comment-form{
-  padding-top: 4px;
-}
-
-.wall-feed-scroll .comment-form input{
-  padding: 6px 8px;
-  border-radius: 8px;
-  font-size: 0.65rem;
-}
-
-.wall-feed-scroll .comment-form button{
-  font-size: 0.64rem;
 }
 
 .dark-mode.wall-shell .wall-center,
@@ -259,139 +143,9 @@
   color: var(--text);
 }
 
-@media(max-width: 860px){
-  .wall-center{
-    height: min(850px, 100dvh);
-    min-height: 630px;
-    border: 0;
-  }
-
-  .wall-feed-scroll{
-    padding-right: 0;
-    padding-left: 0;
-  }
-
-  .wall-feed-scroll > .composer,
-  .wall-feed-scroll > .feed{
-    margin-right: 14px;
-    margin-left: 14px;
-  }
-}
-
-@media(max-width: 520px){
-  .wall-center{
-    height: 100dvh;
-    min-height: 620px;
-  }
-
-  .wall-topbar{
-    padding: 10px 11px 6px;
-  }
-
-  .wall-feed-scroll{
-    padding-right: 0;
-    padding-left: 0;
-  }
-
-  .wall-feed-scroll > .composer,
-  .wall-feed-scroll > .feed{
-    margin-right: 11px;
-    margin-left: 11px;
-  }
-}
-
-
-.page-shell.wall-shell{
-  width: 100%;
-  height: 100dvh;
-  min-height: 620px;
-  padding: 0;
-  overflow: hidden;
-  background: #d9cbcb;
-}
-
-.wall-layout{
-  width: min(1536px, 100%);
-  height: 100%;
-  display: grid;
-  grid-template-columns: minmax(215px, 0.68fr) minmax(390px, 1.35fr) minmax(330px, 1fr);
-  margin: 0 auto;
-  background: #f7eafa;
-}
-
-.wall-left,
-.wall-center,
-.wall-right{
-  min-width: 0;
-  height: 100%;
-}
-
-.wall-left{
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  padding: 17px 16px 12px;
-  overflow: hidden;
-  background: #f7eafa;
-}
-
-.wall-brand{
-  min-height: 39px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 5px;
-  background: transparent;
-  text-align: left;
-}
-
-.wall-brand .brand-mark{
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: #e8d4f1;
-  box-shadow: none;
-  color: #4d3860;
-  font-size: 1rem;
-}
-
-.wall-brand strong{
-  font-size: 1.12rem;
-  letter-spacing: -0.035em;
-}
-
-.wall-left .mini-card,
-.wall-right .mini-card{
-  border: 1px solid rgba(88, 59, 88, 0.12);
-  border-radius: 14px;
-  background: #fff9ff;
-  box-shadow: 0 4px 14px rgba(82, 53, 77, 0.035);
-}
-
-.wall-profile{
-  padding: 12px;
-}
-
-.wall-profile-button{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0;
-  background: transparent;
-  text-align: left;
-}
-
 .wall-profile-button .avatar{
   width: 50px;
   height: 50px;
-}
-
-.wall-profile-button > span:last-child{
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
 }
 
 .wall-profile-button strong{
@@ -401,81 +155,9 @@
   white-space: nowrap;
 }
 
-.wall-profile-button small,
-.wall-profile p,
-.wall-profile-stats small,
-.wall-group-suggestion small,
-.wall-joined-group small,
-.wall-muted{
-  color: #766b7a;
-  font-size: 0.68rem;
-}
-
-.wall-profile p{
-  margin: 9px 0 10px;
-  line-height: 1.45;
-}
-
-.wall-profile-stats{
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(88, 59, 88, 0.1);
-}
-
 .wall-profile-stats > span{
   display: grid;
   gap: 1px;
-}
-
-.wall-profile-stats strong{
-  font-size: 0.81rem;
-}
-
-.wall-profile-stats button{
-  margin-left: auto;
-  background: transparent;
-  font-size: 1rem;
-}
-
-.wall-left .section-head,
-.wall-right .section-head{
-  margin-bottom: 8px;
-}
-
-.wall-left .section-head h3,
-.wall-right .section-head h3{
-  font-size: 0.77rem;
-}
-
-.wall-left .section-head button,
-.wall-right .section-head button{
-  font-size: 0.67rem;
-}
-
-.wall-left-footer{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  color: #776a7a;
-  font-size: 0.61rem;
-}
-
-.wall-left-footer button{
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font-size: inherit;
-}
-
-.wall-right{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 15px 11px;
-  overflow: hidden;
-  background: #f7eafa;
 }
 
 .wall-friend-suggestions{
@@ -547,168 +229,6 @@
 
 }
 
-.wall-chat-heading{
-  min-height: 47px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(88, 59, 88, 0.1);
-}
-
-.wall-chat-avatar{
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border: 1px solid #c8b7d4;
-  border-radius: 7px;
-  color: #584768;
-}
-
-.wall-chat-heading > span:nth-child(2){
-  min-width: 0;
-  flex: 1;
-}
-
-.wall-chat-heading strong,
-.wall-chat-heading small{
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.wall-chat-heading strong{
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.wall-chat-heading small{
-  margin-top: 1px;
-  color: #776a7a;
-  font-size: 0.54rem;
-}
-
-.wall-chat-heading > button{
-  background: transparent;
-  color: #6e6271;
-  font-size: 0.7rem;
-}
-
-.wall-chat-messages{
-  min-height: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 8px;
-  padding: 10px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
-
-.wall-message{
-  max-width: 92%;
-  align-self: flex-start;
-  padding: 6px 8px;
-  border: 1px solid rgba(88, 59, 88, 0.12);
-  border-radius: 7px;
-  background: #f6eff6;
-}
-
-.wall-message.own{
-  align-self: flex-end;
-  background: #ebdcf1;
-}
-
-.wall-message small{
-  display: block;
-  margin-bottom: 3px;
-  color: #776a7a;
-  font-size: 0.51rem;
-}
-
-.wall-message p{
-  overflow-wrap: anywhere;
-  font-size: 0.63rem;
-  line-height: 1.4;
-}
-
-.wall-chat-empty{
-  align-self: center;
-  color: #776a7a;
-  font-size: 0.65rem;
-  text-align: center;
-}
-
-.wall-chat-form{
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 9px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: #f0e2f1;
-}
-
-.wall-chat-form input{
-  min-width: 0;
-  flex: 1;
-  padding: 2px 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #332a37;
-  font-size: 0.61rem;
-}
-
-.wall-chat-form button{
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: #d7c2e4;
-  color: #433450;
-  font-size: 0.9rem;
-}
-
-.wall-chat-note{
-  padding: 5px 8px;
-  color: #827586;
-  font-size: 0.48rem;
-  text-align: center;
-}
-
-.wall-chat-tabs{
-  min-height: 45px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 2px;
-  padding: 5px 5px 3px;
-  border-top: 1px solid rgba(88, 59, 88, 0.12);
-}
-
-.wall-chat-tabs button{
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px 1px;
-  border-radius: 6px;
-  background: transparent;
-  color: #786d7b;
-  font-size: 0.49rem;
-}
-
-.wall-chat-tabs button span{
-  font-size: 0.75rem;
-}
-
 .wall-chat-tabs button.active{
   background: #eadcf0;
   color: #42334e;
@@ -719,78 +239,6 @@
   flex: 1;
   padding: 8px;
   overflow: hidden;
-}
-
-.wall-notification-list button{
-  width: 100%;
-  display: block;
-  padding: 8px 6px;
-  border-bottom: 1px solid rgba(88, 59, 88, 0.1);
-  background: transparent;
-  font-size: 0.62rem;
-  text-align: left;
-}
-
-.wall-notification-list button.unread{
-  border-radius: 6px;
-  background: #f3e7f4;
-}
-
-.wall-notification-list small{
-  display: block;
-  margin-top: 3px;
-  color: #786d7b;
-  font-size: 0.53rem;
-}
-
-.wall-notification-list .wall-mark-read{
-  color: #604875;
-}
-
-.wall-chat-friends{
-  min-height: 0;
-  flex: 1;
-  padding: 7px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.wall-chat-friends button{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: 7px;
-  background: transparent;
-  font-size: 0.68rem;
-  text-align: left;
-}
-
-.wall-chat-friends button:hover{
-  background: #f4eaf5;
-}
-
-.wall-chat-friends button > span:nth-child(2){
-  flex: 1;
-}
-
-.wall-chat-friends small{
-  display: block;
-  color: #786d7b;
-  font-size: 0.55rem;
-}
-
-.wall-right-footer{
-  flex: 0 0 auto;
-  color: #827586;
-  font-size: 0.57rem;
-  text-align: center;
-}
-
-.wall-notification-list{
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
 }
 
 .dark-mode.wall-shell .wall-layout,
@@ -833,72 +281,10 @@
   color: var(--muted);
 }
 
-.dark-mode.wall-shell .wall-chat-form,
-.dark-mode.wall-shell .wall-message,
-.dark-mode.wall-shell .wall-notification-list button.unread,
-.dark-mode.wall-shell .wall-chat-tabs button.active{
-  border-color: var(--line);
-  background: #40372f;
-  color: var(--text);
-}
-
-.dark-mode.wall-shell .wall-chat-form input,
-.dark-mode.wall-shell .wall-message p,
-.dark-mode.wall-shell .wall-notification-list button{
-  color: var(--text);
-}
-
-@media(max-width: 1080px){
-  .wall-layout{
-    grid-template-columns: minmax(190px, 0.62fr) minmax(350px, 1.3fr) minmax(290px, 0.95fr);
-  }
-
-  .wall-left{
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-
-  .wall-right{
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-}
-
 @media(max-width: 860px){
-  .page-shell.wall-shell{
-    height: auto;
-    min-height: 100dvh;
-    overflow: auto;
-  }
-
-  .wall-layout{
-    min-height: 100dvh;
-    height: auto;
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .wall-left{
-    height: auto;
-    overflow: visible;
-    padding: 10px 14px;
-  }
 
   .wall-left-footer{
     display: none;
-  }
-
-  .wall-profile{
-    padding: 8px 10px;
-  }
-
-  .wall-profile p{
-    display: none;
-  }
-
-  .wall-right{
-    height: min(680px, 80dvh);
-    min-height: 480px;
-    padding: 10px 14px;
   }
 
 }

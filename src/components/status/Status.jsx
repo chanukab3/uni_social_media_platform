@@ -129,7 +129,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
         <section className="wall-event-overlay" aria-label="Community event details">
           <header className="wall-event-overlay-heading">
             <div><h2>Community events</h2><p>Scroll sideways to explore what’s happening.</p></div>
-            <button type="button" className="wall-event-overlay-close" onClick={() => setEventsOpen(false)} aria-label="Close events">← Back to posts</button>
+            <button type="button" className="wall-event-overlay-close" onClick={() => setEventsOpen(false)} aria-label="Close events">Back to posts</button>
           </header>
           <div className="wall-event-dialog-strip">
             <EventCards events={events} onSelect={setSelectedEventIndex} />
@@ -138,7 +138,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
             <article className="wall-event-detail">
              {events[selectedEventIndex].image && <img src={events[selectedEventIndex].image} alt="" />}
               <div>
-                <span className="wall-event-tag">{events[selectedEventIndex].tag}</span>
+                
                 <h3>{events[selectedEventIndex].title}</h3>
                 <p>{events[selectedEventIndex].detail}</p>
                 <span className="wall-event-detail-date">{events[selectedEventIndex].date.replace('\n', ' ')}</span>

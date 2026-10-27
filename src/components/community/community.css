@@ -186,13 +186,6 @@
   background-size: cover;
 }
 
-.group-cover-0{
-  background-image: url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=600&q=75');
-}
-
-.group-cover-1{
-  background-image: url('https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=600&q=75');
-}
 
 .wall-group-suggestion > strong{
   font-size: 0.73rem;
@@ -263,9 +256,8 @@
 
 .wall-create-group{
   width: 100%;
-  bottom: 0;
   padding: 9px 0 2px;
-  border-top: 1px solid rgba(88, 59, 88, 0.1);
+  border-top: 2px solid rgba(88, 59, 88, 0.5);
   margin-top: 3px;
   background: transparent;
   color: #594273;
@@ -327,9 +319,11 @@
   width: 35px;
   height: 35px;
   flex: 0 0 auto;
+  display: grid;
+  place-items: center;
   border: 1px solid rgba(88, 59, 88, 0.12);
   border-radius: 9px;
-  background: #fff9ff;
+  background: #000000;
 }
 
 .wall-events{
@@ -347,7 +341,7 @@
 }
 
 .wall-event-heading h2{
-  font-size: 0.94rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -356,7 +350,7 @@
   display: block;
   margin-top: 2px;
   color: #776a7a;
-  font-size: 0.61rem;
+  font-size: 0.6rem;
 }
 
 .wall-event-controls{
@@ -377,7 +371,7 @@
 .wall-event-controls .event-create{
   border-radius: 8px;
   background: #eadbf3;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
 }
 
 .wall-event-track{
@@ -822,8 +816,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0 9px;
-  padding: 6px 8px;
+  margin: 0 6px;
+  margin-top: 6px;
+  padding: 6px 9px;
   border-radius: 8px;
   background: #f0e2f1;
 }
@@ -840,16 +835,17 @@
 }
 
 .wall-chat-form button{
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 25px;
+  
   border-radius: 6px;
   background: #d7c2e4;
   color: #433450;
-  font-size: 0.9rem;
+  font-size: 0.6rem;
 }
 
 .wall-chat-note{
-  padding: 5px 8px;
+  padding: 0px 8px;
   color: #827586;
   font-size: 0.48rem;
   text-align: center;
@@ -878,8 +874,8 @@
   font-size: 0.49rem;
 }
 
-.wall-chat-tabs button span{
-  font-size: 0.75rem;
+.wall-chat-tabs button .ui-icon{
+  font-size: 0.7rem;
 }
 
 .wall-chat-tabs button.active{
@@ -890,6 +886,9 @@
 .wall-notification-list{
   min-height: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 8px;
   overflow-y: auto;
 }
@@ -942,12 +941,15 @@
 }
 
 .wall-notification-list .wall-mark-read{
-  color: #604875;
+  color: #9a7bb6;
+  background-color: #2b2929;
+  border-radius: 6px;
 }
 
 .wall-chat-friends{
   min-height: 0;
   flex: 1;
+  
   padding: 7px;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -958,11 +960,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px;
+  padding: 5px;
   border-radius: 7px;
-  background: transparent;
+  background-color: #3c393e;
   font-size: 0.68rem;
   text-align: left;
+  margin: 2px 0;
 }
 
 .wall-chat-friends button:hover{
@@ -999,6 +1002,7 @@
   background: #292929;
   color: var(--accent-dark);
   box-shadow: none;
+  margin: 3px 0;
 }
 
 .dark-mode.wall-shell .share-recipient,
@@ -1009,11 +1013,7 @@
   color: var(--text);
 }
 
-.share-recipient input[type="checkbox"],
-.group-invite-choice input[type="checkbox"]{
-  color-scheme: dark;
-  accent-color: var(--accent);
-}
+
 
 .share-recipient:has(input:checked),
 .group-invite-choice:has(input:checked){
@@ -1240,11 +1240,6 @@
     padding: 10px 14px;
   }
 
-  .wall-feed-scroll{
-    padding-right: 0;
-    padding-left: 0;
-  }
-
   .wall-feed-scroll > .composer,
   .wall-feed-scroll > .feed{
     margin-right: 14px;
@@ -1270,11 +1265,6 @@
   .wall-event-track{
     height: 136px;
     grid-template-columns: minmax(0, 1fr) 112px;
-  }
-
-  .wall-feed-scroll{
-    padding-right: 0;
-    padding-left: 0;
   }
 
   .wall-feed-scroll > .composer,

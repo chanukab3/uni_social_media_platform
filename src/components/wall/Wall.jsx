@@ -1,4 +1,14 @@
 import{ useRef } from 'react'
+import ArrowRightIcon from '@iconify-react/bitcoin-icons/arrow-right-outline'
+import CameraIcon from '@iconify-react/bitcoin-icons/camera-outline'
+import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
+import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
+import EmailIcon from '@iconify-react/bitcoin-icons/email-outline'
+import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
+import MessageIcon from '@iconify-react/bitcoin-icons/message-outline'
+import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
+import SendIcon from '@iconify-react/bitcoin-icons/send-outline'
+import ShareIcon from '@iconify-react/bitcoin-icons/share-outline'
 import Community from '../community/Community'
 import Profile,{ ProfileAvatar } from '../profile/Profile'
 import Status from '../status/Status'
@@ -44,7 +54,7 @@ export function PostComposer({
             </div>
           )}
           <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
-           {composerImage ? 'Change photo' : '＋ Add photo'}
+           <CameraIcon className="ui-icon"  /> {composerImage ? 'Change photo' : 'Add photo'}
           </button>
           <small className="composer-photo-limit">One photo · max 5 MB</small>
           <input
@@ -143,10 +153,10 @@ export function PostCard({
           <span aria-hidden="true">{post.liked ? '♥' : '♡'}</span>{formatCount(post.likes)}
         </button>
         <button type="button" className="post-action" onClick={() => onToggleComments(post.id)} aria-expanded={commentsExpanded}>
-          <span aria-hidden="true">▢</span>{formatCount(post.commentCount)}
+          <MessageIcon className="ui-icon" aria-hidden="true" />{formatCount(post.commentCount)}
         </button>
         <button type="button" className="post-action" onClick={() => onShare(post)}>
-          <span aria-hidden="true">↗</span>{formatCount(post.shares)}
+          <ShareIcon className="ui-icon" aria-hidden="true" />{formatCount(post.shares)}
         </button>
       </div>
      {commentsExpanded &&(
@@ -299,7 +309,7 @@ function Wall({
     <div className="wall-layout">
       <aside className={activePage === 'Profile' ? 'wall-left wall-left-profile' : 'wall-left'}>
         <button type="button" className="wall-brand" onClick={() => onNavigate('Home')}>
-          <span className="brand-mark">M</span><strong>Mahagedara</strong>
+          <span className="brand-mark"><img src="mg.svg"/></span><strong>Mahagedara</strong>
         </button>
        {activePage === 'Profile' ?(
           <Profile{...profileProps} />
@@ -311,7 +321,7 @@ function Wall({
                 <span><strong>{profileName}</strong><small>@amanda.silva</small></span>
               </button>
               <p>Finding my people, one coffee and creative project at a time.</p>
-              <div className="wall-profile-stats"><span><strong>{postCount + 128}</strong><small>Friends</small></span><span><strong>8</strong><small>Groups</small></span><button type="button" aria-label="View profile" onClick={() => onNavigate('Profile')}>↗</button></div>
+              <div className="wall-profile-stats"><span><strong>{postCount + 128}</strong><small>Friends</small></span><span><strong>8</strong><small>Groups</small></span><button type="button" aria-label="View profile" onClick={() => onNavigate('Profile')}><ArrowRightIcon className="ui-icon" /></button></div>
             </section>
             <Community
               communities={communities}
@@ -333,11 +343,11 @@ function Wall({
           <>
             <header className="topbar wall-topbar">
               <label className="search-wrap">
-                <span aria-hidden="true">⌕</span>
+                <span aria-hidden="true"><SearchIcon className="ui-icon" /></span>
                 <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
                {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
               </label>
-              <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
+              <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}><BellIcon className="ui-icon" />{unreadCount > 0 && <span className="notification-dot" />}</button>
             </header>
             <div className="wall-profile-scroll">
               <Profile{...profileProps} view="posts" />
@@ -348,11 +358,11 @@ function Wall({
             <div className="wall-feed-scroll">
               <header className="topbar wall-topbar">
                 <label className="search-wrap">
-                  <span aria-hidden="true">⌕</span>
+                  <span aria-hidden="true"><SearchIcon className="ui-icon" /></span>
                   <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
                  {query && <button type="button" className="clear-search" onClick={onClearQuery} aria-label="Clear search">×</button>}
                 </label>
-                <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}>♧{unreadCount > 0 && <span className="notification-dot" />}</button>
+                <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => onChatSectionChange('Notifications')}><BellIcon className="ui-icon" />{unreadCount > 0 && <span className="notification-dot" />}</button>
               </header>
               <Status
                 events={events}
@@ -427,16 +437,16 @@ function Wall({
               </div>
               <form className="wall-chat-form" onSubmit={onSendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${chatName}...`} value={messageDraft} onChange={(event) => onMessageDraftChange(event.target.value)} />
-                <button type="submit" aria-label="Send message">↑</button>
+                <button type="submit" aria-label="Send message"><SendIcon className="ui-icon" /></button>
               </form>
               <p className="wall-chat-note">A shared space, a little kindness, a lot of good conversations.</p>
             </>
           )}
           <nav className="wall-chat-tabs" aria-label="Community sections">
-           {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) =>(
+           {[['World', EmailIcon], ['Groups', GridIcon], ['Friends', ContactsIcon], ['Inbox', MessageIcon], ['Notifications', BellIcon]].map(([label, Icon]) =>(
               <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
                 onSelectChatTab(label)
-              }}><span>{icon}</span>{label}</button>
+               }}><Icon className="ui-icon" aria-hidden="true" />{label}</button>
             ))}
           </nav>
         </section>

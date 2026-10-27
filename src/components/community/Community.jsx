@@ -1,6 +1,15 @@
 import './community.css'
+import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
+import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
+import EmailIcon from '@iconify-react/bitcoin-icons/email-outline'
+import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
+import MessageIcon from '@iconify-react/bitcoin-icons/message-outline'
+import PlusIcon from '@iconify-react/bitcoin-icons/plus-outline'
+import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
+import SendIcon from '@iconify-react/bitcoin-icons/send-outline'
 import{ FriendSuggestions, WallProfileCard } from '../profile/Profile'
 import Status from '../status/Status'
+
 
 export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }){
   const term = query.trim().toLowerCase()
@@ -10,7 +19,7 @@ export function CommunityDirectory({ communities, joinedCommunities, query, onCr
     <>
       <div className="section-title">
         <div><h2>Communities</h2><p>Find your people and join the conversation.</p></div>
-        <button className="primary-btn compact" type="button" onClick={onCreate}>＋ Create</button>
+        <button className="primary-btn compact" type="button" onClick={onCreate}><PlusIcon className="ui-icon" /> Create</button>
       </div>
       <div className="community-grid">
        {visibleCommunities.map((community) =>{
@@ -18,7 +27,7 @@ export function CommunityDirectory({ communities, joinedCommunities, query, onCr
           return(
             <article className="community-card" key={community.id || community.name}>
               <div className="community-cover" style={{ background: `linear-gradient(135deg, ${community.tone}, #fff3e4)` }}>
-                <span>+</span>
+                <PlusIcon className="ui-icon" aria-hidden="true" />
               </div>
               <div className="community-card-body">
                 <h3>{community.name}</h3>
@@ -190,7 +199,7 @@ function Community({
      {profileContent ? <div className="wall-profile-view">{profileContent}</div> : <>
       <aside className="wall-left">
         <button type="button" className="wall-brand" onClick={() => navigate('Home')}>
-          <span className="brand-mark">M</span><strong>Mahagedara</strong>
+          <span className="brand-mark"><img src="mg.svg"/></span><strong>Mahagedara</strong>
         </button>
         <WallProfileCard
           profileId={userId}
@@ -224,11 +233,12 @@ function Community({
         <div className="wall-feed-scroll">
           <header className="topbar wall-topbar">
             <label className="search-wrap">
-              <span aria-hidden="true">⌕</span>
+              <span aria-hidden="true"><SearchIcon className="ui-icon" /></span>
               <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search people, groups, and little things you love" aria-label="Search people, groups and posts" />
             </label>
             <button className="wall-icon-button" type="button" aria-label="Notifications" onClick={() => setChatSection('Notifications')}>
-              ♧{unreadCount > 0 && <span className="notification-dot" />}
+              <BellIcon className="ui-icon" />
+              {unreadCount > 0 && <span className="notification-dot" />}
             </button>
           </header>
           <Status
@@ -245,7 +255,7 @@ function Community({
           <section className="feed" aria-label="Post feed">
            {filteredPosts.length
               ? filteredPosts.map(renderPost)
-              : <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try another search.' : 'Share an update to get the conversation started.'}</p></div>}
+              : <div className="empty-state"><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try another search.' : 'Share an update to get the conversation started.'}</p></div>}
           </section>
         </div>
       </main>
@@ -264,15 +274,16 @@ function Community({
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
             <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
-            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ?(inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
            {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
            {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
           </header>
 
-         {chatSection === 'Notifications' ?(
+         {chatSection === 'Notifications' ? (
             <div className="wall-notification-list">
-             {notifications.map((item) =>{
+              <div>
+                {notifications.map((item) =>{
                 const request = incomingFriendRequests.find((friendRequest) =>
                   item.text === `${friendRequest.name} sent you a friend request.`
                 )
@@ -288,6 +299,7 @@ function Community({
                 )
               })}
              {!notifications.length && <p className="wall-muted">You’re all caught up.</p>}
+              </div>
               <button type="button" className="wall-mark-read" onClick={markNotificationsRead}>Mark all as read</button>
             </div>
           ) : chatSection === 'Friends' ?(
@@ -303,11 +315,13 @@ function Community({
             </div>
           ) : chatSection === 'Groups' && !selectedGroup ?(
             <div className="wall-chat-friends wall-chat-group-list">
-             {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
+             <div>
+              {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
                 <span className="wall-group-icon" style={{ background: group.tone }}></span><span>{group.name}<small>{group.members} members</small></span>
               </button>)}
+             </div>
              {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
-              <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}>＋ Create a group</button>
+              <button type="button" className="wall-create-group" onClick={() => setModal({ type: 'create-community' })}><PlusIcon className="ui-icon" /> Create a group</button>
             </div>
           ) : isInboxList ?(
             <div className="wall-chat-friends">
@@ -328,20 +342,20 @@ function Community({
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
-                <button type="submit" aria-label="Send message">↑</button>
+                <button type="submit" aria-label="Send message"><SendIcon className="ui-icon" /></button>
               </form>
               <p className="wall-chat-note">A shared space, a little kindness, a lot of good conversations.</p>
             </>
           )}
 
           <nav className="wall-chat-tabs" aria-label="Community sections">
-           {[['World', '◎'], ['Groups', '▤'], ['Friends', '♧'], ['Inbox', '✉'], ['Notifications', '♢']].map(([label, icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
+           {[['World', EmailIcon], ['Groups', GridIcon], ['Friends', ContactsIcon], ['Inbox', MessageIcon], ['Notifications', BellIcon]].map(([label, Icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
               setChatSection(label)
               if(label === 'World') setCurrentChat('World')
               if(label === 'Groups') setCurrentGroupChat('')
               if(label === 'Inbox') onViewInbox()
               if(label === 'Notifications') markNotificationsRead()
-            }}><span>{icon}</span>{label}</button>)}
+            }}><Icon className="ui-icon" aria-hidden="true" />{label}</button>)}
           </nav>
         </section>
       </aside>
