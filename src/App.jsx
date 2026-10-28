@@ -65,7 +65,6 @@ function App(){
   const [userId, setUserId] = useState(null)
   const [messages, setMessages] = useState({})
   const [messageDraft, setMessageDraft] = useState('')
-  const [commentDraft, setCommentDraft] = useState('')
   const [commentsByPost, setCommentsByPost] = useState({})
   const [expandedCommentPosts, setExpandedCommentPosts] = useState([])
   const [commentsHasMore, setCommentsHasMore] = useState({})
@@ -638,13 +637,11 @@ function App(){
       : post))
   }
 
-  const addComment = async(event, postId) =>{
-    event.preventDefault()
-    const text = commentDraft.trim()
-    if(!text) return
+  const addComment = async(postId, text) =>{
+    if(!text) return false
     if(supabase && !userId){
       showToast('Sign in to comment on posts.')
-      return
+      return false
     }
     let comment
     if(supabase && userId && typeof postId === 'string'){
@@ -656,7 +653,7 @@ function App(){
       }).select('id, author_name, body, created_at').single()
       if(error){
         showToast(`Could not add your comment: ${error.message}`)
-        return
+        return false
       }
       comment ={
         id: data.id,
@@ -669,14 +666,14 @@ function App(){
     }
     setCommentsByPost((current) =>({
       ...current,
-      [postId]: [...(current[postId] || []), comment],
+      [postId]: [comment, ...(current[postId] || [])],
     }))
     setPosts((current) => current.map((post) => post.id === postId
       ?{ ...post, commentCount: post.commentCount + 1 }
       : post))
     setExpandedCommentPosts((current) => current.includes(postId) ? current : [...current, postId])
-    setCommentDraft('')
     showToast('Comment added.')
+    return true
   }
 
   const toggleComments = async(postId) =>{
@@ -698,20 +695,20 @@ function App(){
       showToast(`Could not load comments: ${error.message}`)
       return
     }
-    const latestComments = [...data].reverse().map((comment) =>({
+    const latestComments = data.slice(0, 3).map((comment) =>({
       id: comment.id,
       author: comment.author_name,
       text: comment.body,
       createdAt: comment.created_at,
     }))
     setCommentsByPost((current) =>({ ...current, [postId]: latestComments }))
-    setCommentsHasMore((current) =>({ ...current, [postId]: data.length === 4 }))
+    setCommentsHasMore((current) =>({ ...current, [postId]: data.length > 3 }))
   }
 
   const loadOlderComments = async(postId) =>{
     if(!supabase || typeof postId !== 'string' || loadingComments[postId]) return
     const currentComments = commentsByPost[postId] || []
-    const oldestComment = currentComments[0]
+    const oldestComment = currentComments[currentComments.length - 1]
     if(!oldestComment) return
     setLoadingComments((current) =>({ ...current, [postId]: true }))
     const{ data, error } = await supabase
@@ -726,7 +723,7 @@ function App(){
       showToast(`Could not load older comments: ${error.message}`)
       return
     }
-    const olderComments = [...data].reverse().map((comment) =>({
+    const olderComments = data.map((comment) =>({
       id: comment.id,
       author: comment.author_name,
       text: comment.body,
@@ -734,7 +731,7 @@ function App(){
     }))
     setCommentsByPost((current) =>({
       ...current,
-      [postId]: [...olderComments, ...(current[postId] || [])],
+      [postId]: [...(current[postId] || []), ...olderComments],
     }))
     setCommentsHasMore((current) =>({ ...current, [postId]: data.length === 20 }))
   }
@@ -1314,7 +1311,6 @@ function App(){
       }}
       openMenu={openMenu}
       savedPosts={savedPosts}
-      commentDraft={commentDraft}
       canModerate={isAdmin}
       comments={commentsByPost[post.id] || []}
       commentsExpanded={expandedCommentPosts.includes(post.id)}
@@ -1332,7 +1328,6 @@ function App(){
       onToggleLike={toggleLike}
       onShare={sharePost}
       onAddComment={addComment}
-      onCommentDraftChange={setCommentDraft}
       onProfileClick={openProfile}
     />
   )

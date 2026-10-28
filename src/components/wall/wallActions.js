@@ -6,7 +6,6 @@ export function createWallActions({
   activePage,
   chatSection,
   communities,
-  commentDraft,
   composerFile,
   composerImage,
   composerText,
@@ -19,7 +18,6 @@ export function createWallActions({
   profileName,
   savedPosts,
   setActivePage,
-  setCommentDraft,
   setComposerFile,
   setComposerImage,
   setComposerText,
@@ -65,7 +63,7 @@ export function createWallActions({
       const{ data, error } = await supabase.from('posts').insert({
         author_id: userId,
         author_name: profileName,
-        handle: '@amanda',
+        handle: '@Username',
         body: text,
         image_url: imageUrl || null,
       }).select('id').single()
@@ -78,7 +76,7 @@ export function createWallActions({
     const newPost ={
       id: postId,
       author: profileName,
-      handle: '@amanda',
+      handle: '@Username',
       time: 'just now',
       text,
       image: imageUrl,
@@ -121,13 +119,11 @@ export function createWallActions({
       : item))
   }
 
-  const addComment = async(event, postId) =>{
-    event.preventDefault()
-    const text = commentDraft.trim()
-    if(!text) return
+  const addComment = async(postId, text) =>{
+    if(!text) return false
     if(supabase && !userId){
       showToast('Sign in to comment on posts.')
-      return
+      return false
     }
     if(supabase && userId && typeof postId === 'string'){
       const{ error } = await supabase.from('post_comments').insert({
@@ -138,14 +134,14 @@ export function createWallActions({
       })
       if(error){
         showToast(`Could not add your comment: ${error.message}`)
-        return
+        return false
       }
     }
     setPosts((current) => current.map((item) => item.id === postId
       ?{ ...item, comments: [...item.comments,{ author: profileName, text }] }
       : item))
-    setCommentDraft('')
     showToast('Comment added.')
+    return true
   }
 
   const toggleSave =(postId) =>{

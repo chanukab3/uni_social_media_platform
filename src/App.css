@@ -740,9 +740,14 @@ img{
 }
 
 .comment-list{
+  max-height: 90px;
   display: grid;
   gap: 7px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 10px 2px 3px;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
 }
 
 .comment-list p{
@@ -2075,10 +2080,26 @@ img{
 }
 
 .comment-list{
-  max-height: 210px;
-  overflow-y: auto;
+  max-height: 90px;
+  overflow-y: scroll;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
+  scrollbar-color: #9c62bf #21172a;
+  scrollbar-width: auto;
+}
+
+.comment-list::-webkit-scrollbar{
+  width: 10px;
+}
+
+.comment-list::-webkit-scrollbar-track{
+  border-radius: 8px;
+  background: #21172a;
+}
+
+.comment-list::-webkit-scrollbar-thumb{
+  border: 2px solid #21172a;
+  border-radius: 8px;
+  background: #9c62bf;
 }
 
 .share-recipient-list{

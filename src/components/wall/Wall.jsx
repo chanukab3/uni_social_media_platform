@@ -1,4 +1,4 @@
-import{ useRef } from 'react'
+import{ useRef, useState } from 'react'
 import ArrowRightIcon from '@iconify-react/bitcoin-icons/arrow-right-outline'
 import CameraIcon from '@iconify-react/bitcoin-icons/camera-outline'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
@@ -15,6 +15,7 @@ import Status from '../status/Status'
 import './Wall.css'
 
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
 
 function formatCount(count){
   return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : count
@@ -98,7 +99,6 @@ export function PostCard({
   post,
   openMenu,
   savedPosts,
-  commentDraft,
   comments = [],
   commentsExpanded = false,
   commentsHasMore = false,
@@ -113,9 +113,17 @@ export function PostCard({
   onToggleLike,
   onShare,
   onAddComment,
-  onCommentDraftChange,
   onProfileClick,
 }){
+  const [commentDraft, setCommentDraft] = useState('')
+
+  const submitComment = async(event) =>{
+    event.preventDefault()
+    const text = commentDraft.trim()
+    if(!text) return
+    if(await onAddComment(post.id, text)) setCommentDraft('')
+  }
+
   return(
     <article className="post-card">
       <div className="post-header">
@@ -161,28 +169,29 @@ export function PostCard({
       </div>
      {commentsExpanded &&(
         <div className="comment-list" onScroll={(event) =>{
-          if(event.currentTarget.scrollTop <= 12 && commentsHasMore && !commentsLoading){
-            onLoadOlderComments(post.id)
-          }
-        }}>
-         {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
-           {commentsLoading ? 'Loading comments…' : 'Load older comments'}
-          </button>}
-         {comments.map((comment) =>(
+            const list = event.currentTarget
+            if(list.scrollHeight - list.scrollTop - list.clientHeight <= 12 && commentsHasMore && !commentsLoading){
+              onLoadOlderComments(post.id)
+            }
+          }}>
+          {comments.map((comment) =>(
             <p key={comment.id}><strong>{comment.author}</strong>{comment.text}</p>
           ))}
          {commentsLoading && <p className="wall-muted">Loading comments…</p>}
          {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
+          {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
+            {commentsLoading ? 'Loading comments…' : 'Load older comments'}
+          </button>}
         </div>
       )}
-      <form className="comment-form" onSubmit={(event) => onAddComment(event, post.id)}>
+      <form className="comment-form" onSubmit={submitComment}>
         <input
           id={`comment-${post.id}`}
           type="text"
           aria-label={`Comment on ${post.author}'s post`}
           placeholder="Write a comment..."
           value={commentDraft}
-          onChange={(event) => onCommentDraftChange(event.target.value)}
+          onChange={(event) => setCommentDraft(event.target.value)}
         />
         <button type="submit" aria-label="Send comment">Send</button>
       </form>
@@ -195,7 +204,6 @@ export function PostFeed({
   query,
   openMenu,
   savedPosts,
-  commentDraft,
   commentsByPost,
   expandedCommentPosts,
   commentsHasMore,
@@ -203,7 +211,6 @@ export function PostFeed({
   onToggleComments,
   onLoadOlderComments,
   postActions,
-  onCommentDraftChange,
   onProfileClick,
   emptyState,
 }){
@@ -216,7 +223,6 @@ export function PostFeed({
             post={post}
             openMenu={openMenu}
             savedPosts={savedPosts}
-            commentDraft={commentDraft}
             comments={commentsByPost[post.id] || []}
             commentsExpanded={expandedCommentPosts.includes(post.id)}
             commentsHasMore={Boolean(commentsHasMore[post.id])}
@@ -230,16 +236,16 @@ export function PostFeed({
             onToggleLike={postActions.toggleLike}
             onShare={postActions.sharePost}
             onAddComment={postActions.addComment}
-            onCommentDraftChange={onCommentDraftChange}
             onProfileClick={onProfileClick}
           />
         ))
-        : emptyState || <div className="empty-state"><span>✧</span><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try a different search.' : 'Share an update to get the conversation started.'}</p></div>}
+        : emptyState || <div className="empty-state"><h3>{query ? 'No matches found' : 'Nothing here yet'}</h3><p>{query ? 'Try a different search.' : 'Share an update to get the conversation started.'}</p></div>}
     </section>
   )
 }
 
 function Wall({
+
   activePage,
   query,
   onQueryChange,
@@ -279,7 +285,6 @@ function Wall({
   posts,
   openMenu,
   savedPosts,
-  commentDraft,
   commentsByPost,
   expandedCommentPosts,
   commentsHasMore,
@@ -287,7 +292,6 @@ function Wall({
   onToggleComments,
   onLoadOlderComments,
   postActions,
-  onCommentDraftChange,
   composerText,
   composerImage,
   onComposerTextChange,
@@ -295,6 +299,7 @@ function Wall({
   onComposerFileChange,
   profileProps,
 }){
+
   const term = query.trim().toLowerCase()
   const selectedGroup = communities.find((group) => group.name === currentGroupChat)
   const chatName = chatSection === 'World'
@@ -318,7 +323,7 @@ function Wall({
             <section className="mini-card wall-profile">
               <button type="button" className="wall-profile-button" onClick={() => onNavigate('Profile')}>
                 <span className="avatar large avatar-olive">A</span>
-                <span><strong>{profileName}</strong><small>@amanda.silva</small></span>
+                <span><strong>{profileName}</strong><small>@Username</small></span>
               </button>
               <p>Finding my people, one coffee and creative project at a time.</p>
               <div className="wall-profile-stats"><span><strong>{postCount + 128}</strong><small>Friends</small></span><span><strong>8</strong><small>Groups</small></span><button type="button" aria-label="View profile" onClick={() => onNavigate('Profile')}><ArrowRightIcon className="ui-icon" /></button></div>
@@ -386,7 +391,6 @@ function Wall({
                 query={query}
                 openMenu={openMenu}
                 savedPosts={savedPosts}
-                commentDraft={commentDraft}
                 commentsByPost={commentsByPost}
                 expandedCommentPosts={expandedCommentPosts}
                 commentsHasMore={commentsHasMore}
@@ -394,7 +398,6 @@ function Wall({
                 onToggleComments={onToggleComments}
                 onLoadOlderComments={onLoadOlderComments}
                 postActions={postActions}
-                onCommentDraftChange={onCommentDraftChange}
               />
             </div>
           </>
