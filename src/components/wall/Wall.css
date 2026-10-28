@@ -173,6 +173,7 @@
   min-width: 0;
   overflow: hidden;
   padding: 12px 13px 11px;
+  
 }
 
 .suggested-friends{
@@ -202,6 +203,9 @@
   border: 2px solid rgba(190, 113, 255, 0.22);
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.24);
   font-size: 0.9rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .suggested-friend strong{

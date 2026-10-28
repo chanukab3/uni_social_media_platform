@@ -101,7 +101,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
                 <button className="secondary-btn danger-action" type="button" onClick={onSignOut}>Sign out</button>
               </div>
             </div>
-            <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB</small>
+            <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB · cropped square</small>
           </>}
           <div className="wall-profile-numbers"><span><strong>{postCount}</strong><small>Posts</small></span></div>
         </section>

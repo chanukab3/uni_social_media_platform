@@ -322,9 +322,13 @@ function Community({
                 <span>{request.name} sent you a friend request.</span>
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
-             {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} className={inboxSelected && currentChat === friend.name ? 'selected' : ''} onClick={() => onSelectInboxChat(friend)}>
-                <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
-              </button>)}
+             {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
+                <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
+                  <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
+                  <span>{friend.name}<small>View profile · {friend.status}</small></span>
+                </button>
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
+              </div>)}
              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
           ) : chatSection === 'Groups' && !selectedGroup ?(
