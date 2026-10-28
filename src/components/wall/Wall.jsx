@@ -421,7 +421,7 @@ function Wall({
         </section>
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
-            <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' : chatName[0]}</span>
+            <span className="wall-chat-avatar">{chatSection === 'World' ? '🌐' : chatName[0]}</span>
             <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? currentChat : chatName}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : chatSection === 'Notifications' ? 'Your latest activity' : 'Messages and conversations'}</small></span>
             <button type="button" aria-label="More chat options">•••</button>
           </header>

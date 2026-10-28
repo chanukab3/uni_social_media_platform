@@ -36,7 +36,7 @@ export default function ForgotPassword({ onLogin }){
       if(resetError) throw resetError;
 
       setMessage(
-        "If an account exists for this email, check your inbox for reset instructions."
+        "Check your inbox for reset instructions."
       );
     } catch(err){
       setError(err.message || "Unable to send the reset email.");

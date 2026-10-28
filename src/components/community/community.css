@@ -732,7 +732,8 @@
   flex: 0 0 auto;
   border: 1px solid #c8b7d4;
   border-radius: 7px;
-  color: #584768;
+  font-size: 0.9rem;
+  
 }
 
 .wall-chat-heading > span:nth-child(2){

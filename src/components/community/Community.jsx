@@ -285,7 +285,7 @@ function Community({
 
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
-            <span className="wall-chat-avatar">{chatSection === 'World' ? '◎' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
+            <span className="wall-chat-avatar">{chatSection === 'World' ? '🌐' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
             <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
            {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
@@ -368,7 +368,7 @@ function Community({
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
                 <button type="submit" aria-label="Send message"><SendIcon className="ui-icon" /></button>
               </form>
-              <p className="wall-chat-note">A shared space, a little kindness, a lot of good conversations.</p>
+              
             </>
           )}
 
