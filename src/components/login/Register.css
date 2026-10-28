@@ -187,7 +187,7 @@ body {
 .footer {
   position: absolute;
   bottom: 30px;
-  left: 40px;
+  left: 0px;
   font-size: 13px;
   color: #7a7375;
 }
