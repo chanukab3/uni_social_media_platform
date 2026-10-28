@@ -181,9 +181,9 @@
   grid-auto-flow: column;
   gap: 8px;
   overflow-x: auto;
-  overscroll-behavior-inline: contain;
+  overscroll-behavior-inline: initial ;
   padding: 3px 1px 8px;
-  scrollbar-color: #71339a #0a0711;
+  scrollbar-color: #8d779e #0a0711;
   scrollbar-width: thin;
 }
 

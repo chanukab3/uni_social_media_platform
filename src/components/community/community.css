@@ -520,7 +520,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0 0 18px;
-  scrollbar-color: #d5bfd9 transparent;
+  scrollbar-color: #837b85 transparent;
   scrollbar-width: thin;
 }
 
@@ -663,7 +663,11 @@
 
 .suggested-friends{
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  
+  grid-auto-columns: minmax(150px, 43%);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   gap: 6px;
 }
 
