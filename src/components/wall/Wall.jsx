@@ -316,7 +316,7 @@ function Wall({
     <div className="wall-layout">
       <aside className={activePage === 'Profile' ? 'wall-left wall-left-profile' : 'wall-left'}>
         <button type="button" className="wall-brand" onClick={() => onNavigate('Home')}>
-          <span className="brand-mark"><img src="mg.svg"/></span><strong>Mahagedara</strong>
+          <span className="brand-mark"><img src="mg.png" /></span><strong>Mahagedara</strong>
         </button>
        {activePage === 'Profile' ?(
           <Profile{...profileProps} />

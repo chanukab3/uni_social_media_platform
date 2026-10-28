@@ -52,7 +52,7 @@ export default function ResetPassword({ onLogin }){
   return(
     <main className="auth-page">
       <header className="auth-brand">
-        <span className="brand-icon">♧</span>
+        <span className="brand-icon"><img src="/mg.png" width="35px" height="auto"/></span>
         <span>Mahagedara</span>
       </header>
 

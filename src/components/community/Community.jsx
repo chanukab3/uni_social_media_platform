@@ -201,7 +201,7 @@ function Community({
      {profileContent ? <div className="wall-profile-view">{profileContent}</div> : <>
       <aside className="wall-left">
         <button type="button" className="wall-brand" onClick={() => navigate('Home')}>
-          <span className="brand-mark"><img src="mg.svg"/></span><strong>Mahagedara</strong>
+          <span className="brand-mark"><img src="/mg.png" width="25px" height="auto"/></span><strong>Mahagedara</strong>
         </button>
         <WallProfileCard
           profileId={userId}

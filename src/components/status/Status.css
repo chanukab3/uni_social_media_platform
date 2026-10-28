@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 2px 9px;
+  padding: 0 2px 6px;
 }
 
 .wall-event-heading h2{
@@ -29,12 +29,13 @@
 .wall-event-heading .event-create{
   width: 30px;
   height: 25px;
+  padding: 0 6px;
   flex: center;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #170e22;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .wall-event-strip,
@@ -46,7 +47,7 @@
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   padding: 2px 2px 10px;
-  scrollbar-color: #9c92a3 #0a0711;
+  scrollbar-color: #847e88 #0a0711;
   scrollbar-width: thin;
 }
 
@@ -255,7 +256,7 @@
 
 .dark-mode.wall-shell .wall-event-heading .event-create{
   border: 0;
-  background: #684b8a;
+  background: #776c84;
   color: #17121f;
 }
 

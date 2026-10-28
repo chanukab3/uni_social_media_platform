@@ -104,8 +104,8 @@ img{
 }
 
 .brand-mark{
-  width: 43px;
-  height: 43px;
+  width: 35px;
+  height: 35px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
@@ -2327,7 +2327,7 @@ textarea::placeholder{
 .dark-mode .wall-chat-form button,
 .dark-mode .wall-event-heading .event-create,
 .dark-mode .event-create{
-  background: #997cbd;
+  background: #81798b;
   color: #17121f;
 }
 
