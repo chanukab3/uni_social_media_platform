@@ -34,11 +34,13 @@
 
 .wall-profile-back{
   align-self: flex-start;
-  padding: 5px 0;
-  background: transparent;
-  color: #594273;
+  padding: 4px 8px;
+  background-color: #222;
+  color: #dedbe1;
+  background: linear-gradient(135deg, #3f3d41, #302e31);
   font-size: 0.72rem;
   font-weight: 650;
+  border-radius: 6px;
 }
 
 .wall-profile-identity,

@@ -36,6 +36,31 @@ const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
 const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
+async function cropProfilePhoto(file){
+  const image = await createImageBitmap(file)
+  try{
+    const cropSize = Math.min(image.width, image.height)
+    const sourceX = (image.width - cropSize) / 2
+    const sourceY = (image.height - cropSize) / 2
+    const canvas = document.createElement('canvas')
+    canvas.width = 512
+    canvas.height = 512
+    const context = canvas.getContext('2d')
+    if(!context) throw new Error('Your browser could not prepare the image.')
+    context.fillStyle = '#fff'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.drawImage(image, sourceX, sourceY, cropSize, cropSize, 0, 0, canvas.width, canvas.height)
+    return await new Promise((resolve, reject) =>{
+      canvas.toBlob((blob) =>{
+        if(blob) resolve(blob)
+        else reject(new Error('Your browser could not crop the image.'))
+      }, 'image/jpeg', 0.9)
+    })
+  }finally{
+    image.close()
+  }
+}
+
 function App(){
   const [activePage, setActivePage] = useState('Home')
   const [posts, setPosts] = useState([])
@@ -1068,11 +1093,21 @@ function App(){
       showToast('Sign in to add a profile photo.')
       return false
     }
-    const extension = file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
-    const imagePath = `${userId}/${crypto.randomUUID()}.${extension}`
+    let croppedPhoto
+    try{
+      croppedPhoto = await cropProfilePhoto(file)
+    }catch(error){
+      showToast(`Could not crop your profile photo: ${error.message || String(error)}`)
+      return false
+    }
+    if(croppedPhoto.size >= 1_000_000){
+      showToast('Could not crop your profile photo to a file smaller than 1 MB.')
+      return false
+    }
+    const imagePath = `${userId}/${crypto.randomUUID()}.jpg`
     const{ error: uploadError } = await supabase.storage
       .from('profile-photos')
-      .upload(imagePath, file,{ upsert: false, contentType: file.type })
+      .upload(imagePath, croppedPhoto,{ upsert: false, contentType: 'image/jpeg' })
     if(uploadError){
       showToast(`Could not upload your profile photo: ${uploadError.message}`)
       return false
