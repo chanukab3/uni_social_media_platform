@@ -585,6 +585,7 @@
 }
 
 .wall-feed-scroll .post-header{
+  margin-bottom: 6px;
   gap: 7px;
 }
 

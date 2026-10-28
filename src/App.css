@@ -629,6 +629,7 @@ img{
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 6px;
 }
 
 .author-row{
@@ -1781,7 +1782,7 @@ img{
 .page-shell.dark-mode.wall-shell .wall-chat-card,
 .page-shell.dark-mode.wall-shell .wall-profile-details,
 .page-shell.dark-mode.wall-shell .wall-profile-posts{
-  scrollbar-color: #71339a #0a0711;
+  scrollbar-color: #514b56 #0a0711;
 }
 
 @media(max-width: 1180px){
