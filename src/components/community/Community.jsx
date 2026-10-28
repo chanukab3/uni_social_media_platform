@@ -193,6 +193,8 @@ function Community({
   const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
   const activeMessages = messages[conversationKey] || []
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
+  const truncate = (input, maxChars = 100) =>
+  input?.length > maxChars ? `${input.substring(0, maxChars)}...` : input;
 
   return(
     <div className="wall-layout">
@@ -328,7 +330,7 @@ function Community({
              {inboxConversations.map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
-                  <span>{friend.name}<small>{friend.lastMessage || 'Open profile'}</small></span>
+                  <span>{friend.name}<small>{truncate(friend.lastMessage, 65) || 'Open profile'}</small></span>
                 </button>
                 <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
               </div>)}

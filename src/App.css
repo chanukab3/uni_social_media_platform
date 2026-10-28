@@ -732,7 +732,7 @@ img{
 }
 
 .post-action:hover{
-  background: rgba(90, 70, 55, 0.05);
+  background: rgba(80, 78, 77, 0.2);
 }
 
 .post-action.liked{
@@ -854,6 +854,7 @@ img{
 
 .profile-link span{
   margin-left: 3px;
+  
 }
 
 .stats-grid{
@@ -2143,11 +2144,13 @@ img{
 .wall-chat-friends .inbox-conversation .inbox-profile-link{
   flex: 1;
   min-width: 0;
+  max-height: 40px;
   text-align: left;
 }
 
 .wall-chat-friends .inbox-conversation .inbox-open-chat{
   width: auto;
+  height: 40px;
   min-width: 48px;
   padding: 0px 9px;
   border-radius: 5px;
