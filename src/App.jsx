@@ -23,6 +23,15 @@ const navigation = [
  { label: 'Messages', icon: EmailIcon },
 ]
 
+const pageDetails = {
+  Home: ['Community feed', 'See what your neighbors are sharing.'],
+  Explore: ['Explore', 'Discover the latest happenings in your community.'],
+  Status: ['Your status', 'Share your latest update with friends and neighbors.'],
+  Communities: ['Communities', 'Discover groups, clubs, and local spaces.'],
+  Messages: ['Messages', 'Keep in touch with your friends and groups.'],
+  Profile: ['Profile', 'Your activity, details, and community presence.'],
+}
+
 const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
 const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
