@@ -2239,7 +2239,7 @@ textarea::placeholder{
 .page-shell.dark-mode.wall-shell .wall-event-controls .event-create,
 .page-shell.dark-mode.wall-shell .wall-friend-request button{
   border-color: transparent;
-  background: #8558bd;
+  background: #756d80;
   color: #17121f;
 }
 
@@ -2328,7 +2328,7 @@ textarea::placeholder{
 .dark-mode .wall-chat-form button,
 .dark-mode .wall-event-heading .event-create,
 .dark-mode .event-create{
-  background: #997cbd;
+  background: #7c7782;
   color: #17121f;
 }
 

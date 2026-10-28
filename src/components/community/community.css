@@ -804,6 +804,21 @@
   overflow-wrap: anywhere;
   font-size: 0.68rem;
   line-height: 1.1;
+  margin: 0;
+}
+
+.wall-message-actions{
+  margin-top: 3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #705279;
+  font-size: 0.62rem;
+  cursor: pointer;
+}
+
+.wall-message-actions:hover{
+  text-decoration: underline;
 }
 
 .wall-chat-empty{
@@ -841,7 +856,7 @@
   height: 25px;
   
   border-radius: 6px;
-  background: #d7c2e4;
+  background: #68616c;
   color: #433450;
   font-size: 0.6rem;
 }

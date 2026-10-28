@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './community.css'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
@@ -184,6 +185,7 @@ function Community({
   onRequestLogin,
   profileContent,
 }){
+  const [expandedMessages, setExpandedMessages] = useState(new Set())
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
@@ -195,6 +197,14 @@ function Community({
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
   const truncate = (input, maxChars = 100) =>
   input?.length > maxChars ? `${input.substring(0, maxChars)}...` : input;
+  const toggleMessageExpanded = (messageKey) => {
+    setExpandedMessages((current) => {
+      const updated = new Set(current)
+      if(updated.has(messageKey)) updated.delete(messageKey)
+      else updated.add(messageKey)
+      return updated
+    })
+  }
 
   return(
     <div className="wall-layout">
@@ -339,7 +349,19 @@ function Community({
           ) :(
             <>
               <div className="wall-chat-messages" aria-live="polite">
-               {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => <div key={`${message.id || message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} ·{message.time}</small><p>{message.text}</p></div>)}
+               {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
+                 const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
+                 const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
+                 const isLongMessage = words.length > 30
+                 const isExpanded = expandedMessages.has(messageKey)
+                 return(
+                   <div key={messageKey} className={message.from === profileName ? 'wall-message own' : 'wall-message'}>
+                     <small>{message.from} ·{message.time}</small>
+                     <p>{isLongMessage && !isExpanded ? `${words.slice(0, 30).join(' ')}...` : message.text}</p>
+                     {isLongMessage && <button type="button" className="wall-message-actions" onClick={() => toggleMessageExpanded(messageKey)}>{isExpanded ? 'See less' : 'See more'}</button>}
+                   </div>
+                 )
+               })}
                {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
