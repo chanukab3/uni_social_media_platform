@@ -1,0 +1,299 @@
+.wall-profile-view{
+  grid-column: 1 / 3;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #171717;
+}
+
+.wall-profile-columns{
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(215px, 0.68fr) minmax(390px, 1.35fr);
+  overflow: hidden;
+}
+
+.wall-profile-details,
+.wall-profile-posts{
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+.wall-profile-details{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-right: 1px solid rgba(88, 59, 88, 0.09);
+}
+
+.wall-profile-back{
+  align-self: flex-start;
+  padding: 5px 0;
+  background: transparent;
+  color: #594273;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.wall-profile-identity,
+.wall-profile-friends{
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  background: #222;
+}
+
+.profile-identity-heading{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wall-profile-avatar{
+  width: 75px;
+  height: 75px;
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.profile-identity-name{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-identity-name h2{
+    font-size: 20px;
+    padding: 0px;
+    margin: 4px;
+}
+
+
+.profile-identity-name p{
+    font-size: 14px;
+    padding: 2px;
+    margin: 2px;
+}
+
+
+.wall-profile-identity .wall-profile-bio{
+  margin: 12px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.wall-profile-identity .secondary-btn{
+  min-height: 31px;
+  padding: 0 11px;
+  font-size: 0.68rem;
+}
+
+.profile-controls,
+.profile-account-actions{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-account-actions{
+  flex-wrap: nowrap;
+}
+
+.profile-photo-hint{
+  display: block;
+  margin-top: 7px;
+  color: #a7a7a7;
+  font-size: 0.63rem;
+}
+
+.wall-profile-numbers{
+  display: flex;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.wall-profile-numbers span{
+  display: grid;
+  gap: 2px;
+}
+
+.wall-profile-numbers strong{
+  font-size: 0.82rem;
+}
+
+.wall-profile-numbers small,
+.wall-profile-friends button small{
+  color: #a7a7a7;
+  font-size: 0.63rem;
+}
+
+.wall-profile-friends h3{
+  margin: 0 0 8px;
+  font-size: 0.77rem;
+}
+
+.wall-profile-friends > button{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  background: transparent;
+  font-size: 0.69rem;
+  text-align: left;
+}
+
+.wall-profile-friends > button > span:last-child{
+  display: grid;
+  gap: 2px;
+}
+
+.wall-profile-actions{
+  display: grid;
+  gap: 8px;
+}
+
+.admin-profile-actions{
+  display: grid;
+  gap: 8px;
+}
+
+.admin-management-modal{
+  max-height: min(80vh, 640px);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-management-list{
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  margin-top: 16px;
+  padding-right: 4px;
+}
+
+.wall-profile-action{
+  width: 100%;
+  min-height: 34px;
+  justify-content: flex-start;
+  padding: 0 12px;
+  font-size: 0.69rem;
+}
+
+.wall-profile-action.danger-action{
+  color: #a3463f;
+}
+
+.wall-profile-posts{
+  display: flex;
+  flex-direction: column;
+  padding: 17px 16px;
+}
+
+.wall-profile-posts-heading{
+  margin-bottom: 13px;
+}
+
+.wall-profile-posts-heading h2{
+  margin: 0;
+  font-size: 1rem;
+}
+
+.wall-profile-posts-heading p{
+  margin: 4px 0 0;
+  color: #766b7a;
+  font-size: 0.67rem;
+}
+
+.wall-profile-posts .feed{
+  min-height: 0;
+  overflow-y: auto;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.wall-profile-posts .post-card{
+  padding: 12px;
+  border: 1px solid rgba(88, 59, 88, 0.12);
+  border-radius: 10px;
+  background: #fff9ff;
+}
+
+.dark-mode.wall-shell .wall-profile-view,
+.dark-mode.wall-shell .wall-profile-details{
+  background: #171717;
+}
+
+.dark-mode.wall-shell .wall-profile-identity,
+.dark-mode.wall-shell .wall-profile-friends,
+.dark-mode.wall-shell .wall-profile-posts .post-card{
+  border-color: var(--line);
+  background: #222;
+}
+
+.dark-mode.wall-shell .wall-profile-identity > p,
+.dark-mode.wall-shell .wall-profile-numbers small,
+.dark-mode.wall-shell .wall-profile-friends button small,
+.dark-mode.wall-shell .wall-profile-posts-heading p{
+  color: var(--muted);
+}
+
+@media(max-width: 1080px){
+  .wall-profile-columns{
+    grid-template-columns: minmax(190px, 0.62fr) minmax(350px, 1.3fr);
+  }
+}
+
+@media(max-width: 860px){
+  .wall-profile-view{
+    grid-column: auto;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .wall-profile-columns{
+    height: 100%;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .wall-profile-details{
+    padding: 10px 14px;
+    border-right: 1px solid var(--line);
+  }
+
+  .wall-profile-posts{
+    height: 100%;
+    min-height: 0;
+    padding: 14px;
+  }
+}
+
+@media(max-width: 520px){
+  .wall-profile-columns{
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .wall-profile-details{
+    gap: 8px;
+    max-height: none;
+    overflow: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 10px;
+  }
+
+  .wall-profile-posts{
+    padding: 10px;
+  }
+}
