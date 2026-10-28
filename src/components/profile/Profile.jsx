@@ -7,7 +7,7 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }){
     <button
       type="button"
       className={`${className} profile-avatar-link`}
-      style={{ background: person.color || '#bd8f75' }}
+      
       aria-label={`View ${person.name}'s profile`}
       onClick={() => onClick(person)}
     >
@@ -69,7 +69,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
   return(
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">
-        <button type="button" className="wall-profile-back" onClick={onHome}>← Back to wall</button>
+        <button type="button" className="wall-profile-back" onClick={onHome}>Back to wall</button>
         <section className="wall-profile-identity">
           <div className="profile-identity-heading">
             <div className="avatar wall-profile-avatar avatar-olive">{(isOwnProfile ? profilePhotoUrl : profileTarget?.avatarUrl || profileTarget?.avatar_url)

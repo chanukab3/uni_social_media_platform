@@ -683,11 +683,8 @@
 .suggested-friend .avatar{
   width: 35px;
   height: 35px;
-  border: 2px solid #f0e3f1;
+  
   font-size: 0.63rem;
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: 50%;
 }
 
 .suggested-friend strong{

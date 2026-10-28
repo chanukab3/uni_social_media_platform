@@ -583,7 +583,7 @@ img{
 }
 
 .primary-btn{
-  background: linear-gradient(135deg, #d08058, #e6a575);
+  background: linear-gradient(135deg, #7f748c, #484150);
   box-shadow: 0 10px 20px rgba(194, 115, 72, 0.2);
   color: #fff;
 }
@@ -969,6 +969,7 @@ img{
 }
 
 .avatar{
+  position: relative;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -2174,7 +2175,7 @@ textarea::placeholder{
 
 .dark-mode .primary-btn,
 .dark-mode .auth-primary{
-  background: linear-gradient(135deg, #8a5bc2, #bb86fc);
+  background: linear-gradient(135deg, #7f748c, #484150);
   box-shadow: 0 8px 20px rgba(187, 134, 252, 0.18);
 }
 
@@ -2252,14 +2253,17 @@ textarea::placeholder{
 .page-shell.dark-mode.wall-shell .wall-brand .brand-mark{
   border-color: rgba(80, 53, 114, 0.28);
   background: rgba(191, 139, 255, 0.15);
-  color: #d0a8ff;
+  color: #d2ccd9;
 }
 
-.avatar img,
-.profile-avatar-link img{
+.avatar > img{
+  position: absolute;
+  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
-  
+  max-width: none;
+  border-radius: inherit;
   object-fit: cover;
   object-position: center;
 }
@@ -2300,17 +2304,6 @@ textarea::placeholder{
 .profile-photo-hint{
   color: var(--muted);
   font-size: 0.6rem;
-}
-
-.wall-profile-avatar img{
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-}
-
-.wall-profile-avatar{
-  overflow: hidden;
 }
 
 .dark-mode .nav-item:hover,
