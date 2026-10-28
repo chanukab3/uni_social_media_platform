@@ -54,15 +54,23 @@
   justify-items: flex-start;
   gap: 8px;
 }
-
+.pbtn{
+  display: inline-flex;
+}
+.pbtn small{
+  margin: 5px 12px;
+}
 .composer-photo-button{
   min-height: 25px;
-  padding: 5px 11px;
+  display: inline-flex;
   border: 1px solid rgba(190, 113, 255, 0.28);
   border-radius: 8px;
   background: linear-gradient(135deg, #40195e, #7b2eaa);
   color: #fff;
-  font-size: 0.70rem;
+  font-size: 0.6rem;
+}
+.composer-photo-button .add-photo{
+  margin: 3px 0px;
 }
 
 .wall-feed-scroll .composer-fields .attachment-preview{
@@ -95,10 +103,10 @@
 }
 
 .wall-feed-scroll .composer > .primary-btn{
-  min-height: 36px;
-  padding: 0 14px;
+  min-height: 26px;
+  padding: 2px 12px 5px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
 }
 
 @media(max-width: 520px){

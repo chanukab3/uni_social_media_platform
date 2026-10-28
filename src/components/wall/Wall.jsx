@@ -54,10 +54,12 @@ export function PostComposer({
               }} aria-label="Remove attached image">×</button>
             </div>
           )}
-          <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
-           <CameraIcon className="ui-icon"  /> {composerImage ? 'Change photo' : 'Add photo'}
+          <div className="pbtn">
+            <button type="button" className="composer-photo-button" onClick={() => fileInputRef.current?.click()}>
+           <CameraIcon className="ui-icon"  /><div className="add-photo">{composerImage ? 'Change photo' : 'Add photo'}</div>
           </button>
           <small className="composer-photo-limit">One photo · max 5 MB</small>
+          </div>
           <input
             ref={fileInputRef}
             className="visually-hidden"

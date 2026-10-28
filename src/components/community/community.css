@@ -796,19 +796,19 @@
   display: block;
   margin-bottom: 3px;
   color: #776a7a;
-  font-size: 0.51rem;
+  font-size: 0.52rem;
 }
 
 .wall-message p{
   overflow-wrap: anywhere;
-  font-size: 0.63rem;
-  line-height: 1.4;
+  font-size: 0.68rem;
+  line-height: 1.1;
 }
 
 .wall-chat-empty{
   align-self: center;
   color: #776a7a;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   text-align: center;
 }
 
@@ -817,8 +817,8 @@
   align-items: center;
   gap: 6px;
   margin: 0 6px;
-  margin-top: 6px;
-  padding: 6px 9px;
+  margin-top: 4px;
+  padding: 0px 9px 5px;
   border-radius: 8px;
   background: #f0e2f1;
 }
@@ -826,15 +826,16 @@
 .wall-chat-form input{
   min-width: 0;
   flex: 1;
-  padding: 2px 0;
+  padding: 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: #332a37;
-  font-size: 0.61rem;
+  font-size: 0.75rem;
 }
 
 .wall-chat-form button{
+  margin: 5px 0px 0px;
   width: 32px;
   height: 25px;
   
@@ -847,7 +848,7 @@
 .wall-chat-note{
   padding: 0px 8px;
   color: #827586;
-  font-size: 0.48rem;
+  font-size: 0.45rem;
   text-align: center;
 }
 
@@ -889,7 +890,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 8px;
+  padding: 2px 8px;
   overflow-y: auto;
 }
 
@@ -906,7 +907,7 @@
 .wall-notification-list button{
   width: 100%;
   display: block;
-  padding: 8px 6px;
+  padding: 3px 6px;
   border-bottom: 1px solid rgba(88, 59, 88, 0.1);
   background: transparent;
   font-size: 0.62rem;
@@ -914,14 +915,15 @@
 }
 
 .wall-notification-list button.wall-notification-item{
-  padding: 4px 0;
   border: 0;
+  border-top: 1px solid rgba(88, 59, 88, 0.1);
 }
 
 .wall-notification-list button.wall-notification-accept{
   width: auto;
-  padding: 4px 8px;
+  padding: 2px 8px 5px;
   border: 0;
+  margin: 3px 0px;
   border-radius: 999px;
   background: #eadcf0;
   color: #604875;
