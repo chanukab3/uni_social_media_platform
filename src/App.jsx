@@ -1197,6 +1197,7 @@ function App(){
     <Community
       profileName={profileName}
       profileHandle={profileHandle}
+      profileBio={profileBio}
       profilePhotoUrl={profilePhotoUrl}
       communities={communities}
       joinedCommunities={joinedCommunities}

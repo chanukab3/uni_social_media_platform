@@ -16,7 +16,7 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }){
   )
 }
 
-export function WallProfileCard({ profileId, profileName, profileHandle, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }){
+export function WallProfileCard({ profileId, profileName, profileHandle, profileBio, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }){
   const currentUser ={ id: profileId, name: profileName, avatarUrl: profilePhotoUrl, color: '#879174' }
   return(
     <section className="mini-card wall-profile">
@@ -24,7 +24,7 @@ export function WallProfileCard({ profileId, profileName, profileHandle, profile
         <span className="avatar large avatar-olive">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</span>
         <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
       </button>
-      <p>Finding my people, one coffee and creative project at a time.</p>
+      {profileBio && <p>{profileBio}</p>}
       <div className="wall-profile-stats">
         <button type="button" onClick={() => onOpenWallTab('Friends')}><strong>{friendsCount}</strong><small>Friends</small></button>
         <button type="button" onClick={() => onOpenWallTab('Groups')}><strong>{groupsCount}</strong><small>Groups</small></button>

@@ -134,6 +134,7 @@ export function CreateCommunityForm({
 function Community({
   profileName,
   profileHandle,
+  profileBio,
   profilePhotoUrl,
   communities,
   joinedCommunities,
@@ -217,6 +218,7 @@ function Community({
           profileId={userId}
           profileName={profileName}
           profileHandle={profileHandle}
+          profileBio={profileBio}
           profilePhotoUrl={profilePhotoUrl}
           friendsCount={friendsList.length}
           groupsCount={joinedCommunities.length}
