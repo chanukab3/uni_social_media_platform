@@ -2173,7 +2173,7 @@ textarea::placeholder{
 .dark-mode .primary-btn,
 .dark-mode .auth-primary{
   background: linear-gradient(135deg, #8a5bc2, #bb86fc);
-  box-shadow: 0 8px 20px rgba(187, 134, 252, 0.18);
+  box-shadow: 0 2px 4px rgba(187, 134, 252, 0.18);
 }
 
 .dark-mode .secondary-btn,

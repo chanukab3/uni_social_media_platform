@@ -184,7 +184,7 @@
   overscroll-behavior-inline: initial ;
   padding: 3px 1px 8px;
   scrollbar-color: #8d779e #0a0711;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .suggested-friend{
