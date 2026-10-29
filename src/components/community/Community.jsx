@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './community.css'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
@@ -134,6 +134,7 @@ export function CreateCommunityForm({
 function Community({
   profileName,
   profileHandle,
+  profileBio,
   profilePhotoUrl,
   communities,
   joinedCommunities,
@@ -145,6 +146,8 @@ function Community({
   setQuery,
   query,
   messages,
+  unreadChats,
+  onMarkChatRead,
   chatSection,
   currentChat,
   currentGroupChat,
@@ -186,6 +189,7 @@ function Community({
   profileContent,
 }){
   const [expandedMessages, setExpandedMessages] = useState(new Set())
+  const chatMessagesRef = useRef(null)
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
@@ -195,6 +199,13 @@ function Community({
   const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
   const activeMessages = messages[conversationKey] || []
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
+  const hasUnreadWorld = unreadChats.has('World')
+  const hasUnreadGroups = [...unreadChats].some((key) => key.startsWith('group:'))
+  const hasUnreadDirect = [...unreadChats].some((key) => key !== 'World' && !key.startsWith('group:'))
+  const hasUnreadFriend = friendsList.some((friend) => unreadChats.has(friend.name))
+  const showingChatMessages = chatSection === 'World'
+    || (chatSection === 'Groups' && Boolean(selectedGroup))
+    || (chatSection === 'Inbox' && inboxSelected)
   const truncate = (input, maxChars = 100) =>
   input?.length > maxChars ? `${input.substring(0, maxChars)}...` : input;
   const toggleMessageExpanded = (messageKey) => {
@@ -205,6 +216,12 @@ function Community({
       return updated
     })
   }
+
+  useEffect(() =>{
+    if(!showingChatMessages) return
+    const messageList = chatMessagesRef.current
+    if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
+  }, [chatSection, currentChat, currentGroupChat, inboxSelected, messages, showingChatMessages])
 
   return(
     <div className="wall-layout">
@@ -217,6 +234,7 @@ function Community({
           profileId={userId}
           profileName={profileName}
           profileHandle={profileHandle}
+          profileBio={profileBio}
           profilePhotoUrl={profilePhotoUrl}
           friendsCount={friendsList.length}
           groupsCount={joinedCommunities.length}
@@ -320,9 +338,14 @@ function Community({
                 <span>{request.name} sent you a friend request.</span>
                 <button type="button" onClick={() => acceptFriendRequest(request)}>Accept</button>
               </div>)}
-             {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <button type="button" key={friend.id || friend.name} className={inboxSelected && currentChat === friend.name ? 'selected' : ''} onClick={() => onSelectInboxChat(friend)}>
-                <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span><span>{friend.name}<small>{friend.status}</small></span>
-              </button>)}
+             {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
+                <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
+                  <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
+                  <span>{friend.name}<small>View profile · {friend.status}</small></span>
+                </button>
+                {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
+              </div>)}
              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
           ) : chatSection === 'Groups' && !selectedGroup ?(
@@ -330,6 +353,7 @@ function Community({
              <div>
               {joinedGroups.filter((group) => `${group.name} ${group.description}`.toLowerCase().includes(term)).map((group) => <button type="button" key={group.id || group.name} className={currentGroupChat === group.name ? 'selected' : ''} onClick={() => openGroupChat(group)}>
                 <span className="wall-group-icon" style={{ background: group.tone }}></span><span>{group.name}<small>{group.members} members</small></span>
+                {unreadChats.has(`group:${group.id}`) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages in ${group.name}`} />}
               </button>)}
              </div>
              {!joinedGroups.length && <p className="wall-muted">Join a group to start chatting.</p>}
@@ -348,7 +372,7 @@ function Community({
             </div>
           ) :(
             <>
-              <div className="wall-chat-messages" aria-live="polite">
+              <div className="wall-chat-messages" aria-live="polite" ref={chatMessagesRef}>
                {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
                  const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
                  const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
@@ -373,13 +397,16 @@ function Community({
           )}
 
           <nav className="wall-chat-tabs" aria-label="Community sections">
-           {[['World', EmailIcon], ['Groups', GridIcon], ['Friends', ContactsIcon], ['Inbox', MessageIcon], ['Notifications', BellIcon]].map(([label, Icon]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
+           {[['World', EmailIcon, hasUnreadWorld], ['Groups', GridIcon, hasUnreadGroups], ['Friends', ContactsIcon, hasUnreadFriend], ['Inbox', MessageIcon, hasUnreadDirect], ['Notifications', BellIcon, false]].map(([label, Icon, hasUnread]) => <button type="button" key={label} className={chatSection === label ? 'active' : ''} onClick={() =>{
               setChatSection(label)
-              if(label === 'World') setCurrentChat('World')
+              if(label === 'World'){
+                setCurrentChat('World')
+                onMarkChatRead('World')
+              }
               if(label === 'Groups') setCurrentGroupChat('')
               if(label === 'Inbox') onViewInbox()
               if(label === 'Notifications') markNotificationsRead()
-            }}><Icon className="ui-icon" aria-hidden="true" />{label}</button>)}
+            }}><Icon className="ui-icon" aria-hidden="true" />{label}{hasUnread && <span className="chat-unread-dot" aria-label="Unread messages" />}</button>)}
           </nav>
         </section>
       </aside>

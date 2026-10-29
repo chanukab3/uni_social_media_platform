@@ -7,7 +7,7 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }){
     <button
       type="button"
       className={`${className} profile-avatar-link`}
-      style={{ background: person.color || '#bd8f75' }}
+      
       aria-label={`View ${person.name}'s profile`}
       onClick={() => onClick(person)}
     >
@@ -16,7 +16,7 @@ export function ProfileAvatar({ person, className = 'avatar small', onClick }){
   )
 }
 
-export function WallProfileCard({ profileId, profileName, profileHandle, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }){
+export function WallProfileCard({ profileId, profileName, profileHandle, profileBio, profilePhotoUrl, friendsCount, groupsCount, onProfileClick, onOpenWallTab }){
   const currentUser ={ id: profileId, name: profileName, avatarUrl: profilePhotoUrl, color: '#879174' }
   return(
     <section className="mini-card wall-profile">
@@ -24,7 +24,7 @@ export function WallProfileCard({ profileId, profileName, profileHandle, profile
         <span className="avatar large avatar-olive">{profilePhotoUrl ? <img src={profilePhotoUrl} alt="" /> : profileName?.[0] || 'A'}</span>
         <span><strong>{profileName}</strong><small>{profileHandle}</small></span>
       </button>
-      <p>Finding my people, one coffee and creative project at a time.</p>
+      {profileBio && <p>{profileBio}</p>}
       <div className="wall-profile-stats">
         <button type="button" onClick={() => onOpenWallTab('Friends')}><strong>{friendsCount}</strong><small>Friends</small></button>
         <button type="button" onClick={() => onOpenWallTab('Groups')}><strong>{groupsCount}</strong><small>Groups</small></button>
@@ -69,7 +69,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
   return(
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">
-        <button type="button" className="wall-profile-back" onClick={onHome}>← Back to wall</button>
+        <button type="button" className="wall-profile-back" onClick={onHome}>Back to wall</button>
         <section className="wall-profile-identity">
           <div className="profile-identity-heading">
             <div className="avatar wall-profile-avatar avatar-olive">{(isOwnProfile ? profilePhotoUrl : profileTarget?.avatarUrl || profileTarget?.avatar_url)
@@ -101,7 +101,7 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
                 <button className="secondary-btn danger-action" type="button" onClick={onSignOut}>Sign out</button>
               </div>
             </div>
-            <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB</small>
+            <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB · cropped square</small>
           </>}
           <div className="wall-profile-numbers"><span><strong>{postCount}</strong><small>Posts</small></span></div>
         </section>

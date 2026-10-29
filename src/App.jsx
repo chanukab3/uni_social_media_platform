@@ -1,4 +1,4 @@
-import{ useCallback, useEffect, useMemo, useState } from 'react'
+import{ useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import EmailIcon from '@iconify-react/bitcoin-icons/email-outline'
 import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
@@ -35,6 +35,31 @@ const pageDetails = {
 const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
 const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
+async function cropProfilePhoto(file){
+  const image = await createImageBitmap(file)
+  try{
+    const cropSize = Math.min(image.width, image.height)
+    const sourceX = (image.width - cropSize) / 2
+    const sourceY = (image.height - cropSize) / 2
+    const canvas = document.createElement('canvas')
+    canvas.width = 512
+    canvas.height = 512
+    const context = canvas.getContext('2d')
+    if(!context) throw new Error('Your browser could not prepare the image.')
+    context.fillStyle = '#fff'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.drawImage(image, sourceX, sourceY, cropSize, cropSize, 0, 0, canvas.width, canvas.height)
+    return await new Promise((resolve, reject) =>{
+      canvas.toBlob((blob) =>{
+        if(blob) resolve(blob)
+        else reject(new Error('Your browser could not crop the image.'))
+      }, 'image/jpeg', 0.9)
+    })
+  }finally{
+    image.close()
+  }
+}
 
 function App(){
   const [activePage, setActivePage] = useState('Home')
@@ -73,6 +98,9 @@ function App(){
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
   const [messages, setMessages] = useState({})
+  const [unreadChats, setUnreadChats] = useState(() => new Set())
+  const directChatMessagesRef = useRef(null)
+  const chatViewRef = useRef({})
   const [messageDraft, setMessageDraft] = useState('')
   const [commentsByPost, setCommentsByPost] = useState({})
   const [expandedCommentPosts, setExpandedCommentPosts] = useState([])
@@ -82,6 +110,24 @@ function App(){
   const showToast = useCallback((message) =>{
     setToast(message)
   }, [])
+  const clearUnreadChat = useCallback((key) =>{
+    setUnreadChats((current) =>{
+      if(!current.has(key)) return current
+      const next = new Set(current)
+      next.delete(key)
+      return next
+    })
+  }, [])
+
+  useEffect(() =>{
+    if(activePage !== 'Messages') return
+    const messageList = directChatMessagesRef.current
+    if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
+  }, [activePage, currentChat, messages])
+
+  useEffect(() =>{
+    chatViewRef.current = { activePage, chatSection, currentChat, currentGroupChat, inboxSelected, communities }
+  }, [activePage, chatSection, communities, currentChat, currentGroupChat, inboxSelected])
 
   useEffect(() =>{
     if(!toast) return undefined
@@ -404,6 +450,19 @@ function App(){
           key = people.find((person) => person.id === otherId)?.name
           if(!key) return
         } else return
+
+        if(message.sender_id !== userId){
+          const currentView = chatViewRef.current
+          const isViewingMessage = message.room === 'world'
+            ? currentView.activePage === 'Home' && currentView.chatSection === 'World'
+            : message.group_id
+              ? currentView.activePage === 'Home'
+                && currentView.chatSection === 'Groups'
+                && currentView.communities.some((group) => group.id === message.group_id && group.name === currentView.currentGroupChat)
+              : (currentView.activePage === 'Home' && currentView.chatSection === 'Inbox' && currentView.inboxSelected && currentView.currentChat === key)
+                || (currentView.activePage === 'Messages' && currentView.currentChat === key)
+          if(!isViewingMessage) setUnreadChats((current) => new Set(current).add(key))
+        }
 
         setMessages((current) =>{
           const existing = current[key] || []
@@ -834,11 +893,11 @@ function App(){
       showToast('Sign in to send a message.')
       return
     }
-    const isWorldChat = activePage === 'Home' && chatSection === 'World'
-    const selectedGroup = activePage === 'Home' && chatSection === 'Groups'
+    const isWorldChat = chatSection === 'World'
+    const selectedGroup = chatSection === 'Groups'
       ? communities.find((group) => group.name === currentGroupChat)
       : null
-    if(activePage === 'Home' && chatSection === 'Groups' && !selectedGroup){
+    if(chatSection === 'Groups' && !selectedGroup){
       showToast('Choose a group before sending a message.')
       return
     }
@@ -914,6 +973,7 @@ function App(){
   }
 
   const openFriendChat = async(friend) =>{
+    clearUnreadChat(friend.name)
     setCurrentChat(friend.name)
     setChatSection('Inbox')
     setInboxSelected(true)
@@ -941,6 +1001,7 @@ function App(){
   }
 
   const openGroupChat = async(group) =>{
+    clearUnreadChat(`group:${group.id}`)
     setCurrentGroupChat(group.name)
     setChatSection('Groups')
     if(!supabase || !userId || !group.id) return
@@ -1068,11 +1129,21 @@ function App(){
       showToast('Sign in to add a profile photo.')
       return false
     }
-    const extension = file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
-    const imagePath = `${userId}/${crypto.randomUUID()}.${extension}`
+    let croppedPhoto
+    try{
+      croppedPhoto = await cropProfilePhoto(file)
+    }catch(error){
+      showToast(`Could not crop your profile photo: ${error.message || String(error)}`)
+      return false
+    }
+    if(croppedPhoto.size >= 1_000_000){
+      showToast('Could not crop your profile photo to a file smaller than 1 MB.')
+      return false
+    }
+    const imagePath = `${userId}/${crypto.randomUUID()}.jpg`
     const{ error: uploadError } = await supabase.storage
       .from('profile-photos')
-      .upload(imagePath, file,{ upsert: false, contentType: file.type })
+      .upload(imagePath, croppedPhoto,{ upsert: false, contentType: 'image/jpeg' })
     if(uploadError){
       showToast(`Could not upload your profile photo: ${uploadError.message}`)
       return false
@@ -1197,6 +1268,7 @@ function App(){
     <Community
       profileName={profileName}
       profileHandle={profileHandle}
+      profileBio={profileBio}
       profilePhotoUrl={profilePhotoUrl}
       communities={communities}
       joinedCommunities={joinedCommunities}
@@ -1208,6 +1280,8 @@ function App(){
       query={query}
       setQuery={setQuery}
       messages={messages}
+      unreadChats={unreadChats}
+      onMarkChatRead={clearUnreadChat}
       chatSection={chatSection}
       currentChat={currentChat}
       currentGroupChat={currentGroupChat}
@@ -1234,6 +1308,7 @@ function App(){
       openGroupChat={openGroupChat}
       onOpenWallTab={(tab) =>{
         setChatSection(tab)
+        if(tab === 'World') clearUnreadChat('World')
         if(tab === 'Groups') setCurrentGroupChat('')
       }}
       markNotificationRead={markNotificationRead}
@@ -1378,7 +1453,7 @@ function App(){
             <div className="chat-heading"><span className="avatar tiny avatar-olive">{people.find((friend) => friend.name === currentChat)?.avatarUrl
               ? <img src={people.find((friend) => friend.name === currentChat).avatarUrl} alt="" />
               : currentChat[0]}</span><div><strong>{currentChat}</strong><small>{people.find((friend) => friend.name === currentChat)?.status}</small></div></div>
-            <div className="chat-messages">
+            <div className="chat-messages" ref={directChatMessagesRef}>
              {chatMessages.map((message, index) =>(
                 <div key={`${currentChat}-${index}`} className={message.from === profileName ? 'message-bubble own' : 'message-bubble'}>
                   <p>{message.text}</p><small>{message.time}</small>

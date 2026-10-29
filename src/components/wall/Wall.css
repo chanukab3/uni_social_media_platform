@@ -33,7 +33,7 @@
   padding: 12px;
   border: 1px solid rgba(190, 113, 255, 0.2);
   border-radius: 13px;
-  background: linear-gradient(145deg, #120a1c, #0d0815);
+  background: linear-gradient(135deg, #7f748c, #484150);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.27), 0 3px 15px rgba(111, 31, 167, 0.11);
 }
 
@@ -65,7 +65,7 @@
   display: inline-flex;
   border: 1px solid rgba(190, 113, 255, 0.28);
   border-radius: 8px;
-  background: linear-gradient(135deg, #40195e, #7b2eaa);
+  background: linear-gradient(135deg, #7f748c, #484150);
   color: #fff;
   font-size: 0.6rem;
 }
@@ -173,6 +173,7 @@
   min-width: 0;
   overflow: hidden;
   padding: 12px 13px 11px;
+  
 }
 
 .suggested-friends{
@@ -199,9 +200,12 @@
 .suggested-friend .avatar{
   width: 50px;
   height: 50px;
-  border: 2px solid rgba(190, 113, 255, 0.22);
+  
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.24);
   font-size: 0.9rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .suggested-friend strong{

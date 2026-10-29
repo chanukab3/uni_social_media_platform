@@ -254,6 +254,7 @@ function Wall({
   onClearQuery,
   unreadCount,
   profileName,
+  profileBio,
   postCount,
   communities,
   joinedCommunities,
@@ -324,10 +325,10 @@ function Wall({
           <>
             <section className="mini-card wall-profile">
               <button type="button" className="wall-profile-button" onClick={() => onNavigate('Profile')}>
-                <span className="avatar large avatar-olive">A</span>
+                <span className="avatar large avatar-olive">U</span>
                 <span><strong>{profileName}</strong><small>@Username</small></span>
               </button>
-              <p>Finding my people, one coffee and creative project at a time.</p>
+              {profileBio && <p>{profileBio}</p>}
               <div className="wall-profile-stats"><span><strong>{postCount + 128}</strong><small>Friends</small></span><span><strong>8</strong><small>Groups</small></span><button type="button" aria-label="View profile" onClick={() => onNavigate('Profile')}><ArrowRightIcon className="ui-icon" /></button></div>
             </section>
             <Community
