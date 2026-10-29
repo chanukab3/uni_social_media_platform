@@ -1,4 +1,4 @@
-import{ useCallback, useEffect, useMemo, useState } from 'react'
+import{ useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import EmailIcon from '@iconify-react/bitcoin-icons/email-outline'
 import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
@@ -98,6 +98,7 @@ function App(){
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
   const [messages, setMessages] = useState({})
+  const directChatMessagesRef = useRef(null)
   const [messageDraft, setMessageDraft] = useState('')
   const [commentsByPost, setCommentsByPost] = useState({})
   const [expandedCommentPosts, setExpandedCommentPosts] = useState([])
@@ -107,6 +108,12 @@ function App(){
   const showToast = useCallback((message) =>{
     setToast(message)
   }, [])
+
+  useEffect(() =>{
+    if(activePage !== 'Messages') return
+    const messageList = directChatMessagesRef.current
+    if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
+  }, [activePage, currentChat, messages])
 
   useEffect(() =>{
     if(!toast) return undefined
@@ -859,11 +866,11 @@ function App(){
       showToast('Sign in to send a message.')
       return
     }
-    const isWorldChat = activePage === 'Home' && chatSection === 'World'
-    const selectedGroup = activePage === 'Home' && chatSection === 'Groups'
+    const isWorldChat = chatSection === 'World'
+    const selectedGroup = chatSection === 'Groups'
       ? communities.find((group) => group.name === currentGroupChat)
       : null
-    if(activePage === 'Home' && chatSection === 'Groups' && !selectedGroup){
+    if(chatSection === 'Groups' && !selectedGroup){
       showToast('Choose a group before sending a message.')
       return
     }
@@ -1414,7 +1421,7 @@ function App(){
             <div className="chat-heading"><span className="avatar tiny avatar-olive">{people.find((friend) => friend.name === currentChat)?.avatarUrl
               ? <img src={people.find((friend) => friend.name === currentChat).avatarUrl} alt="" />
               : currentChat[0]}</span><div><strong>{currentChat}</strong><small>{people.find((friend) => friend.name === currentChat)?.status}</small></div></div>
-            <div className="chat-messages">
+            <div className="chat-messages" ref={directChatMessagesRef}>
              {chatMessages.map((message, index) =>(
                 <div key={`${currentChat}-${index}`} className={message.from === profileName ? 'message-bubble own' : 'message-bubble'}>
                   <p>{message.text}</p><small>{message.time}</small>

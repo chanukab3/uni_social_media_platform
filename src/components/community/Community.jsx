@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './community.css'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
@@ -187,6 +187,7 @@ function Community({
   profileContent,
 }){
   const [expandedMessages, setExpandedMessages] = useState(new Set())
+  const chatMessagesRef = useRef(null)
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
@@ -196,6 +197,9 @@ function Community({
   const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
   const activeMessages = messages[conversationKey] || []
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
+  const showingChatMessages = chatSection === 'World'
+    || (chatSection === 'Groups' && Boolean(selectedGroup))
+    || (chatSection === 'Inbox' && inboxSelected)
   const truncate = (input, maxChars = 100) =>
   input?.length > maxChars ? `${input.substring(0, maxChars)}...` : input;
   const toggleMessageExpanded = (messageKey) => {
@@ -206,6 +210,12 @@ function Community({
       return updated
     })
   }
+
+  useEffect(() =>{
+    if(!showingChatMessages) return
+    const messageList = chatMessagesRef.current
+    if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
+  }, [chatSection, currentChat, currentGroupChat, inboxSelected, messages, showingChatMessages])
 
   return(
     <div className="wall-layout">
@@ -354,7 +364,7 @@ function Community({
             </div>
           ) :(
             <>
-              <div className="wall-chat-messages" aria-live="polite">
+              <div className="wall-chat-messages" aria-live="polite" ref={chatMessagesRef}>
                {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
                  const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
                  const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
