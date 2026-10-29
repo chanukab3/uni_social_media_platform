@@ -773,6 +773,13 @@
   font-size: 0.7rem;
 }
 
+.wall-chat-message-area{
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+}
+
 .wall-chat-messages{
   min-height: 0;
   flex: 1;
@@ -785,6 +792,24 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+
+.wall-chat-scroll-bottom{
+  position: absolute;
+  right: 19px;
+  bottom: 12px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(88, 59, 88, 0.16);
+  border-radius: 50%;
+  background: #756d80;
+  box-shadow: 0 2px 8px rgba(48, 39, 55, 0.2);
+  color: #594273;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .wall-message{

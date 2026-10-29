@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './community.css'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
@@ -10,6 +10,8 @@ import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
 import SendIcon from '@iconify-react/bitcoin-icons/send-outline'
 import{ FriendSuggestions, WallProfileCard } from '../profile/Profile'
 import Status from '../status/Status'
+
+const EMPTY_MESSAGES = []
 
 
 export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }){
@@ -186,6 +188,8 @@ function Community({
   profileContent,
 }){
   const [expandedMessages, setExpandedMessages] = useState(new Set())
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false)
+  const chatMessagesRef = useRef(null)
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
@@ -193,8 +197,21 @@ function Community({
   const joinedGroups = communities.filter((group) => joinedCommunities.includes(group.name))
   const selectedGroup = communities.find((group) => group.name === currentGroupChat)
   const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
-  const activeMessages = messages[conversationKey] || []
+  const activeMessages = messages[conversationKey] || EMPTY_MESSAGES
+  const visibleMessages = chatSection === 'World' ? (messages.World || EMPTY_MESSAGES) : activeMessages
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
+  const updateScrollToBottomVisibility = useCallback(() => {
+    const element = chatMessagesRef.current
+    if(!element) return
+    setShowScrollToBottom(element.scrollHeight - element.scrollTop - element.clientHeight > 40)
+  }, [])
+  useEffect(() => {
+    const frame = requestAnimationFrame(updateScrollToBottomVisibility)
+    return () => cancelAnimationFrame(frame)
+  }, [chatSection, conversationKey, updateScrollToBottomVisibility, visibleMessages])
+  const scrollToBottom = () => {
+    chatMessagesRef.current?.scrollTo({ top: chatMessagesRef.current.scrollHeight, behavior: 'smooth' })
+  }
   const truncate = (input, maxChars = 100) =>
   input?.length > maxChars ? `${input.substring(0, maxChars)}...` : input;
   const toggleMessageExpanded = (messageKey) => {
@@ -348,8 +365,9 @@ function Community({
             </div>
           ) :(
             <>
-              <div className="wall-chat-messages" aria-live="polite">
-               {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
+              <div className="wall-chat-message-area">
+              <div className="wall-chat-messages" ref={chatMessagesRef} onScroll={updateScrollToBottomVisibility} aria-live="polite">
+               {visibleMessages.map((message, index) => {
                  const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
                  const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
                  const isLongMessage = words.length > 30
@@ -362,7 +380,9 @@ function Community({
                    </div>
                  )
                })}
-               {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+               {chatSection === 'World' && !visibleMessages.length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+              </div>
+              {showScrollToBottom && <button type="button" className="wall-chat-scroll-bottom" onClick={scrollToBottom} aria-label="Scroll to latest messages" title="Scroll to latest messages">▼</button>}
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
