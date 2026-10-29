@@ -98,7 +98,9 @@ function App(){
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
   const [messages, setMessages] = useState({})
+  const [unreadChats, setUnreadChats] = useState(() => new Set())
   const directChatMessagesRef = useRef(null)
+  const chatViewRef = useRef({})
   const [messageDraft, setMessageDraft] = useState('')
   const [commentsByPost, setCommentsByPost] = useState({})
   const [expandedCommentPosts, setExpandedCommentPosts] = useState([])
@@ -108,12 +110,24 @@ function App(){
   const showToast = useCallback((message) =>{
     setToast(message)
   }, [])
+  const clearUnreadChat = useCallback((key) =>{
+    setUnreadChats((current) =>{
+      if(!current.has(key)) return current
+      const next = new Set(current)
+      next.delete(key)
+      return next
+    })
+  }, [])
 
   useEffect(() =>{
     if(activePage !== 'Messages') return
     const messageList = directChatMessagesRef.current
     if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
   }, [activePage, currentChat, messages])
+
+  useEffect(() =>{
+    chatViewRef.current = { activePage, chatSection, currentChat, currentGroupChat, inboxSelected, communities }
+  }, [activePage, chatSection, communities, currentChat, currentGroupChat, inboxSelected])
 
   useEffect(() =>{
     if(!toast) return undefined
@@ -436,6 +450,19 @@ function App(){
           key = people.find((person) => person.id === otherId)?.name
           if(!key) return
         } else return
+
+        if(message.sender_id !== userId){
+          const currentView = chatViewRef.current
+          const isViewingMessage = message.room === 'world'
+            ? currentView.activePage === 'Home' && currentView.chatSection === 'World'
+            : message.group_id
+              ? currentView.activePage === 'Home'
+                && currentView.chatSection === 'Groups'
+                && currentView.communities.some((group) => group.id === message.group_id && group.name === currentView.currentGroupChat)
+              : (currentView.activePage === 'Home' && currentView.chatSection === 'Inbox' && currentView.inboxSelected && currentView.currentChat === key)
+                || (currentView.activePage === 'Messages' && currentView.currentChat === key)
+          if(!isViewingMessage) setUnreadChats((current) => new Set(current).add(key))
+        }
 
         setMessages((current) =>{
           const existing = current[key] || []
@@ -946,6 +973,7 @@ function App(){
   }
 
   const openFriendChat = async(friend) =>{
+    clearUnreadChat(friend.name)
     setCurrentChat(friend.name)
     setChatSection('Inbox')
     setInboxSelected(true)
@@ -973,6 +1001,7 @@ function App(){
   }
 
   const openGroupChat = async(group) =>{
+    clearUnreadChat(`group:${group.id}`)
     setCurrentGroupChat(group.name)
     setChatSection('Groups')
     if(!supabase || !userId || !group.id) return
@@ -1251,6 +1280,8 @@ function App(){
       query={query}
       setQuery={setQuery}
       messages={messages}
+      unreadChats={unreadChats}
+      onMarkChatRead={clearUnreadChat}
       chatSection={chatSection}
       currentChat={currentChat}
       currentGroupChat={currentGroupChat}
@@ -1277,6 +1308,7 @@ function App(){
       openGroupChat={openGroupChat}
       onOpenWallTab={(tab) =>{
         setChatSection(tab)
+        if(tab === 'World') clearUnreadChat('World')
         if(tab === 'Groups') setCurrentGroupChat('')
       }}
       markNotificationRead={markNotificationRead}
