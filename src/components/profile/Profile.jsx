@@ -50,7 +50,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
             <ProfileAvatar person={friend} onClick={onProfileClick} />
             <strong>{friend.name}</strong>
             <button type="button" disabled={friendRequests.includes(friend.name)} onClick={() => sendFriendRequest(friend.name)}>
-             {friendRequests.includes(friend.name) ? 'Requested ✓' : '＋ Connect'}
+             {friendRequests.includes(friend.name) ? ' Requested ✓' : '＋ Connect '}
             </button>
           </article>
         ))}

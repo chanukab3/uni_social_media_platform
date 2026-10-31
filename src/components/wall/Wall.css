@@ -220,7 +220,7 @@
 .suggested-friend button{
   width: 100%;
   overflow: hidden;
-  padding: 5px 3px;
+  padding: 2px 0px 4px 7px;
   border: 1px solid var(--line);
   border-radius: 7px;
   background: #170e22;
@@ -243,7 +243,7 @@
 
 .wall-chat-tabs button.active{
   background: #eadcf0;
-  color: #42334e;
+  color: #3f3a42;
 }
 
 .wall-notification-list{
