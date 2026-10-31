@@ -228,6 +228,7 @@
   color: var(--muted);
   font-size: 0.7rem;
   line-height: 1.5;
+  margin-right: 10px;
   color: #b9b1c3;
 }
 
@@ -265,6 +266,27 @@
   margin-top: -8px;
   color: var(--muted);
   font-size: 0.7rem;
+}
+
+.event-coming-soon{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.event-coming-soon input{
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.event-edit-button,
+.event-delete-button{
+  display: inline-block;
+  margin: 12px 10px 0 0;
 }
 
 @media(max-width: 600px){

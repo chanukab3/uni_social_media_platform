@@ -20,8 +20,8 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: #555 transparent;
+  scrollbar-width: none;
+  scrollbar-color: #222 transparent;
 }
 
 .wall-profile-details{
@@ -45,7 +45,7 @@
 
 .wall-profile-identity,
 .wall-profile-friends{
-  padding: 14px;
+  padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 10px;
   background: #222;
@@ -53,15 +53,15 @@
 
 .profile-identity-heading{
   display: flex;
-  align-items: center;
+  align-items: self-start;
   gap: 12px;
 }
 
 .wall-profile-avatar{
-  width: 75px;
-  height: 75px;
+  width: 100px;
+  height: 100px;
   flex: 0 0 auto;
-  margin: 0;
+  margin: 2px;
   font-size: 1.2rem;
 }
 
@@ -74,15 +74,16 @@
 
 .profile-identity-name h2{
     font-size: 20px;
-    padding: 0px;
-    margin: 4px;
+    padding: 7px 3px 0px;
+    margin: 0px 4px;
 }
 
 
 .profile-identity-name p{
-    font-size: 14px;
+    font-size: 11px;
     padding: 2px;
-    margin: 2px;
+    margin: 0px;
+    color: #aca7ab;
 }
 
 
@@ -203,7 +204,31 @@
 }
 
 .wall-profile-posts-heading{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 13px;
+}
+
+.profile-post-tabs{
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.profile-post-tabs button{
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.profile-post-tabs button.active{
+  background: #333333;
+  color: var(--text);
 }
 
 .wall-profile-posts-heading h2{
@@ -213,7 +238,7 @@
 
 .wall-profile-posts-heading p{
   margin: 4px 0 0;
-  color: #766b7a;
+  color: #77717a;
   font-size: 0.67rem;
 }
 
@@ -221,7 +246,7 @@
   min-height: 0;
   overflow-y: auto;
   gap: 10px;
-  padding-right: 4px;
+  
 }
 
 .wall-profile-posts .post-card{
@@ -345,7 +370,7 @@
   padding: 14px;
   border: 1px solid rgba(88, 59, 88, 0.12);
   border-radius: 10px;
-  background: #fff9ff;
+  background: #585758;
 }
 
 .wall-profile-avatar {
@@ -362,7 +387,7 @@
 
 .wall-profile-identity > p {
   margin: 4px 0;
-  color: #766b7a;
+  color: #49454c;
   font-size: 0.7rem;
 }
 
@@ -506,4 +531,11 @@
     min-height: 620px;
     padding: 12px;
   }
+}
+
+.wall-profile-posts .feed {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }

@@ -24,11 +24,13 @@ function formatCount(count){
 export function PostComposer({
   composerText,
   composerImage,
+  composerVisibility = 'public',
   profileName,
   profilePhotoUrl,
   onComposerTextChange,
   onComposerImageChange,
   onComposerFileChange,
+  onComposerVisibilityChange,
   onPublish,
   showToast,
 }){
@@ -91,6 +93,17 @@ export function PostComposer({
           onChange={(event) => onComposerTextChange(event.target.value)}
           rows="2"
         />
+        <label className="composer-visibility">
+          Post visibility
+          <select
+            aria-label="Post visibility"
+            value={composerVisibility}
+            onChange={(event) => onComposerVisibilityChange?.(event.target.value)}
+          >
+            <option value="public">Public</option>
+            <option value="friends">Friends only</option>
+          </select>
+        </label>
       </div>
       <button type="submit" className="primary-btn">Post</button>
     </form>
@@ -110,6 +123,7 @@ export function PostCard({
   onLoadOlderComments,
   onSetOpenMenu,
   onToggleSave,
+  onEdit,
   onDelete,
   onReport,
   onToggleLike,
@@ -145,6 +159,7 @@ export function PostCard({
          {openMenu === post.id &&(
             <div className="post-menu">
               <button type="button" onClick={() => onToggleSave(post.id)}>{savedPosts.includes(post.id) ? 'Remove saved post' : 'Save post'}</button>
+             {post.mine && onEdit && <button type="button" onClick={() => onEdit(post)}>Edit post</button>}
              {post.mine || canModerate
                 ? <button type="button" onClick={() => onDelete(post.id)}>Delete post</button>
                 : <button type="button" onClick={onReport}>Report post</button>}
@@ -179,7 +194,7 @@ export function PostCard({
           {comments.map((comment) =>(
             <p key={comment.id}><strong>{comment.author}</strong>{comment.text}</p>
           ))}
-         {commentsLoading && <p className="wall-muted">Loading comments…</p>}
+         {commentsLoading && <p className="wall-muted"></p>}
          {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
           {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
             {commentsLoading ? 'Loading comments…' : 'Load older comments'}
@@ -300,6 +315,8 @@ function Wall({
   onComposerTextChange,
   onComposerImageChange,
   onComposerFileChange,
+  onComposerVisibilityChange,
+  composerVisibility,
   profileProps,
 }){
 
@@ -383,9 +400,11 @@ function Wall({
               <PostComposer
                 composerText={composerText}
                 composerImage={composerImage}
+                composerVisibility={composerVisibility}
                 onComposerTextChange={onComposerTextChange}
                 onComposerImageChange={onComposerImageChange}
                 onComposerFileChange={onComposerFileChange}
+                onComposerVisibilityChange={onComposerVisibilityChange}
                 onPublish={postActions.publishPost}
                 showToast={showToast}
               />
