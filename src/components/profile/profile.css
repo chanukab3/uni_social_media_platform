@@ -45,7 +45,7 @@
 
 .wall-profile-identity,
 .wall-profile-friends{
-  padding: 14px;
+  padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 10px;
   background: #222;
@@ -53,15 +53,15 @@
 
 .profile-identity-heading{
   display: flex;
-  align-items: center;
+  align-items: self-start;
   gap: 12px;
 }
 
 .wall-profile-avatar{
-  width: 75px;
-  height: 75px;
+  width: 100px;
+  height: 100px;
   flex: 0 0 auto;
-  margin: 0;
+  margin: 2px;
   font-size: 1.2rem;
 }
 
@@ -74,15 +74,16 @@
 
 .profile-identity-name h2{
     font-size: 20px;
-    padding: 0px;
-    margin: 4px;
+    padding: 7px 3px 0px;
+    margin: 0px 4px;
 }
 
 
 .profile-identity-name p{
-    font-size: 14px;
+    font-size: 11px;
     padding: 2px;
-    margin: 2px;
+    margin: 0px;
+    color: #aca7ab;
 }
 
 
@@ -226,7 +227,7 @@
 }
 
 .profile-post-tabs button.active{
-  background: #38312c;
+  background: #333333;
   color: var(--text);
 }
 
@@ -369,7 +370,7 @@
   padding: 14px;
   border: 1px solid rgba(88, 59, 88, 0.12);
   border-radius: 10px;
-  background: #fff9ff;
+  background: #585758;
 }
 
 .wall-profile-avatar {
@@ -386,7 +387,7 @@
 
 .wall-profile-identity > p {
   margin: 4px 0;
-  color: #766b7a;
+  color: #49454c;
   font-size: 0.7rem;
 }
 

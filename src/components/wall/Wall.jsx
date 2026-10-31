@@ -100,7 +100,7 @@ export function PostComposer({
             value={composerVisibility}
             onChange={(event) => onComposerVisibilityChange?.(event.target.value)}
           >
-            <option value="public">Public — all users</option>
+            <option value="public">Public</option>
             <option value="friends">Friends only</option>
           </select>
         </label>

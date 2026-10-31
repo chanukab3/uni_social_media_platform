@@ -203,7 +203,7 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
             <form onSubmit={publishEvent}>
               <label className="field-label">Event name<input name="event-title" autoFocus placeholder="e.g. Saturday neighborhood picnic" defaultValue={editingEvent?.title || ''} required /></label>
               <label className="field-label">Date<input name="event-date" type="date" disabled={eventComingSoon} defaultValue={editingEvent?.dateValue || ''} required={!eventComingSoon} /></label>
-              <label className="event-coming-soon"><input type="checkbox" name="event-coming-soon" checked={eventComingSoon} onChange={(event) => setEventComingSoon(event.target.checked)} /> Date not set — Coming soon</label>
+              <label className="event-coming-soon"><input type="checkbox" name="event-coming-soon" checked={eventComingSoon} onChange={(event) => setEventComingSoon(event.target.checked)} />Coming Soon</label>
               <label className="field-label">A few details<input name="event-detail" placeholder="Place, time, or what to bring" defaultValue={editingEvent?.detail || ''} /></label>
              {!editingEvent && <label className="field-label">Event image<input
                 ref={eventImageInputRef}

@@ -282,7 +282,7 @@ function App(){
 
       const{ data: groupRows, error: groupsError } = await supabase
         .from('groups')
-        .select('id, name, description, image_url, image_path, invite_link, created_by, group_members(count)')
+        .select('id, name, description, image_url, image_path, invite_link, created_by, is_private, group_members(count)')
         .order('created_at',{ ascending: false })
       if(!active) return
       if(groupsError){
@@ -299,6 +299,7 @@ function App(){
           image_path: group.image_path || '',
           invite_link: group.invite_link || '',
           created_by: group.created_by,
+          is_private: Boolean(group.is_private),
           members: String(group.group_members?.[0]?.count ?? 0),
           tone: communityTones[index % communityTones.length],
         }))
@@ -532,6 +533,7 @@ function App(){
       })
       .on('postgres_changes',{ event: 'INSERT', schema: 'public', table: 'groups' },({ new: group }) =>{
         if(!group.id) return
+        if(group.is_private && group.created_by !== userId) return
         setCommunities((current) => current.some((item) => item.id === group.id)
           ? current
           : [...current,{
@@ -542,6 +544,7 @@ function App(){
             image_path: group.image_path || '',
             invite_link: group.invite_link || '',
             created_by: group.created_by,
+            is_private: Boolean(group.is_private),
             members: '0',
             tone: communityTones[current.length % communityTones.length],
           }])
@@ -550,6 +553,33 @@ function App(){
             ? null
             : [...new Set([group.id, ...current])].slice(0, 3))
         }
+      })
+      .on('postgres_changes',{ event: 'INSERT', schema: 'public', table: 'group_members', filter: userId ? `user_id=eq.${userId}` : undefined }, async({ new: membership }) =>{
+        if(!userId || membership.user_id !== userId || !membership.group_id) return
+        const{ data: group, error } = await supabase.from('groups')
+          .select('id, name, description, image_url, image_path, invite_link, created_by, is_private, group_members(count)')
+          .eq('id', membership.group_id)
+          .maybeSingle()
+        if(error){
+          showToast(`Could not load your invited group: ${error.message}`)
+          return
+        }
+        if(!group) return
+        setCommunities((current) => current.some((item) => item.id === group.id)
+          ? current
+          : [...current,{
+            id: group.id,
+            name: group.name,
+            description: group.description || '',
+            image_url: group.image_url || '',
+            image_path: group.image_path || '',
+            invite_link: group.invite_link || '',
+            created_by: group.created_by,
+            is_private: Boolean(group.is_private),
+            members: String(group.group_members?.[0]?.count ?? 0),
+            tone: communityTones[current.length % communityTones.length],
+          }])
+        setJoinedCommunities((current) => current.includes(group.name) ? current : [...current, group.name])
       })
       .on('postgres_changes',{ event: '*', schema: 'public', table: 'friend_requests' },({ eventType, new: request, old }) =>{
         if(!userId) return
@@ -922,6 +952,10 @@ function App(){
     const group = communities.find((item) => item.name === name)
     if(supabase && !userId){
       showToast('Sign in to join a group.')
+      return
+    }
+    if(!isMember && group?.is_private){
+      showToast('This is a private group. Ask its creator to invite you.')
       return
     }
     if(supabase && userId && group?.id){
@@ -1790,7 +1824,7 @@ function App(){
                   <label className="field-label">Post text<textarea name="edit-post-body" rows="5" maxLength="5000" defaultValue={modal.post.text} autoFocus /></label>
                   <label className="field-label">Visibility
                     <select name="edit-post-visibility" defaultValue={modal.post.visibility || 'public'}>
-                      <option value="public">Public — all users</option>
+                      <option value="public">Public</option>
                       <option value="friends">Friends only</option>
                     </select>
                   </label>
@@ -1817,6 +1851,7 @@ function App(){
               <>
                 <h2>{modal.group.name}</h2>
                 <p className="modal-intro">{modal.group.description}</p>
+               <p className="modal-intro">{modal.group.is_private ? 'Private group · invite-only' : 'Public group · anyone can join'}{modal.group.created_by === userId ? ' · You are the group admin' : ''}</p>
                {modal.group.invite_link && <label className="field-label">Invite link<input readOnly value={modal.group.invite_link} /></label>}
                 <button className="secondary-btn group-option-button" type="button" onClick={async() =>{
                   const group = modal.group
@@ -1834,7 +1869,7 @@ function App(){
                   setModal(null)
                   showToast(`You left ${group.name}.`)
                 }}>Leave group</button>
-                <button className="secondary-btn group-option-button" type="button" onClick={() => setModal({ type: 'add-group-member', group: modal.group })}>Add friend</button>
+               {modal.group.is_private && modal.group.created_by === userId && <button className="secondary-btn group-option-button" type="button" onClick={() => setModal({ type: 'add-group-member', group: modal.group })}>Add friend</button>}
                {(isAdmin || modal.group.created_by === userId) && <button className="text-action danger-action group-option-button" type="button" onClick={async() =>{
                   const group = modal.group
                   const{ error } = isAdmin
@@ -1864,9 +1899,13 @@ function App(){
                     showToast('Choose one of your friends.')
                     return
                   }
-                  const{ error } = await supabase.rpc('add_community_group_members',{
-                    target_group_id: modal.group.id,
-                    member_ids: [friend.id],
+                  if(modal.group.created_by !== userId){
+                    showToast('Only the group creator can invite members to a private group.')
+                    return
+                  }
+                  const{ error } = await supabase.from('group_members').insert({
+                    group_id: modal.group.id,
+                    user_id: friend.id,
                   })
                   if(error){
                     showToast(`Could not add ${friend.name} to the group: ${error.message}`)

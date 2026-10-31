@@ -6,8 +6,8 @@
   --text: #eeeeee;
   --muted: #a7a7a7;
   --line: rgba(255, 255, 255, 0.09);
-  --accent: #bb86fc;
-  --accent-dark: #d0a8ff;
+  --accent: #5f5c62;
+  --accent-dark: #4f4e51;
   --shadow: 0 26px 60px rgba(0, 0, 0, 0.42);
 }
 
@@ -696,7 +696,7 @@ img{
 }
 
 .photo-frame{
-  height: clamp(180px, 28vw, 310px);
+  height: clamp(200px, 300px, 310px);
   overflow: hidden;
   border: 1px solid rgba(94, 73, 60, 0.08);
   border-radius: 18px;
@@ -706,7 +706,7 @@ img{
 .photo-frame img{
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit:cover;
 }
 
 .post-actions{
@@ -779,9 +779,10 @@ img{
   border: 1px solid var(--line);
   border-radius: 12px;
   outline: 0;
-  background: rgba(255, 255, 255, 0.48);
+  background: rgba(139, 137, 137, 0.48);
   color: var(--text);
   font-size: 0.8rem;
+  
 }
 
 .comment-form button{
@@ -1069,6 +1070,14 @@ img{
 .community-card h3{
   margin: 0 0 5px;
   font-size: 0.94rem;
+}
+
+.community-privacy-label{
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--accent-dark);
+  font-size: 0.66rem;
+  font-weight: 650;
 }
 
 .community-card p{
@@ -1449,6 +1458,9 @@ img{
   font-size: 0.75rem;
   font-weight: 600;
 }
+.field-label select{
+  background-color: #3d3c3f;
+}
 
 .field-label input,
 .field-label textarea,
@@ -1458,7 +1470,7 @@ img{
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 11px;
-  background: rgba(247, 244, 239, 0.8);
+  background: rgb(78, 74, 74);
   color: var(--text);
   font-size: 0.84rem;
 }
@@ -1617,8 +1629,8 @@ img{
   --text: #eeeeee;
   --muted: #a7a7a7;
   --line: rgba(255, 255, 255, 0.09);
-  --accent: #bb86fc;
-  --accent-dark: #d0a8ff;
+  --accent: #3f3e40;
+  --accent-dark: #363439;
   --shadow: 0 26px 60px rgba(0, 0, 0, 0.42);
   background: var(--bg);
   color: var(--text);
@@ -1706,7 +1718,7 @@ img{
 .page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
 .page-shell.dark-mode.wall-shell .wall-profile-action{
   border-color: var(--line);
-  background: #bca4d9;
+  background: #d6d6d7;
   color: var(--text);
 }
 
@@ -1763,7 +1775,7 @@ img{
 .page-shell.dark-mode.wall-shell .wall-event-controls .event-create,
 .page-shell.dark-mode.wall-shell .wall-friend-request button{
   background: #29133a;
-  color: #ddaaff;
+  color: #d7d2db;
 }
 
 .page-shell.dark-mode.wall-shell .wall-event-feature{
@@ -2015,7 +2027,7 @@ img{
 .page-shell.dark-mode.wall-shell .wall-profile-identity,
 .page-shell.dark-mode.wall-shell .wall-profile-friends,
 .page-shell.dark-mode.wall-shell .wall-profile-posts .post-card{
-  border-color: rgba(190, 113, 255, 0.2);
+  border-color: rgba(119, 111, 126, 0.2);
   background: linear-gradient(145deg, #120a1c, #0d0815);
   box-shadow: 0 9px 24px rgba(0, 0, 0, 0.32), 0 3px 18px rgba(111, 31, 167, 0.12);
 }
@@ -2178,7 +2190,7 @@ textarea::placeholder{
 
 .dark-mode .primary-btn,
 .dark-mode .auth-primary{
-  background: linear-gradient(135deg, #8a5bc2, #bb86fc);
+  background: linear-gradient(135deg, #8d8795, #6e6d6f);
   box-shadow: 0 2px 4px rgba(187, 134, 252, 0.18);
 }
 

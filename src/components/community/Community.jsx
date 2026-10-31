@@ -32,6 +32,7 @@ export function CommunityDirectory({ communities, joinedCommunities, query, onCr
               </div>
               <div className="community-card-body">
                 <h3>{community.name}</h3>
+                <small className="community-privacy-label">{community.is_private ? 'Private group' : 'Public group'}</small>
                 <p>{community.description}</p>
                 <div className="community-card-footer">
                   <small>{community.members} members</small>
@@ -60,6 +61,7 @@ export function CreateCommunityForm({
   setModal,
   showToast,
 }){
+  const [privacy, setPrivacy] = useState('public')
   return(
     <>
       <h2>Create a community</h2><p className="modal-intro">Start a new space around something you care about.</p>
@@ -68,8 +70,9 @@ export function CreateCommunityForm({
         const formData = new FormData(event.currentTarget)
         const name = String(formData.get('community-name') || '').trim()
         const description = String(formData.get('community-description') || '').trim()
+        const isPrivate = formData.get('group-privacy') === 'private'
         const inviteLink = `${window.location.origin}/?invite=${crypto.randomUUID()}`
-        const invitedFriendIds = formData.getAll('group-friend').map(String)
+        const invitedFriendIds = isPrivate ? formData.getAll('group-friend').map(String) : []
         if(!name){
           showToast('Give your community a name first.')
           return
@@ -91,23 +94,23 @@ export function CreateCommunityForm({
           description,
           invite_link: inviteLink,
           created_by: userId,
+          is_private: isPrivate,
         }).select('id').single()
         if(error){
           showToast(`Could not create your group: ${error.message}`)
           return
         }
         const memberIds = [...new Set([userId, ...invitedFriendIds])]
-        const{ error: membershipError } = await supabase.rpc('add_community_group_members',{
-          target_group_id: group.id,
-          member_ids: memberIds,
-        })
+        const{ error: membershipError } = await supabase.from('group_members').insert(
+          memberIds.map((memberId) => ({ group_id: group.id, user_id: memberId }))
+        )
         if(membershipError){
           const{ error: rollbackError } = await supabase.rpc('delete_community_group',{ target_group_id: group.id })
           const rollbackNote = rollbackError ? ` Cleanup failed: ${rollbackError.message}` : ''
           showToast(`Could not save the group members: ${membershipError.message}.${rollbackNote}`)
           return
         }
-        const createdGroup ={ id: group.id, name, members: String(memberIds.length), tone: '#d5bfd9', description, invite_link: inviteLink, created_by: userId }
+        const createdGroup ={ id: group.id, name, members: String(memberIds.length), tone: '#d5bfd9', description, invite_link: inviteLink, created_by: userId, is_private: isPrivate }
         setCommunities((current) => [createdGroup, ...current])
         setJoinedCommunities((current) => [...current, name])
         setCurrentGroupChat(name)
@@ -118,13 +121,19 @@ export function CreateCommunityForm({
       }}>
         <label className="field-label">Group name<input name="community-name" autoFocus placeholder="e.g. Weekend Gardeners" required /></label>
         <label className="field-label">Description<textarea name="community-description" placeholder="What is this group about?" required /></label>
-        <fieldset className="group-invite-picker">
-          <legend>Invite friends(choose up to 5)</legend>
+        <label className="field-label">Group privacy
+          <select name="group-privacy" value={privacy} onChange={(event) => setPrivacy(event.target.value)}>
+            <option value="public">Public — anyone can join</option>
+            <option value="private">Private — invite-only</option>
+          </select>
+        </label>
+       {privacy === 'private' && <fieldset className="group-invite-picker">
+          <legend>Invite friends to your private group (up to 5)</legend>
          {friendsList.slice(0, 5).map((person) => <label key={person.id} className="group-invite-choice">
             <input type="checkbox" name="group-friend" value={person.id} disabled={!person.id} />
             <span>{person.name}</span>
           </label>)}
-        </fieldset>
+        </fieldset>}
         <button className="primary-btn modal-submit" type="submit">Create community</button>
       </form>
     </>
@@ -194,6 +203,7 @@ function Community({
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
     .filter((group) => !joinedCommunities.includes(group.name))
+    .filter((group) => !group.is_private)
     .filter((group) => discoverGroupIds === null || discoverGroupIds.includes(group.id))
   const joinedGroups = communities.filter((group) => joinedCommunities.includes(group.name))
   const selectedGroup = communities.find((group) => group.name === currentGroupChat)
@@ -248,7 +258,7 @@ function Community({
             <article className="wall-group-suggestion" key={group.id || group.name}>
               <div className={`wall-group-cover group-cover-${index % 2}`} />
               <strong>{group.name}</strong>
-              <small>{group.members} members ·{group.description}</small>
+              <small>{group.members} members · {group.is_private ? 'Private' : 'Public'} · {group.description}</small>
               <button type="button" className="secondary-btn compact" onClick={() => toggleJoin(group.name)}>Join</button>
             </article>
           ))}

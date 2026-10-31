@@ -854,8 +854,8 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #332a37;
-  font-size: 0.75rem;
+  color: #e7e5e8;
+  font-size: 0.7rem;
 }
 
 .wall-chat-form button{
@@ -865,7 +865,7 @@
   
   border-radius: 6px;
   background: #68616c;
-  color: #433450;
+  color: #443d4a;
   font-size: 0.6rem;
 }
 
@@ -1164,7 +1164,7 @@
 .dark-mode.wall-shell .wall-feed-scroll .composer,
 .dark-mode.wall-shell .wall-feed-scroll .post-card{
   border-color: var(--line);
-  background: #322d29;
+  background: #363534;
 }
 
 .dark-mode.wall-shell .wall-topbar .search-wrap,
@@ -1217,7 +1217,7 @@
 }
 
 .dark-mode.wall-shell .wall-notification-list article.unread{
-  background: #40372f;
+  background: #5f5e5d;
 }
 
 .dark-mode.wall-shell .wall-notification-list button.wall-notification-accept{
