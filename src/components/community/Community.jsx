@@ -351,9 +351,12 @@ function Community({
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                   <span>{friend.name}<small>View profile · {friend.status}</small></span>
+                  
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>
+                  <MessageIcon className="ui-icon"/>{unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                  </button>
                 </button>
-                {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
-                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
+                
               </div>)}
              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
@@ -374,8 +377,11 @@ function Community({
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                   <span>{friend.name}<small>{truncate(friend.lastMessage, 65) || 'Open profile'}</small></span>
+                  <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}><MessageIcon className="ui-icon"/>
+                  {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                  </button>
                 </button>
-                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>Chat</button>
+                
               </div>)}
              {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
             </div>
