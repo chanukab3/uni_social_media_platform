@@ -773,9 +773,17 @@
   font-size: 0.7rem;
 }
 
+.wall-chat-message-area{
+  min-height: 0;
+  flex: 1;
+  position: relative;
+  display: flex;
+}
+
 .wall-chat-messages{
   min-height: 0;
   flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -785,6 +793,27 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+
+.wall-chat-scroll-latest{
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(208, 169, 208, 0.2);
+  border-radius: 50%;
+  background: rgba(190, 113, 255, 0.32);
+  color: #76677d;
+  box-shadow: 0 2px 4px rgba(190, 113, 255, 0.32);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.wall-chat-scroll-latest:hover{
+  background: #eadcf0;
 }
 
 .wall-message{
@@ -1208,6 +1237,16 @@
   border-color: var(--line);
   background: #2a2725;
   color: var(--text);
+}
+
+.dark-mode.wall-shell .wall-chat-scroll-latest{
+  border-color: var(--line);
+  background: rgba(209, 170, 240, 0.32);
+  color: var(--text);
+}
+
+.dark-mode.wall-shell .wall-chat-scroll-latest:hover{
+  background: #4a3e4f;
 }
 
 .dark-mode.wall-shell .wall-chat-form input,

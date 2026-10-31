@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './community.css'
 import BellIcon from '@iconify-react/bitcoin-icons/bell-outline'
 import ContactsIcon from '@iconify-react/bitcoin-icons/contacts-outline'
@@ -189,6 +189,7 @@ function Community({
   profileContent,
 }){
   const [expandedMessages, setExpandedMessages] = useState(new Set())
+  const [showScrollToLatest, setShowScrollToLatest] = useState(false)
   const chatMessagesRef = useRef(null)
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
@@ -215,6 +216,16 @@ function Community({
       else updated.add(messageKey)
       return updated
     })
+  }
+  const scrollToLatestMessage = useCallback(() => {
+    const messageList = chatMessagesRef.current
+    if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
+    setShowScrollToLatest(false)
+  }, [])
+  const handleChatMessagesScroll = () => {
+    const messageList = chatMessagesRef.current
+    if(!messageList) return
+    setShowScrollToLatest(messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight > 32)
   }
 
   useEffect(() =>{
@@ -378,21 +389,24 @@ function Community({
             </div>
           ) :(
             <>
-              <div className="wall-chat-messages" aria-live="polite" ref={chatMessagesRef}>
-               {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
-                 const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
-                 const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
-                 const isLongMessage = words.length > 30
-                 const isExpanded = expandedMessages.has(messageKey)
-                 return(
-                   <div key={messageKey} className={message.from === profileName ? 'wall-message own' : 'wall-message'}>
-                     <small>{message.from} ·{message.time}</small>
-                     <p>{isLongMessage && !isExpanded ? `${words.slice(0, 30).join(' ')}...` : message.text}</p>
-                     {isLongMessage && <button type="button" className="wall-message-actions" onClick={() => toggleMessageExpanded(messageKey)}>{isExpanded ? 'See less' : 'See more'}</button>}
-                   </div>
-                 )
-               })}
-               {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+              <div className="wall-chat-message-area">
+                <div className="wall-chat-messages" aria-live="polite" ref={chatMessagesRef} onScroll={handleChatMessagesScroll}>
+                 {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
+                   const messageKey = `${chatSection === 'World' ? 'World' : conversationKey}:${message.id || message.from}-${index}`
+                   const words = (message.text || '').trim().split(/\s+/).filter(Boolean)
+                   const isLongMessage = words.length > 30
+                   const isExpanded = expandedMessages.has(messageKey)
+                   return(
+                     <div key={messageKey} className={message.from === profileName ? 'wall-message own' : 'wall-message'}>
+                       <small>{message.from} ·{message.time}</small>
+                       <p>{isLongMessage && !isExpanded ? `${words.slice(0, 30).join(' ')}...` : message.text}</p>
+                       {isLongMessage && <button type="button" className="wall-message-actions" onClick={() => toggleMessageExpanded(messageKey)}>{isExpanded ? 'See less' : 'See more'}</button>}
+                     </div>
+                   )
+                 })}
+                 {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
+                </div>
+                {showScrollToLatest && <button type="button" className="wall-chat-scroll-latest" onClick={scrollToLatestMessage} aria-label="Scroll to latest messages" title="Scroll to latest messages">⮟</button>}
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
