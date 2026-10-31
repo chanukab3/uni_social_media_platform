@@ -1903,9 +1903,9 @@ function App(){
                     showToast('Only the group creator can invite members to a private group.')
                     return
                   }
-                  const{ error } = await supabase.from('group_members').insert({
-                    group_id: modal.group.id,
-                    user_id: friend.id,
+                  const{ error } = await supabase.rpc('add_group_members_as_creator',{
+                    target_group_id: modal.group.id,
+                    member_ids: [friend.id],
                   })
                   if(error){
                     showToast(`Could not add ${friend.name} to the group: ${error.message}`)

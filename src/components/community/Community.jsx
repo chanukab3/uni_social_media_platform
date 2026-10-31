@@ -101,9 +101,10 @@ export function CreateCommunityForm({
           return
         }
         const memberIds = [...new Set([userId, ...invitedFriendIds])]
-        const{ error: membershipError } = await supabase.from('group_members').insert(
-          memberIds.map((memberId) => ({ group_id: group.id, user_id: memberId }))
-        )
+        const{ error: membershipError } = await supabase.rpc('add_group_members_as_creator',{
+          target_group_id: group.id,
+          member_ids: memberIds,
+        })
         if(membershipError){
           const{ error: rollbackError } = await supabase.rpc('delete_community_group',{ target_group_id: group.id })
           const rollbackNote = rollbackError ? ` Cleanup failed: ${rollbackError.message}` : ''
