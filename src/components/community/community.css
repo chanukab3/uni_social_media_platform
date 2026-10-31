@@ -701,11 +701,11 @@
 .suggested-friend button{
   width: 100%;
   overflow: hidden;
-  padding: 4px 2px;
+  padding: 2px 0px 4px 7px;
   border: 1px solid #c8b4d4;
   border-radius: 5px;
   background: #fbf5fd;
-  color: #564269;
+  color: #564d5f;
   font-size: 0.52rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -882,7 +882,7 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2px;
   padding: 5px 5px 3px;
-  border-top: 1px solid rgba(88, 59, 88, 0.12);
+  border-top: 1px solid rgba(100, 84, 100, 0.12);
 }
 
 .wall-chat-tabs button{
@@ -896,7 +896,7 @@
   padding: 4px 1px;
   border-radius: 6px;
   background: transparent;
-  color: #786d7b;
+  color: #746977;
   font-size: 0.49rem;
 }
 
@@ -926,7 +926,7 @@
 
 .wall-chat-tabs button.active{
   background: #eadcf0;
-  color: #6b4987;
+  color: #5b5460;
 }
 
 .wall-notification-list{
@@ -1047,7 +1047,7 @@
 .page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
 .page-shell.dark-mode.wall-shell .wall-chat-friends button:hover{
   border-color: var(--line);
-  background: #292929;
+  background: #393739;
   color: var(--accent-dark);
   box-shadow: none;
   margin: 3px 0;
@@ -1206,7 +1206,7 @@
 .dark-mode.wall-shell .wall-notification-list button.unread,
 .dark-mode.wall-shell .wall-chat-tabs button.active{
   border-color: var(--line);
-  background: #40372f;
+  background: #2a2725;
   color: var(--text);
 }
 
