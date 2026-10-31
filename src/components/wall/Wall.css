@@ -128,7 +128,7 @@
 }
 
 .wall-feed-scroll .photo-frame{
-  height: clamp(150px, 22vh, 205px);
+  height: clamp(300px, 35vh, 400px);
   border-radius: 7px;
   margin-top: 5px;
 }
@@ -299,4 +299,22 @@
     display: none;
   }
 
+}
+
+.composer-visibility{
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.composer-visibility select{
+  min-width: 0;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #38312c;
+  color: var(--text);
+  font-size: 0.65rem;
 }

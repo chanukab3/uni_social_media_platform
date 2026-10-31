@@ -73,6 +73,7 @@ function App(){
   const [composerText, setComposerText] = useState('')
   const [composerImage, setComposerImage] = useState('')
   const [composerFile, setComposerFile] = useState(null)
+  const [composerVisibility, setComposerVisibility] = useState('public')
   const [modal, setModal] = useState(null)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
@@ -228,7 +229,7 @@ function App(){
 
       const{ data: wallPosts, error: postsError } = await supabase
         .from('posts')
-        .select('id, author_id, author_name, handle, body, image_url, likes, comment_count, is_event, event_title, event_date, created_at')
+        .select('id, author_id, author_name, handle, body, image_url, likes, comment_count, is_event, event_title, event_date, visibility, created_at')
         .order('created_at',{ ascending: false })
         .limit(50)
       if(!active) return
@@ -245,6 +246,7 @@ function App(){
           time: new Date(post.created_at).toLocaleDateString(),
           text: post.body || '',
           image: post.image_url || '',
+          visibility: post.visibility || 'public',
           likes: post.likes || 0,
           comments: [],
           commentCount: post.comment_count || 0,
@@ -268,8 +270,9 @@ function App(){
         }
         const remoteEvents = wallPosts.filter((post) => post.is_event && post.event_title).map((post) =>({
           title: post.event_title,
-          detail: `${post.event_date ? new Date(post.event_date).toLocaleDateString() : 'Community event'} · ${post.body || 'Join your neighbors'}`,
-          date: post.event_date ? new Date(post.event_date).toLocaleDateString('en',{ month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n') : 'SOON',
+          detail: post.body || '',
+          dateValue: post.event_date ? post.event_date.slice(0, 10) : '',
+          date: post.event_date ? new Date(post.event_date).toLocaleDateString('en',{ month: 'short', day: '2-digit' }).toUpperCase().replace(' ', '\n') : 'COMING\nSOON',
           id: post.id,
           image: post.image_url || '',
           tag: 'COMMUNITY EVENT',
@@ -597,9 +600,14 @@ function App(){
             : posts.filter((post) => post.mine)
         : posts
 
-    if(!term) return source
-    return source.filter((post) => `${post.author} ${post.handle} ${post.text}`.toLowerCase().includes(term))
-  }, [activePage, posts, profileTarget, query])
+    return source.filter((post) =>{
+      const visible = post.visibility !== 'friends'
+        || post.mine
+        || isAdmin
+        || friendsList.some((friend) => friend.id === post.authorId)
+      return visible && (!term || `${post.author} ${post.handle} ${post.text}`.toLowerCase().includes(term))
+    })
+  }, [activePage, friendsList, isAdmin, posts, profileTarget, query])
 
   const unreadCount = notifications.filter((item) => !item.read).length
 
@@ -644,6 +652,7 @@ function App(){
         handle: profileHandle,
         body: text,
         image_url: imageUrl || null,
+        visibility: composerVisibility,
       }).select('id').single()
       if(error){
         if(uploadedImagePath){
@@ -666,6 +675,7 @@ function App(){
       time: 'just now',
       text,
       image: imageUrl,
+      visibility: composerVisibility,
       likes: 0,
       comments: [],
       commentCount: 0,
@@ -679,8 +689,9 @@ function App(){
     if(composerImage.startsWith('blob:')) URL.revokeObjectURL(composerImage)
     setComposerImage('')
     setComposerFile(null)
+    setComposerVisibility('public')
     showToast('Your update has been posted.')
-    setActivePage('Home')
+    if(activePage !== 'Profile') setActivePage('Home')
     return true
   }
 
@@ -690,6 +701,7 @@ function App(){
       showToast('Sign in to like posts.')
       return
     }
+
     if(supabase && userId && typeof postId === 'string'){
       const request = post?.liked
         ? supabase.from('post_likes').delete().eq('post_id', postId).eq('user_id', userId)
@@ -703,6 +715,47 @@ function App(){
     setPosts((current) => current.map((post) => post.id === postId
       ?{ ...post, liked: !post.liked, likes: post.likes +(post.liked ? -1 : 1) }
       : post))
+  }
+
+  const savePostEdits = async(event) =>{
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const text = String(formData.get('edit-post-body') || '').trim()
+    const visibility = String(formData.get('edit-post-visibility') || 'public')
+    const post = modal?.post
+    if(!post) return
+    if(!text && !post.image){
+      showToast('Write an update or keep a photo before saving.')
+      return
+    }
+    if(!['public', 'friends'].includes(visibility)){
+      showToast('Choose who can see this post.')
+      return
+    }
+    if(supabase && typeof post.id === 'string'){
+      if(!userId){
+        showToast('Sign in to edit your post.')
+        return
+      }
+      const{ data, error } = await supabase.from('posts').update({ body: text, visibility })
+        .eq('id', post.id)
+        .eq('author_id', userId)
+        .select('id')
+        .maybeSingle()
+      if(error){
+        showToast(`Could not update your post: ${error.message}`)
+        return
+      }
+      if(!data){
+        showToast('You do not have permission to edit this post.')
+        return
+      }
+    }
+    setPosts((current) => current.map((item) => item.id === post.id
+      ?{ ...item, text, visibility }
+      : item))
+    setModal(null)
+    showToast('Your post was updated.')
   }
 
   const addComment = async(postId, text) =>{
@@ -1213,6 +1266,31 @@ function App(){
     return true
   }
 
+  const editEvent = async(event) =>{
+    if(!isAdmin || !supabase || !event.id){
+      showToast('Only admins can edit published events.')
+      return false
+    }
+    const{ data, error } = await supabase.from('posts').update({
+      event_title: event.title,
+      body: event.detail,
+      event_date: event.dateValue ? new Date(`${event.dateValue}T12:00:00`).toISOString() : null,
+    })
+      .eq('id', event.id)
+      .eq('is_event', true)
+      .select('id')
+      .maybeSingle()
+    if(error){
+      showToast(`Could not update this event: ${error.message}`)
+      return false
+    }
+    if(!data){
+      showToast('You do not have permission to edit this event.')
+      return false
+    }
+    return true
+  }
+
   const banUser = async(person) =>{
     if(!isAdmin || !person.id || person.id === userId){
       showToast('You cannot change this account’s ban status.')
@@ -1315,6 +1393,7 @@ function App(){
       markNotificationsRead={markNotificationsRead}
       onProfileClick={openProfile}
       onDeleteEvent={deleteEvent}
+      onEditEvent={editEvent}
       onGroupAction={(group) => setModal({ type: 'group-options', group })}
       onDeleteChat={(friendName) => setModal({ type: 'delete-chat', friendName })}
       onViewInbox={openInbox}
@@ -1379,6 +1458,8 @@ function App(){
       onComposerTextChange={setComposerText}
       onComposerImageChange={setComposerImage}
       onComposerFileChange={setComposerFile}
+      composerVisibility={composerVisibility}
+      onComposerVisibilityChange={setComposerVisibility}
       onPublish={publishPost}
       showToast={showToast}
     />
@@ -1404,6 +1485,10 @@ function App(){
       onLoadOlderComments={loadOlderComments}
       onSetOpenMenu={setOpenMenu}
       onToggleSave={toggleSave}
+      onEdit={() =>{
+        setOpenMenu(null)
+        setModal({ type: 'edit-post', post })
+      }}
       onDelete={() => deletePost(post)}
       onReport={() =>{
         setOpenMenu(null)
@@ -1471,6 +1556,12 @@ function App(){
   }
 
   const renderProfile =() =>{
+    const term = query.trim().toLowerCase()
+    const visibleSavedPosts = posts.filter((post) =>
+      savedPosts.includes(post.id)
+      && (post.visibility !== 'friends' || post.mine || isAdmin || friendsList.some((friend) => friend.id === post.authorId))
+      && (!term || `${post.author} ${post.handle} ${post.text}`.toLowerCase().includes(term))
+    )
     const viewedPostCount = profileTarget?.id
       ? posts.filter((post) => post.authorId === profileTarget.id).length
       : profileTarget
@@ -1487,6 +1578,8 @@ function App(){
         postCount={viewedPostCount}
         friendsList={friendsList}
         filteredPosts={filteredPosts}
+        savedPosts={visibleSavedPosts}
+        composer={renderComposer()}
         renderPost={renderPost}
         onSignOut={signOut}
         onEditProfile={() =>{
@@ -1687,6 +1780,21 @@ function App(){
                   <label className="field-label">Bio<textarea rows="4" maxLength="300" placeholder="Tell your community a little about yourself." value={profileBioDraft} onChange={(event) => setProfileBioDraft(event.target.value)} /></label>
                   <small className="bio-character-count">{profileBioDraft.length}/300</small>
                   <button className="primary-btn modal-submit" type="submit">Save changes</button>
+                </form>
+              </>
+            )}
+           {modal.type === 'edit-post' &&(
+              <>
+                <h2>Edit your post</h2><p className="modal-intro">Update the post and choose who can see it.</p>
+                <form onSubmit={savePostEdits}>
+                  <label className="field-label">Post text<textarea name="edit-post-body" rows="5" maxLength="5000" defaultValue={modal.post.text} autoFocus /></label>
+                  <label className="field-label">Visibility
+                    <select name="edit-post-visibility" defaultValue={modal.post.visibility || 'public'}>
+                      <option value="public">Public — all users</option>
+                      <option value="friends">Friends only</option>
+                    </select>
+                  </label>
+                  <button className="primary-btn modal-submit" type="submit">Save post</button>
                 </form>
               </>
             )}

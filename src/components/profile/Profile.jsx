@@ -60,12 +60,14 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
+export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, savedPosts = [], composer, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
   const photoInputRef = useRef(null)
   const [adminPanel, setAdminPanel] = useState('')
+  const [postView, setPostView] = useState('posts')
   const viewedName = profileTarget?.name || profileName
   const isOwnProfile = !profileTarget || profileTarget.id === userId
   const viewedHandle = isOwnProfile ? profileHandle : profileTarget?.handle
+  const visiblePosts = postView === 'saved' && isOwnProfile ? savedPosts : filteredPosts
   return(
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">
@@ -112,12 +114,20 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
       </aside>
       <main className="wall-profile-posts">
         <header className="wall-profile-posts-heading">
-          <div><h2>{isOwnProfile ? 'Your posts' : `${viewedName}’s posts`}</h2><p>Updates shared with the community.</p></div>
+          <div>
+            <h2>{postView === 'saved' && isOwnProfile ? 'Saved posts' : isOwnProfile ? 'Your posts' : `${viewedName}’s posts`}</h2>
+            <p>{postView === 'saved' && isOwnProfile ? 'Posts you saved for later.' : 'Updates shared with the community.'}</p>
+          </div>
+          {isOwnProfile && <nav className="profile-post-tabs" aria-label="Profile post views">
+            <button type="button" className={postView === 'posts' ? 'active' : ''} onClick={() => setPostView('posts')}>Your posts</button>
+            <button type="button" className={postView === 'saved' ? 'active' : ''} onClick={() => setPostView('saved')}>Saved posts</button>
+          </nav>}
         </header>
+        {isOwnProfile && postView === 'posts' && composer}
         <section className="feed">
-         {filteredPosts.length
-            ? filteredPosts.map(renderPost)
-            : <div className="empty-state"><h3>No posts yet</h3><p>{isOwnProfile ? 'Write your first update from the home feed.' : 'This person has not shared any posts yet.'}</p>{isOwnProfile && <button type="button" className="secondary-btn" onClick={onHome}>Go to Home</button>}</div>}
+         {visiblePosts.length
+            ? visiblePosts.map(renderPost)
+            : <div className="empty-state"><h3>{postView === 'saved' && isOwnProfile ? 'No saved posts yet' : 'No posts yet'}</h3><p>{postView === 'saved' && isOwnProfile ? 'Save a post to keep it here for later.' : isOwnProfile ? 'Write your first update above.' : 'This person has not shared any posts yet.'}</p>{isOwnProfile && postView === 'posts' && <button type="button" className="secondary-btn" onClick={onHome}>Go to Home</button>}</div>}
         </section>
       </main>
      {adminPanel &&(

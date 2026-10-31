@@ -203,7 +203,31 @@
 }
 
 .wall-profile-posts-heading{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 13px;
+}
+
+.profile-post-tabs{
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.profile-post-tabs button{
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.profile-post-tabs button.active{
+  background: #38312c;
+  color: var(--text);
 }
 
 .wall-profile-posts-heading h2{

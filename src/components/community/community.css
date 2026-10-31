@@ -615,7 +615,7 @@
 }
 
 .wall-feed-scroll .photo-frame{
-  height: clamp(150px, 22vh, 205px);
+  height: clamp(200px, 35vh, 300px);
   border-radius: 7px;
 }
 

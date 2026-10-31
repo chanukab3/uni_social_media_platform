@@ -177,6 +177,7 @@ function Community({
   markNotificationsRead,
   onProfileClick,
   onDeleteEvent,
+  onEditEvent,
   onGroupAction,
   onDeleteChat,
   onViewInbox,
@@ -280,6 +281,7 @@ function Community({
             profileHandle={profileHandle}
             showToast={showToast}
             onDeleteEvent={onDeleteEvent}
+            onEditEvent={onEditEvent}
           />
          {composer}
           <section className="feed" aria-label="Post feed">
