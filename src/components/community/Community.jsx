@@ -10,6 +10,7 @@ import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
 import SendIcon from '@iconify-react/bitcoin-icons/send-outline'
 import{ FriendSuggestions, WallProfileCard } from '../profile/Profile'
 import Status from '../status/Status'
+import MessageText from '../wall/MessageText'
 
 
 export function CommunityDirectory({ communities, joinedCommunities, query, onCreate, onToggleJoin }){
@@ -178,7 +179,9 @@ function Community({
   onProfileClick,
   onDeleteEvent,
   onGroupAction,
-  onDeleteChat,
+  onChatOptions,
+  blockedChatIds,
+  onToggleBlockedChat,
   onViewInbox,
   onSelectInboxChat,
   inboxConversations,
@@ -197,6 +200,11 @@ function Community({
     .filter((group) => discoverGroupIds === null || discoverGroupIds.includes(group.id))
   const joinedGroups = communities.filter((group) => joinedCommunities.includes(group.name))
   const selectedGroup = communities.find((group) => group.name === currentGroupChat)
+  const selectedChatFriend = [...friendsList, ...people, ...inboxConversations].find((friend) => friend.name === currentChat)
+  const activeChatBlocked = chatSection === 'Inbox'
+    && inboxSelected
+    && selectedChatFriend?.id
+    && blockedChatIds.has(selectedChatFriend.id)
   const conversationKey = selectedGroup ? `group:${selectedGroup.id}` : currentChat
   const activeMessages = messages[conversationKey] || []
   const isInboxList = chatSection === 'Inbox' && !inboxSelected
@@ -314,10 +322,10 @@ function Community({
 
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
-            <span className="wall-chat-avatar">{chatSection === 'World' ? '🌐' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
-            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+            <span className="wall-chat-avatar">{chatSection === 'Inbox' && inboxSelected && selectedChatFriend?.avatarUrl ? <img src={selectedChatFriend.avatarUrl} alt="" /> : chatSection === 'World' ? '🌐' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
+            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'Inbox' && inboxSelected && selectedChatFriend ? `Friend · ${selectedChatFriend.status || 'Member'}` : chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
-           {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onDeleteChat(currentChat)}>•••</button>}
+           {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onChatOptions(selectedChatFriend)}>•••</button>}
            {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
           </header>
 
@@ -353,12 +361,10 @@ function Community({
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                   <span>{friend.name}<small>View profile · {friend.status}</small></span>
-                  
-                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}>
-                  <MessageIcon className="ui-icon"/>{unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
-                  </button>
                 </button>
-                
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open private chat with ${friend.name}`}>
+                  <MessageIcon className="ui-icon" />{unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                  </button>
               </div>)}
              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
@@ -379,16 +385,23 @@ function Community({
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
                   <span>{friend.name}<small>{truncate(friend.lastMessage, 65) || 'Open profile'}</small></span>
-                  <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open chat with ${friend.name}`}><MessageIcon className="ui-icon"/>
-                  {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
-                  </button>
                 </button>
-                
+                <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open private chat with ${friend.name}`}>
+                  <MessageIcon className="ui-icon" />
+                  {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                </button>
               </div>)}
              {!inboxConversations.length && <p className="wall-muted">No previous conversations yet.</p>}
             </div>
           ) :(
             <>
+              {activeChatBlocked ? (
+                <div className="wall-chat-blocked" role="status">
+                  <p>Chat with {selectedChatFriend.name} is blocked. Messages are hidden until you unblock this friend.</p>
+                  <button type="button" onClick={() => onToggleBlockedChat(selectedChatFriend)}>Unblock chat</button>
+                </div>
+              ) : (
+                <>
               <div className="wall-chat-message-area">
                 <div className="wall-chat-messages" aria-live="polite" ref={chatMessagesRef} onScroll={handleChatMessagesScroll}>
                  {(chatSection === 'World' ?(messages.World || []) : activeMessages).map((message, index) => {
@@ -399,7 +412,7 @@ function Community({
                    return(
                      <div key={messageKey} className={message.from === profileName ? 'wall-message own' : 'wall-message'}>
                        <small>{message.from} ·{message.time}</small>
-                       <p>{isLongMessage && !isExpanded ? `${words.slice(0, 30).join(' ')}...` : message.text}</p>
+                       <p><MessageText text={isLongMessage && !isExpanded ? `${words.slice(0, 30).join(' ')}...` : message.text} /></p>
                        {isLongMessage && <button type="button" className="wall-message-actions" onClick={() => toggleMessageExpanded(messageKey)}>{isExpanded ? 'See less' : 'See more'}</button>}
                      </div>
                    )
@@ -412,7 +425,8 @@ function Community({
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
                 <button type="submit" aria-label="Send message"><SendIcon className="ui-icon" /></button>
               </form>
-              
+                </>
+              )}
             </>
           )}
 

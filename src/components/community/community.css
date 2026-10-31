@@ -740,7 +740,13 @@
   border: 1px solid #c8b7d4;
   border-radius: 7px;
   font-size: 0.9rem;
-  
+  overflow: hidden;
+}
+
+.wall-chat-avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .wall-chat-heading > span:nth-child(2){
@@ -842,6 +848,13 @@
   font-size: 0.68rem;
   line-height: 1.1;
   margin: 0;
+  white-space: pre-wrap;
+}
+
+.wall-message a{
+  color: inherit;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
 }
 
 .wall-message-actions{
@@ -896,6 +909,33 @@
   background: #68616c;
   color: #433450;
   font-size: 0.6rem;
+}
+
+.wall-chat-blocked{
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  color: #776a7a;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.wall-chat-blocked p{
+  margin: 0;
+}
+
+.wall-chat-blocked button{
+  padding: 7px 12px;
+  border-radius: 7px;
+  background: #eadcf0;
+  color: #5b4565;
+  cursor: pointer;
+  font-size: 0.68rem;
 }
 
 .wall-chat-note{
