@@ -123,8 +123,8 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
             <button type="button" className={postView === 'saved' ? 'active' : ''} onClick={() => setPostView('saved')}>Saved posts</button>
           </nav>}
         </header>
-        {isOwnProfile && postView === 'posts' && composer}
         <section className="feed">
+         {isOwnProfile && postView === 'posts' && composer}
          {visiblePosts.length
             ? visiblePosts.map(renderPost)
             : <div className="empty-state"><h3>{postView === 'saved' && isOwnProfile ? 'No saved posts yet' : 'No posts yet'}</h3><p>{postView === 'saved' && isOwnProfile ? 'Save a post to keep it here for later.' : isOwnProfile ? 'Write your first update above.' : 'This person has not shared any posts yet.'}</p>{isOwnProfile && postView === 'posts' && <button type="button" className="secondary-btn" onClick={onHome}>Go to Home</button>}</div>}

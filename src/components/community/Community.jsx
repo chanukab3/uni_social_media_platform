@@ -123,8 +123,8 @@ export function CreateCommunityForm({
         <label className="field-label">Description<textarea name="community-description" placeholder="What is this group about?" required /></label>
         <label className="field-label">Group privacy
           <select name="group-privacy" value={privacy} onChange={(event) => setPrivacy(event.target.value)}>
-            <option value="public">Public — anyone can join</option>
-            <option value="private">Private — invite-only</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
           </select>
         </label>
        {privacy === 'private' && <fieldset className="group-invite-picker">
@@ -266,7 +266,7 @@ function Community({
         </section>
         <div className="wall-left-footer">
          {!userId && <button type="button" onClick={onRequestLogin}>Sign in</button>}
-          <span>· Community guidelines · Privacy</span>
+          <span>© 2026 Mahagedara · Made for community</span>
         </div>
       </aside>
 

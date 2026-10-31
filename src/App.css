@@ -1459,7 +1459,12 @@ img{
   font-weight: 600;
 }
 .field-label select{
-  background-color: #3d3c3f;
+  background-color: #323131;
+  width: 70px;
+  border-radius: 6px;
+  color: #eae6ea;
+  padding: 3px 7px;
+  font-size: 0.75rem;
 }
 
 .field-label input,
@@ -2042,7 +2047,7 @@ img{
 }
 
 .page-shell.dark-mode.wall-shell .suggested-friend .avatar{
-  border-color: rgba(190, 113, 255, 0.34);
+  border-color: rgba(127, 124, 131, 0.34);
 }
 
 .page-shell.dark-mode button:not(.wall-brand):not(.wall-profile-button):not(.profile-name-link):not(.wall-event-card):not(.profile-avatar-link):not(.avatar){
@@ -2163,7 +2168,7 @@ img{
   min-width: 0;
   max-height: 40px;
   text-align: left;
-  background-color: #302c32;
+  background-color: #222;
 }
 
 .wall-chat-friends .inbox-conversation .inbox-open-chat{

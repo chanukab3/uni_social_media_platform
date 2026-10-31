@@ -194,7 +194,7 @@ export function PostCard({
           {comments.map((comment) =>(
             <p key={comment.id}><strong>{comment.author}</strong>{comment.text}</p>
           ))}
-         {commentsLoading && <p className="wall-muted">Loading comments…</p>}
+         {commentsLoading && <p className="wall-muted"></p>}
          {!comments.length && !commentsLoading && <p className="wall-muted">No comments yet. Start the conversation.</p>}
           {commentsHasMore && <button type="button" className="load-older-comments" onClick={() => onLoadOlderComments(post.id)} disabled={commentsLoading}>
             {commentsLoading ? 'Loading comments…' : 'Load older comments'}
