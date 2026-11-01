@@ -1741,12 +1741,12 @@ img{
 .page-shell.dark-mode.wall-shell .wall-icon-button,
 .page-shell.dark-mode.wall-shell .wall-event-controls button,
 .page-shell.dark-mode.wall-shell .suggested-friend button,
-.page-shell.dark-mode.wall-shell .wall-chat-form,
+
 .page-shell.dark-mode.wall-shell .wall-message,
 .page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
 .page-shell.dark-mode.wall-shell .wall-profile-action{
   border-color: var(--line);
-  background: #d6d6d7;
+  background: #e0dfdf;
   color: var(--text);
 }
 
@@ -1793,10 +1793,10 @@ img{
   color: #fff;
 }
 
-.page-shell.dark-mode.wall-shell .wall-chat-form button,
+
 .page-shell.dark-mode.wall-shell .wall-profile-action:not(.danger-action){
   border: 1px solid rgba(190, 113, 255, 0.32);
-  background: linear-gradient(135deg, #7028a8, #a13fe0);
+  
   color: #fff;
 }
 
@@ -2251,7 +2251,7 @@ textarea::placeholder{
 .dark-mode .field-label input,
 .dark-mode .field-label textarea,
 .dark-mode .share-copy{
-  background: #252525;
+  background: #434141;
   color: var(--text);
 }
 
@@ -2300,12 +2300,12 @@ textarea::placeholder{
   color: var(--text);
 }
 
-.page-shell.dark-mode.wall-shell .wall-chat-form button,
+.page-shell.dark-mode.wall-shell .wall-chat-form,
 .page-shell.dark-mode.wall-shell .wall-event-controls .event-create,
 .page-shell.dark-mode.wall-shell .wall-friend-request button{
   border-color: transparent;
-  background: #756d80;
-  color: #17121f;
+  background: #3b3a3b;
+  color: #cdcad3;
 }
 
 .page-shell.dark-mode.wall-shell .wall-chat-tabs button.active,
@@ -2383,7 +2383,7 @@ textarea::placeholder{
   box-shadow: 0 0 18x rgba(187, 134, 252, 0.2);
 }
 
-.dark-mode .wall-chat-form button,
+.dark-mode .wall-chat-form,
 .dark-mode .wall-event-heading .event-create,
 .dark-mode .event-create{
   background: #81798b;

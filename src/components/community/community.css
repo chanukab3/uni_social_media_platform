@@ -930,7 +930,7 @@
 
 .wall-chat-empty{
   align-self: center;
-  color: #776a7a;
+  color: #545055;
   font-size: 0.6rem;
   text-align: center;
 }
@@ -943,7 +943,11 @@
   margin-top: 6px;
   padding: 0px 9px 5px;
   border-radius: 8px;
-  background: #f0e2f1;
+  
+}
+.send-btn{
+  background-color: transparent;
+  
 }
 
 .wall-chat-form input{
@@ -961,10 +965,9 @@
   margin: 5px 0px 0px;
   width: 32px;
   height: 25px;
-  
   border-radius: 6px;
-  background: #68616c;
-  color: #443d4a;
+  border: transparent;
+  color: #7a777d;
   font-size: 0.6rem;
 }
 

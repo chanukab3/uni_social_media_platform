@@ -7,7 +7,7 @@ import GridIcon from '@iconify-react/bitcoin-icons/grid-outline'
 import MessageIcon from '@iconify-react/bitcoin-icons/message-outline'
 import PlusIcon from '@iconify-react/bitcoin-icons/plus-outline'
 import SearchIcon from '@iconify-react/bitcoin-icons/search-outline'
-import SendIcon from '@iconify-react/bitcoin-icons/send-outline'
+import ShareIcon from '@iconify-react/bitcoin-icons/share-outline'
 import{ FriendSuggestions, WallProfileCard } from '../profile/Profile'
 import Status from '../status/Status'
 import MessageText from '../wall/MessageText'
@@ -456,7 +456,7 @@ function Community({
               </div>
               <form className="wall-chat-form" onSubmit={sendMessage}>
                 <input aria-label="Write a message" placeholder={chatSection === 'World' ? 'Say hello to the neighborhood...' : `Message ${selectedGroup?.name || currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
-                <button type="submit" aria-label="Send message"><SendIcon className="ui-icon" /></button>
+                <button className="send-btn" type="submit" aria-label="Send message"><ShareIcon className="ui-icon" /></button>
               </form>
                 </>
               )}
