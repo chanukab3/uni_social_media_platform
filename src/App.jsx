@@ -1881,6 +1881,11 @@ function App(){
                   }
                   setCommunities((current) => current.filter((item) => item.id !== group.id))
                   setJoinedCommunities((current) => current.filter((name) => name !== group.name))
+                  setMessages((current) =>{
+                    const next ={ ...current }
+                    delete next[`group:${group.id}`]
+                    return next
+                  })
                   setCurrentGroupChat('')
                   setModal(null)
                   showToast(`${group.name} was deleted.`)
@@ -1929,7 +1934,31 @@ function App(){
                 <h2>Delete conversation?</h2><p className="modal-intro">This removes the conversation with{modal.friendName} from your inbox.</p>
                 <button className="text-action danger-action group-option-button" type="button" onClick={async() =>{
                   const friend = people.find((person) => person.name === modal.friendName)
-                  if(supabase && userId && friend?.id){
+                  if(supabase){
+                    if(!userId || !friend?.id){
+                      showToast('Sign in to delete this conversation.')
+                      return
+                    }
+                    const conversationFilter = `and(sender_id.eq.${userId},recipient_id.eq.${friend.id}),and(sender_id.eq.${friend.id},recipient_id.eq.${userId})`
+                    const{ error: deleteError } = await supabase.from('messages')
+                      .delete()
+                      .or(conversationFilter)
+                    if(deleteError){
+                      showToast(`Could not delete this conversation’s messages: ${deleteError.message}`)
+                      return
+                    }
+                    const{ data: remainingMessages, error: verifyError } = await supabase.from('messages')
+                      .select('id')
+                      .or(conversationFilter)
+                      .limit(1)
+                    if(verifyError){
+                      showToast(`Could not verify that this conversation was deleted: ${verifyError.message}`)
+                      return
+                    }
+                    if(remainingMessages.length){
+                      showToast('Could not delete all messages in this conversation. Check your database permissions.')
+                      return
+                    }
                     const{ error } = await supabase.rpc('hide_direct_conversation',{ other_user_id: friend.id })
                     if(error){
                       showToast(`Could not delete this conversation: ${error.message}`)
