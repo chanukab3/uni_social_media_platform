@@ -1400,6 +1400,49 @@ function App(){
     setInboxConversations([...latestByPerson.values()])
   }
 
+  const deleteConversation = async(friend) =>{
+    if(!friend){
+      showToast('Could not find this friend’s account.')
+      return
+    }
+    if(supabase){
+      if(!userId || !friend.id){
+        showToast('Sign in to delete this conversation.')
+        return
+      }
+      const conversationFilter = `and(sender_id.eq.${userId},recipient_id.eq.${friend.id}),and(sender_id.eq.${friend.id},recipient_id.eq.${userId})`
+      const{ error: deleteError } = await supabase.from('messages')
+        .delete()
+        .or(conversationFilter)
+      if(deleteError){
+        showToast(`Could not delete this conversation’s messages: ${deleteError.message}`)
+        return
+      }
+      const{ data: remainingMessages, error: verifyError } = await supabase.from('messages')
+        .select('id')
+        .or(conversationFilter)
+        .limit(1)
+      if(verifyError){
+        showToast(`Could not verify that this conversation was deleted: ${verifyError.message}`)
+        return
+      }
+      if(remainingMessages.length){
+        showToast('Could not delete all messages in this conversation. Check your database permissions.')
+        return
+      }
+      const{ error } = await supabase.rpc('hide_direct_conversation',{ other_user_id: friend.id })
+      if(error){
+        showToast(`Could not delete this conversation: ${error.message}`)
+        return
+      }
+    }
+    setMessages((current) =>({ ...current, [friend.name]: [] }))
+    setInboxConversations((current) => current.filter((person) => person.id !== friend.id))
+    setInboxSelected(false)
+    setCurrentChat('World')
+    showToast('Conversation deleted.')
+  }
+
   const openProfile =(person) =>{
     setProfileTarget(person?.id === userId || person?.name === profileName ? null : person)
     setActivePage('Profile')
@@ -1628,10 +1671,7 @@ function App(){
       onDeleteEvent={deleteEvent}
       onEditEvent={editEvent}
       onGroupAction={(group) => setModal({ type: 'group-options', group })}
-      onChatOptions={(friend) =>{
-        if(friend) setModal({ type: 'direct-chat-options', friend })
-        else showToast('Could not find this friend’s account.')
-      }}
+      onDeleteConversation={deleteConversation}
       blockedChatIds={blockedChatIds}
       onToggleBlockedChat={toggleBlockedChat}
       onViewInbox={openInbox}
@@ -2145,63 +2185,6 @@ function App(){
                   </label>
                   <button className="primary-btn modal-submit" type="submit">Add to group</button>
                 </form>
-              </>
-            )}
-           {modal.type === 'direct-chat-options' &&(
-              <>
-                <h2>Chat with {modal.friend.name}</h2>
-                <p className="modal-intro">{blockedChatIds.has(modal.friend.id)
-                  ? 'Messages from this friend are hidden on this device.'
-                  : 'Manage messages from this friend.'}</p>
-                <button className="secondary-btn group-option-button" type="button" onClick={() => toggleBlockedChat(modal.friend)}>
-                  {blockedChatIds.has(modal.friend.id) ? 'Unblock chat' : 'Block chat'}
-                </button>
-                <button className="text-action danger-action group-option-button" type="button" onClick={() => setModal({ type: 'delete-chat', friendName: modal.friend.name })}>Delete conversation</button>
-              </>
-            )}
-           {modal.type === 'delete-chat' &&(
-              <>
-                <h2>Delete conversation?</h2><p className="modal-intro">This removes the conversation with{modal.friendName} from your inbox.</p>
-                <button className="text-action danger-action group-option-button" type="button" onClick={async() =>{
-                  const friend = people.find((person) => person.name === modal.friendName)
-                  if(supabase){
-                    if(!userId || !friend?.id){
-                      showToast('Sign in to delete this conversation.')
-                      return
-                    }
-                    const conversationFilter = `and(sender_id.eq.${userId},recipient_id.eq.${friend.id}),and(sender_id.eq.${friend.id},recipient_id.eq.${userId})`
-                    const{ error: deleteError } = await supabase.from('messages')
-                      .delete()
-                      .or(conversationFilter)
-                    if(deleteError){
-                      showToast(`Could not delete this conversation’s messages: ${deleteError.message}`)
-                      return
-                    }
-                    const{ data: remainingMessages, error: verifyError } = await supabase.from('messages')
-                      .select('id')
-                      .or(conversationFilter)
-                      .limit(1)
-                    if(verifyError){
-                      showToast(`Could not verify that this conversation was deleted: ${verifyError.message}`)
-                      return
-                    }
-                    if(remainingMessages.length){
-                      showToast('Could not delete all messages in this conversation. Check your database permissions.')
-                      return
-                    }
-                    const{ error } = await supabase.rpc('hide_direct_conversation',{ other_user_id: friend.id })
-                    if(error){
-                      showToast(`Could not delete this conversation: ${error.message}`)
-                      return
-                    }
-                  }
-                  setMessages((current) =>({ ...current, [modal.friendName]: [] }))
-                  setInboxConversations((current) => current.filter((person) => person.name !== modal.friendName))
-                  setInboxSelected(false)
-                  setCurrentChat('World')
-                  setModal(null)
-                  showToast('Conversation deleted.')
-                }}>Delete conversation</button>
               </>
             )}
            {modal.type === 'create-event' && isAdmin &&(

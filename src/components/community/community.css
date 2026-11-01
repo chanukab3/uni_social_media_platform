@@ -723,6 +723,7 @@
 }
 
 .wall-chat-heading{
+  position: relative;
   min-height: 47px;
   display: flex;
   align-items: center;
@@ -777,6 +778,62 @@
   background: transparent;
   color: #383539;
   font-size: 0.7rem;
+}
+
+.wall-chat-heading .inbox-chat-profile{
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.wall-chat-heading .inbox-chat-profile > span:last-child{
+  min-width: 0;
+}
+
+.wall-chat-heading .inbox-chat-profile strong{
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.wall-chat-options-menu{
+  position: absolute;
+  z-index: 5;
+  top: calc(100% - 2px);
+  right: 8px;
+  min-width: 150px;
+  display: grid;
+  gap: 2px;
+  padding: 5px;
+  border: 1px solid rgba(88, 59, 88, 0.18);
+  border-radius: 8px;
+  background: #fff9ff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.wall-chat-options-menu button{
+  padding: 7px 9px;
+  border-radius: 5px;
+  background: transparent;
+  color: #383539;
+  font-size: 0.66rem;
+  text-align: left;
+}
+
+.wall-chat-options-menu button:hover{
+  background: rgba(88, 59, 88, 0.1);
+}
+
+.wall-chat-options-menu button.danger-action{
+  color: #b3261e;
 }
 
 .wall-chat-message-area{
@@ -1268,6 +1325,19 @@
 .dark-mode.wall-shell .wall-left-footer,
 .dark-mode.wall-shell .wall-right-footer{
   color: var(--muted);
+}
+
+.dark-mode.wall-shell .wall-chat-options-menu{
+  border-color: var(--line);
+  background: #363534;
+}
+
+.dark-mode.wall-shell .wall-chat-options-menu button{
+  color: var(--text);
+}
+
+.dark-mode.wall-shell .wall-chat-options-menu button.danger-action{
+  color: #ff8a80;
 }
 
 .dark-mode.wall-shell .wall-chat-form,
