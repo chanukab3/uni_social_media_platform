@@ -12,6 +12,7 @@
   "dependencies": {
     "@iconify-react/bitcoin-icons": "gitlab:iconify-icons/react#bitcoin-icons",
     "@supabase/supabase-js": "^2.118.0",
+    "lucide-react": "^1.61.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
