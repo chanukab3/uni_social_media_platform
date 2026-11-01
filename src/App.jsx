@@ -1589,7 +1589,6 @@ function App(){
       people={people}
       friendsList={friendsList}
       incomingFriendRequests={incomingFriendRequests}
-      friendRequests={friendRequests}
       query={query}
       setQuery={setQuery}
       messages={messages}
@@ -1616,7 +1615,6 @@ function App(){
       navigate={navigate}
       toggleJoin={toggleJoin}
       sendMessage={sendMessage}
-      sendFriendRequest={sendFriendRequest}
       acceptFriendRequest={acceptFriendRequest}
       openGroupChat={openGroupChat}
       onOpenWallTab={(tab) =>{
@@ -1829,6 +1827,8 @@ function App(){
         friendsCount={profileCounts.friendsCount}
         groupsCount={profileCounts.groupsCount}
         friendsList={friendsList}
+        friendRequests={friendRequests}
+        onSendFriendRequest={sendFriendRequest}
         filteredPosts={filteredPosts}
         savedPosts={visibleSavedPosts}
         composer={renderComposer()}

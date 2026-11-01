@@ -34,7 +34,7 @@ export function WallProfileCard({ profileId, profileName, profileHandle, profile
   )
 }
 
-export function FriendSuggestions({ people, friendsList, query, friendRequests, sendFriendRequest, onProfileClick }){
+export function FriendSuggestions({ people, friendsList, query, onProfileClick }){
   const term = query.trim().toLowerCase()
   const friendIds = new Set(friendsList.map((friend) => friend.id))
   const suggestions = people.filter((person) =>
@@ -49,9 +49,6 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
           <article className="suggested-friend" key={friend.id || friend.name}>
             <ProfileAvatar person={friend} onClick={onProfileClick} />
             <strong>{friend.name}</strong>
-            <button type="button" disabled={friendRequests.includes(friend.name)} onClick={() => sendFriendRequest(friend.name)}>
-             {friendRequests.includes(friend.name) ? ' Requested ✓' : '＋ Connect '}
-            </button>
           </article>
         ))}
        {!suggestions.length && <p className="wall-muted">No people match your search.</p>}
@@ -60,7 +57,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, friendsCount, groupsCount, filteredPosts, savedPosts = [], composer, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
+export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, friendsCount, groupsCount, friendsList = [], friendRequests = [], onSendFriendRequest, filteredPosts, savedPosts = [], composer, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
   const photoInputRef = useRef(null)
   const [adminPanel, setAdminPanel] = useState('')
   const [postView, setPostView] = useState('posts')
@@ -68,6 +65,8 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
   const isOwnProfile = !profileTarget || profileTarget.id === userId
   const viewedHandle = isOwnProfile ? profileHandle : profileTarget?.handle
   const visiblePosts = postView === 'saved' && isOwnProfile ? savedPosts : filteredPosts
+  const isFriend = friendsList.some((friend) => friend.id === profileTarget?.id)
+  const requestSent = friendRequests.includes(viewedName)
   return(
     <div className="wall-profile-columns">
       <aside className="wall-profile-details">
@@ -83,6 +82,12 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
             </div>
           </div>
          {profileBio && <p className="wall-profile-bio">{profileBio}</p>}
+         {!isOwnProfile && !isFriend && <button
+            className="secondary-btn"
+            type="button"
+            disabled={requestSent}
+            onClick={() => onSendFriendRequest?.(viewedName)}
+          >{requestSent ? 'Request sent ✓' : '＋ Add friend'}</button>}
          {isOwnProfile && <>
             <div className="profile-controls">
               <button className="secondary-btn" type="button" onClick={() => photoInputRef.current?.click()}>{profilePhotoUrl ? 'Change photo' : 'Add profile photo'}</button>

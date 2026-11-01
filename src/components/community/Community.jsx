@@ -153,7 +153,6 @@ function Community({
   people,
   friendsList,
   incomingFriendRequests,
-  friendRequests,
   setQuery,
   query,
   messages,
@@ -180,7 +179,6 @@ function Community({
   navigate,
   toggleJoin,
   sendMessage,
-  sendFriendRequest,
   acceptFriendRequest,
   openGroupChat,
   onOpenWallTab,
@@ -328,8 +326,6 @@ function Community({
           people={people}
           friendsList={friendsList}
           query={query}
-          friendRequests={friendRequests}
-          sendFriendRequest={sendFriendRequest}
           onProfileClick={onProfileClick}
         />
 
