@@ -35,9 +35,9 @@
 .wall-profile-back{
   align-self: flex-start;
   padding: 4px 8px;
-  background-color: #222;
+  background-color: #333333;
   color: #dedbe1;
-  background: linear-gradient(135deg, #3f3d41, #302e31);
+  background: linear-gradient(135deg, #444444, #333333);
   font-size: 0.72rem;
   font-weight: 650;
   border-radius: 6px;
@@ -97,6 +97,7 @@
   min-height: 31px;
   padding: 0 5px;
   font-size: 0.68rem;
+  background-color: #333333;
 }
 
 .profile-controls,
@@ -358,11 +359,11 @@
 
 .wall-profile-back {
   align-self: flex-start;
-  padding: 5px 0;
-  background: transparent;
-  color: #594273;
-  font-size: 0.72rem;
-  font-weight: 650;
+  margin-left: 10px;
+  background-color: #333333;
+  color: #868488;
+  font-size: 0.7rem;
+  font-weight: 500;
 }
 
 .wall-profile-identity,
