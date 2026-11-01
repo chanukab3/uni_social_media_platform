@@ -188,7 +188,7 @@ function Community({
   onDeleteEvent,
   onEditEvent,
   onGroupAction,
-  onChatOptions,
+  onDeleteConversation,
   blockedChatIds,
   onToggleBlockedChat,
   onViewInbox,
@@ -202,6 +202,7 @@ function Community({
 }){
   const [expandedMessages, setExpandedMessages] = useState(new Set())
   const [showScrollToLatest, setShowScrollToLatest] = useState(false)
+  const [chatOptionsFriend, setChatOptionsFriend] = useState(null)
   const chatMessagesRef = useRef(null)
   const term = query.trim().toLowerCase()
   const discoverGroups = communities
@@ -331,10 +332,32 @@ function Community({
 
         <section className="wall-chat-card">
           <header className="wall-chat-heading">
-            <span className="wall-chat-avatar">{chatSection === 'Inbox' && inboxSelected && selectedChatFriend?.avatarUrl ? <img src={selectedChatFriend.avatarUrl} alt="" /> : chatSection === 'World' ? '🌐' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
-            <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Inbox' ? (inboxSelected ? currentChat : 'Inbox') : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : 'World chat'}</strong><small>{chatSection === 'Inbox' && inboxSelected && selectedChatFriend ? `Friend · ${selectedChatFriend.status || 'Member'}` : chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+            {chatSection === 'Inbox' && inboxSelected && selectedChatFriend
+              ? <button type="button" className="inbox-chat-profile" onClick={() => onProfileClick(selectedChatFriend)} aria-label={`View ${selectedChatFriend.name}'s profile`}>
+                  <span className="wall-chat-avatar">{selectedChatFriend.avatarUrl
+                    ? <img src={selectedChatFriend.avatarUrl} alt="" />
+                    : selectedChatFriend.name?.[0] || '?'}
+                  </span>
+                  <span><strong>{selectedChatFriend.name}</strong><small>Friend · {selectedChatFriend.status || 'Member'}</small></span>
+                </button>
+              : <>
+                  <span className="wall-chat-avatar">{chatSection === 'World' ? '🌐' :(selectedGroup?.name || currentChat || 'M')[0]}</span>
+                  <span><strong>{chatSection === 'Notifications' ? 'Notifications' : chatSection === 'Groups' ?(selectedGroup?.name || 'Groups') : chatSection === 'Friends' ? 'Friends' : chatSection === 'Inbox' ? 'Inbox' : 'World chat'}</strong><small>{chatSection === 'World' ? 'A little room for everyone' : 'Messages and conversations'}</small></span>
+                </>}
            {(chatSection === 'Groups' && selectedGroup) && <button type="button" aria-label="Group options" onClick={() => onGroupAction(selectedGroup)}>•••</button>}
-           {chatSection === 'Inbox' && inboxSelected && <button type="button" aria-label="Chat options" onClick={() => onChatOptions(selectedChatFriend)}>•••</button>}
+           {chatSection === 'Inbox' && inboxSelected && selectedChatFriend && <>
+              <button type="button" aria-label="Chat options" aria-expanded={chatOptionsFriend === (selectedChatFriend.id || selectedChatFriend.name)} onClick={() => setChatOptionsFriend((current) => current === (selectedChatFriend.id || selectedChatFriend.name) ? null : selectedChatFriend.id || selectedChatFriend.name)}>•••</button>
+             {chatOptionsFriend === (selectedChatFriend.id || selectedChatFriend.name) && <div className="wall-chat-options-menu" role="menu">
+                <button type="button" role="menuitem" onClick={() =>{
+                  setChatOptionsFriend(null)
+                  onToggleBlockedChat(selectedChatFriend)
+                }}>{blockedChatIds.has(selectedChatFriend.id) ? 'Unblock chat' : 'Block chat'}</button>
+                <button type="button" className="danger-action" role="menuitem" onClick={() =>{
+                  setChatOptionsFriend(null)
+                  onDeleteConversation(selectedChatFriend)
+                }}>Delete conversation</button>
+              </div>}
+            </>}
            {chatSection !== 'Groups' && chatSection !== 'Inbox' && <span />}
           </header>
 
@@ -369,11 +392,12 @@ function Community({
              {friendsList.filter((person) => person.name.toLowerCase().includes(term)).map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
-                  <span>{friend.name}<small>View profile · {friend.status}</small></span>
                 </button>
                 <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open private chat with ${friend.name}`}>
-                  <MessageIcon className="ui-icon" />{unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
-                  </button>
+                  <span>{friend.name}<small>{friend.status}</small></span>
+                  <MessageIcon className="ui-icon" aria-hidden="true" />
+                  {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
+                </button>
               </div>)}
              {!friendsList.length && !incomingFriendRequests.length && <p className="wall-muted">Your accepted friends will appear here.</p>}
             </div>
@@ -393,10 +417,10 @@ function Community({
              {inboxConversations.map((friend) => <div className="inbox-conversation" key={friend.id || friend.name}>
                 <button type="button" className="inbox-profile-link" onClick={() => onProfileClick(friend)} aria-label={`View ${friend.name}'s profile`}>
                   <span className="avatar tiny" style={{ background: friend.color }}>{friend.avatarUrl ? <img src={friend.avatarUrl} alt="" /> : friend.name[0]}</span>
-                  <span>{friend.name}<small>{truncate(friend.lastMessage, 65) || 'Open profile'}</small></span>
                 </button>
                 <button type="button" className="inbox-open-chat" onClick={() => onSelectInboxChat(friend)} aria-label={`Open private chat with ${friend.name}`}>
-                  <MessageIcon className="ui-icon" />
+                  <span>{friend.name}<small>{truncate(friend.lastMessage, 65)}</small></span>
+                  <MessageIcon className="ui-icon" aria-hidden="true" />
                   {unreadChats.has(friend.name) && <span className="conversation-unread-dot" role="img" aria-label={`Unread messages from ${friend.name}`} />}
                 </button>
               </div>)}

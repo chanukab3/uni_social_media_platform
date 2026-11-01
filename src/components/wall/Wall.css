@@ -66,9 +66,9 @@
 .composer-photo-button{
   min-height: 25px;
   display: inline-flex;
-  border: 1px solid rgba(156, 152, 160, 0.28);
+  
   border-radius: 8px;
-  background: linear-gradient(135deg, #7f748c, #484150);
+  background: linear-gradient(170deg, #565658, #333333);
   color: #fff;
   font-size: 0.6rem;
 }

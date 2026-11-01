@@ -580,7 +580,7 @@ img{
   font-size: 0.82rem;
   font-weight: 700;
   transition: filter 0.17s ease, transform 0.17s ease;
-  border: 1px solid rgba(190, 113, 255, 0.28);
+  border: 1px solid rgba(122, 114, 128, 0.28);
 }
 
 .primary-btn{
@@ -607,7 +607,7 @@ img{
 }
 
 .secondary-btn.joined{
-  border-color: rgba(126, 153, 116, 0.3);
+  border-color: rgba(148, 151, 146, 0.3);
   background: rgba(142, 171, 129, 0.13);
   color: #57734b;
 }
@@ -1981,6 +1981,9 @@ img{
     justify-self: end;
     min-width: 50px;
   }
+  .primary-btn-p{
+    background: linear-gradient(170deg, #565658, #333333);
+  }
 
   .messages-layout{
     min-height: 480px;
@@ -2087,7 +2090,7 @@ img{
 .page-shell.dark-mode .wall-event-overlay-close,
 .page-shell.dark-mode .composer-photo-button,
 .page-shell.dark-mode .wall-feed-scroll .composer > .primary-btn{
-  background: linear-gradient(135deg, #7f748c, #484150);
+  background: linear-gradient(170deg, #565658, #333333);
   color: #fff;
 }
 
@@ -2187,21 +2190,37 @@ img{
 }
 
 .wall-chat-friends .inbox-conversation .inbox-profile-link{
-  flex: 1;
-  min-width: 0;
-  max-height: 40px;
-  text-align: left;
-  background-color: #222;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .wall-chat-friends .inbox-conversation .inbox-open-chat{
-  width: auto;
-  height: 30px;
-  min-width: 30px;
-  padding: 5px;
-  border-radius: 5px;
-  border: 2px solid #363338;
-  font-size: 0.7rem;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  text-align: left;
+}
+
+.wall-chat-friends .inbox-conversation .inbox-open-chat > span:first-child{
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-chat-friends .inbox-conversation .inbox-open-chat > .ui-icon{
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 input:not([type="checkbox"]):not([type="radio"]),
