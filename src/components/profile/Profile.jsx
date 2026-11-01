@@ -60,7 +60,7 @@ export function FriendSuggestions({ people, friendsList, query, friendRequests, 
   )
 }
 
-export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, filteredPosts, savedPosts = [], composer, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
+export function ProfilePage({ profileTarget, profileName, profileHandle, profileBio, profilePhotoUrl, userId, postCount, friendsCount, groupsCount, filteredPosts, savedPosts = [], composer, renderPost, onSignOut, onEditProfile, onHome, onUploadProfilePhoto, isAdmin, people, onBanUser, communities, onDeleteGroup }){
   const photoInputRef = useRef(null)
   const [adminPanel, setAdminPanel] = useState('')
   const [postView, setPostView] = useState('posts')
@@ -105,7 +105,11 @@ export function ProfilePage({ profileTarget, profileName, profileHandle, profile
             </div>
             <small className="profile-photo-hint">JPG, PNG, WebP, or GIF · max 1 MB · cropped square</small>
           </>}
-          <div className="wall-profile-numbers"><span><strong>{postCount}</strong><small>Posts</small></span></div>
+          <div className="wall-profile-numbers">
+            <span><strong>{postCount}</strong><small>Posts</small></span>
+            <span><strong>{friendsCount}</strong><small>Friends</small></span>
+            <span><strong>{groupsCount}</strong><small>Groups</small></span>
+          </div>
         </section>
        {isAdmin && isOwnProfile && <section className="admin-profile-actions" aria-label="Admin controls">
           <button className="secondary-btn" type="button" onClick={() => setAdminPanel('users')}>Manage users</button>

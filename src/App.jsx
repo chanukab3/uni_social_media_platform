@@ -121,6 +121,7 @@ function App(){
   const [incomingFriendRequests, setIncomingFriendRequests] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [userId, setUserId] = useState(null)
+  const [viewedProfileCounts, setViewedProfileCounts] = useState(null)
   const [messages, setMessages] = useState({})
   const [unreadChats, setUnreadChats] = useState(() => new Set())
   const directChatMessagesRef = useRef(null)
@@ -236,6 +237,41 @@ function App(){
     const messageList = directChatMessagesRef.current
     if(messageList) messageList.scrollTo({ top: messageList.scrollHeight, behavior: 'smooth' })
   }, [activePage, currentChat, messages])
+
+  useEffect(() =>{
+    let active = true
+    const targetId = profileTarget?.id
+    if(activePage !== 'Profile' || !targetId || targetId === userId || !supabase){
+      return() =>{ active = false }
+    }
+
+    const loadProfileCounts = async() =>{
+      const{ data, error } = await supabase.rpc('get_profile_counts',{ target_user_id: targetId })
+      if(!active) return
+      if(error){
+        setViewedProfileCounts({ profileId: targetId, friendsCount: null, groupsCount: null })
+        showToast(`Could not load profile counts: ${error.message}`)
+        return
+      }
+      const counts = Array.isArray(data) ? data[0] : data
+      if(!counts){
+        setViewedProfileCounts({ profileId: targetId, friendsCount: null, groupsCount: null })
+        showToast('Could not load profile counts: no count data was returned.')
+        return
+      }
+      setViewedProfileCounts({
+        profileId: targetId,
+        friendsCount: Number(counts.friends_count),
+        groupsCount: Number(counts.groups_count),
+      })
+    }
+    loadProfileCounts().catch((error) =>{
+      if(!active) return
+      setViewedProfileCounts({ profileId: targetId, friendsCount: null, groupsCount: null })
+      showToast(`Could not load profile counts: ${error.message || String(error)}`)
+    })
+    return() =>{ active = false }
+  }, [activePage, profileTarget?.id, showToast, userId])
 
   useEffect(() =>{
     chatViewRef.current = { activePage, chatSection, currentChat, currentGroupChat, inboxSelected, communities }
@@ -1775,6 +1811,12 @@ function App(){
       : profileTarget
         ? posts.filter((post) => post.author === profileTarget.name).length
         : posts.filter((post) => post.mine).length
+    const viewingOwnProfile = !profileTarget || profileTarget.id === userId
+    const profileCounts = viewingOwnProfile
+      ? { friendsCount: friendsList.length, groupsCount: joinedCommunities.length }
+      : viewedProfileCounts?.profileId === profileTarget.id
+        ? viewedProfileCounts
+        : { friendsCount: null, groupsCount: null }
     return(
       <ProfilePage
         profileTarget={profileTarget}
@@ -1784,6 +1826,8 @@ function App(){
         profilePhotoUrl={profilePhotoUrl}
         userId={userId}
         postCount={viewedPostCount}
+        friendsCount={profileCounts.friendsCount}
+        groupsCount={profileCounts.groupsCount}
         friendsList={friendsList}
         filteredPosts={filteredPosts}
         savedPosts={visibleSavedPosts}
