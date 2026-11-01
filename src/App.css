@@ -1197,6 +1197,22 @@ img{
   scrollbar-width: thin;
 }
 
+.blocked-private-chat{
+  margin: auto;
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.82rem;
+}
+
+.blocked-private-chat button{
+  margin-top: 8px;
+  padding: 7px 12px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
 .message-bubble{
   max-width: 84%;
   align-self: flex-start;
@@ -1217,6 +1233,13 @@ img{
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.message-bubble a{
+  color: inherit;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
 }
 
 .message-bubble small{

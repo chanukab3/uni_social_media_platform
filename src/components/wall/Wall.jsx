@@ -12,6 +12,7 @@ import ShareIcon from '@iconify-react/bitcoin-icons/share-outline'
 import Community from '../community/Community'
 import Profile,{ ProfileAvatar } from '../profile/Profile'
 import Status from '../status/Status'
+import MessageText from './MessageText'
 import './Wall.css'
 
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
@@ -141,7 +142,7 @@ export function PostCard({
   }
 
   return(
-    <article className="post-card">
+    <article id={`post-${post.id}`} className="post-card">
       <div className="post-header">
         <ProfileAvatar
           person={{ id: post.authorId, name: post.author, handle: post.handle, color: post.accent, avatarUrl: post.avatarUrl }}
@@ -457,7 +458,7 @@ function Wall({
           ) :(
             <>
               <div className="wall-chat-messages" aria-live="polite">
-               {(chatSection === 'World' ?(messages.World || []) : chatMessages).map((message, index) => <div key={`${message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} ·{message.time}</small><p>{message.text}</p></div>)}
+               {(chatSection === 'World' ?(messages.World || []) : chatMessages).map((message, index) => <div key={`${message.from}-${index}`} className={message.from === profileName ? 'wall-message own' : 'wall-message'}><small>{message.from} ·{message.time}</small><p><MessageText text={message.text} /></p></div>)}
                {chatSection === 'World' && !(messages.World || []).length && <p className="wall-chat-empty">Welcome to the neighborhood. Say hello and start a conversation.</p>}
               </div>
               <form className="wall-chat-form" onSubmit={onSendMessage}>

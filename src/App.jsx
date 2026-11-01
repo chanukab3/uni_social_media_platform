@@ -14,6 +14,7 @@ import ForgotPassword from './components/login/Froget'
 import ResetPassword from './components/login/ResetPassword'
 import{ ProfilePage } from './components/profile/Profile'
 import{ PostCard, PostComposer } from './components/wall/Wall'
+import MessageText from './components/wall/MessageText'
 
 const navigation = [
  { label: 'Home', icon: HomeIcon },
@@ -35,6 +36,26 @@ const pageDetails = {
 const communityTones = ['#b9d8b1', '#f0c38f', '#d5bfd9', '#e8a78d']
 const personColors = ['#bd8f75', '#78977f', '#a897b4', '#bd9b68']
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+const blockedChatsStorageKey = 'mahagedara-blocked-chats'
+
+function readBlockedChats(){
+  try{
+    const stored = JSON.parse(window.localStorage.getItem(blockedChatsStorageKey) || '{}')
+    if(!stored || typeof stored !== 'object' || Array.isArray(stored)) return {}
+    return Object.fromEntries(Object.entries(stored)
+      .filter(([, ids]) => Array.isArray(ids))
+      .map(([userId, ids]) => [userId, ids.filter((id) => typeof id === 'string')]))
+  }catch(error){
+    console.error('Could not read blocked chats:', error)
+    return {}
+  }
+}
+
+function clearSharedPostHash(){
+  const cleanUrl = new URL(window.location.href)
+  cleanUrl.hash = ''
+  window.history.replaceState(null, '', cleanUrl)
+}
 
 async function cropProfilePhoto(file){
   const image = await createImageBitmap(file)
@@ -92,6 +113,8 @@ function App(){
   const [inboxConversations, setInboxConversations] = useState([])
   const [inboxSelected, setInboxSelected] = useState(false)
   const [profileTarget, setProfileTarget] = useState(null)
+  const [pendingSharedPostId, setPendingSharedPostId] = useState(null)
+  const [blockedChatsByUser, setBlockedChatsByUser] = useState(readBlockedChats)
   const [events, setEvents] = useState([])
   const [friendRequests, setFriendRequests] = useState([])
   const [friendsList, setFriendsList] = useState([])
@@ -108,6 +131,11 @@ function App(){
   const [commentsHasMore, setCommentsHasMore] = useState({})
   const [loadingComments, setLoadingComments] = useState({})
   const [shareRecipientIds, setShareRecipientIds] = useState([])
+  const sharedPostRequestRef = useRef(null)
+  const blockedChatIds = useMemo(
+    () => new Set(blockedChatsByUser[userId || 'guest'] || []),
+    [blockedChatsByUser, userId],
+  )
   const showToast = useCallback((message) =>{
     setToast(message)
   }, [])
@@ -119,6 +147,89 @@ function App(){
       return next
     })
   }, [])
+
+  useEffect(() =>{
+    const openSharedPostFromHash = () =>{
+      const postId = new URLSearchParams(window.location.hash.slice(1)).get('post')
+      if(!postId) return
+      setPendingSharedPostId(postId)
+      setActivePage('Home')
+      setProfileTarget(null)
+      setQuery('')
+    }
+    openSharedPostFromHash()
+    window.addEventListener('hashchange', openSharedPostFromHash)
+    return() => window.removeEventListener('hashchange', openSharedPostFromHash)
+  }, [])
+
+  useEffect(() =>{
+    if(!pendingSharedPostId || authPage) return
+    const sharedPost = posts.find((post) => String(post.id) === pendingSharedPostId)
+    if(sharedPost){
+      const frame = window.requestAnimationFrame(() =>{
+        document.getElementById(`post-${sharedPost.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        setPendingSharedPostId(null)
+        clearSharedPostHash()
+      })
+      return() => window.cancelAnimationFrame(frame)
+    }
+
+    if(!supabase){
+      const frame = window.requestAnimationFrame(() =>{
+        showToast('This shared post could not be found.')
+        setPendingSharedPostId(null)
+        clearSharedPostHash()
+      })
+      return() => window.cancelAnimationFrame(frame)
+    }
+    if(sharedPostRequestRef.current === pendingSharedPostId) return
+    sharedPostRequestRef.current = pendingSharedPostId
+    supabase.from('posts')
+      .select('id, author_id, author_name, handle, body, image_url, likes, comment_count, created_at')
+      .eq('id', pendingSharedPostId)
+      .maybeSingle()
+      .then(({ data, error }) =>{
+        if(sharedPostRequestRef.current !== pendingSharedPostId) return
+        sharedPostRequestRef.current = null
+        if(error){
+          showToast(`Could not load the shared post: ${error.message}`)
+          setPendingSharedPostId(null)
+          clearSharedPostHash()
+          return
+        }
+        if(!data){
+          showToast('This shared post could not be found.')
+          setPendingSharedPostId(null)
+          clearSharedPostHash()
+          return
+        }
+        setPosts((current) => current.some((post) => String(post.id) === pendingSharedPostId)
+          ? current
+          : [{
+            id: data.id,
+            authorId: data.author_id,
+            author: data.author_name,
+            handle: data.handle || '',
+            time: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
+            text: data.body || '',
+            image: data.image_url || '',
+            likes: data.likes || 0,
+            comments: [],
+            commentCount: data.comment_count || 0,
+            shares: 0,
+            accent: '#d9a172',
+            liked: false,
+            mine: data.author_id === userId,
+          }, ...current])
+      })
+      .catch((error) =>{
+        if(sharedPostRequestRef.current !== pendingSharedPostId) return
+        sharedPostRequestRef.current = null
+        showToast(`Could not load the shared post: ${error.message || String(error)}`)
+        setPendingSharedPostId(null)
+        clearSharedPostHash()
+      })
+  }, [authPage, pendingSharedPostId, posts, showToast, userId])
 
   useEffect(() =>{
     if(activePage !== 'Messages') return
@@ -439,6 +550,7 @@ function App(){
     if(!supabase) return undefined
     const channel = supabase.channel(`community-live-${userId || 'visitor'}`)
       .on('postgres_changes',{ event: 'INSERT', schema: 'public', table: 'messages' },({ new: message }) =>{
+        if(message.recipient_id && message.sender_id !== userId && blockedChatIds.has(message.sender_id)) return
         const messageTime = new Date(message.created_at).toLocaleTimeString([],{ hour: '2-digit', minute: '2-digit' })
         const formatted ={
           id: message.id,
@@ -616,7 +728,7 @@ function App(){
     return() =>{
       supabase.removeChannel(channel)
     }
-  }, [people, profileName, showToast, userId])
+  }, [blockedChatIds, people, profileName, showToast, userId])
 
   const filteredPosts = useMemo(() =>{
     const term = query.trim().toLowerCase()
@@ -904,7 +1016,13 @@ function App(){
       showToast('Choose at least one friend or group.')
       return
     }
-    const shareText = `Shared a post by ${modal.post.author}: ${modal.post.text || 'Photo'}${modal.post.image ? `\n${modal.post.image}` : ''}`
+    if(shareRecipientIds.some((recipientId) => recipientId.startsWith('friend:') && blockedChatIds.has(recipientId.slice('friend:'.length)))){
+      showToast('Unblock this friend before sharing a post with them.')
+      return
+    }
+    const postUrl = new URL(window.location.href)
+    postUrl.hash = `post=${encodeURIComponent(modal.post.id)}`
+    const shareText = `Shared a post by ${modal.post.author}: ${modal.post.text || 'Photo'}\nView post: ${postUrl.toString()}`
     const messagesToSend = shareRecipientIds.map((selectedId) =>{
       const [type, id] = selectedId.split(':')
       return{
@@ -984,6 +1102,13 @@ function App(){
     const selectedGroup = chatSection === 'Groups'
       ? communities.find((group) => group.name === currentGroupChat)
       : null
+    const directChatFriend = !isWorldChat && !selectedGroup
+      ? [...people, ...friendsList, ...inboxConversations].find((person) => person.name === currentChat)
+      : null
+    if(directChatFriend?.id && blockedChatIds.has(directChatFriend.id)){
+      showToast(`Unblock ${directChatFriend.name} before sending a message.`)
+      return
+    }
     if(chatSection === 'Groups' && !selectedGroup){
       showToast('Choose a group before sending a message.')
       return
@@ -1064,6 +1189,10 @@ function App(){
     setCurrentChat(friend.name)
     setChatSection('Inbox')
     setInboxSelected(true)
+    if(friend.id && blockedChatIds.has(friend.id)){
+      setMessages((current) =>({ ...current, [friend.name]: [] }))
+      return
+    }
     if(!supabase || !userId || !friend.id) return
     const{ data: directMessages, error } = await supabase
       .from('messages')
@@ -1076,6 +1205,7 @@ function App(){
       showToast(`Could not load your conversation: ${error.message}`)
       return
     }
+
     setMessages((current) =>({
       ...current,
       [friend.name]: directMessages.map((message) =>({
@@ -1085,6 +1215,40 @@ function App(){
         time: new Date(message.created_at).toLocaleTimeString([],{ hour: '2-digit', minute: '2-digit' }),
       })),
     }))
+  }
+
+  const toggleBlockedChat = (friend) =>{
+    if(!friend?.id){
+      showToast('Could not find this friend’s account.')
+      return
+    }
+    const userKey = userId || 'guest'
+    const currentIds = blockedChatsByUser[userKey] || []
+    const shouldBlock = !currentIds.includes(friend.id)
+    const updated = {
+      ...blockedChatsByUser,
+      [userKey]: shouldBlock
+        ? [...currentIds, friend.id]
+        : currentIds.filter((id) => id !== friend.id),
+    }
+    try{
+      window.localStorage.setItem(blockedChatsStorageKey, JSON.stringify(updated))
+    }catch(error){
+      showToast(`Could not update blocked chats: ${error.message || String(error)}`)
+      return
+    }
+    setBlockedChatsByUser(updated)
+    setModal(null)
+    if(shouldBlock){
+      setMessages((current) =>({ ...current, [friend.name]: [] }))
+      setInboxConversations((current) => current.filter((person) => person.id !== friend.id))
+      clearUnreadChat(friend.name)
+      showToast(`Chat with ${friend.name} blocked.`)
+      return
+    }
+    showToast(`Chat with ${friend.name} unblocked.`)
+    if(chatSection === 'Inbox' && inboxSelected && currentChat === friend.name) openFriendChat(friend)
+    if(chatSection === 'Inbox' && !inboxSelected) openInbox()
   }
 
   const openGroupChat = async(group) =>{
@@ -1188,6 +1352,7 @@ function App(){
     const latestByPerson = new Map()
     for(const message of directMessages){
       const otherId = message.sender_id === userId ? message.recipient_id : message.sender_id
+      if(blockedChatIds.has(otherId)) continue
       if(!latestByPerson.has(otherId)){
         const person = people.find((item) => item.id === otherId)
         latestByPerson.set(otherId,{
@@ -1429,7 +1594,12 @@ function App(){
       onDeleteEvent={deleteEvent}
       onEditEvent={editEvent}
       onGroupAction={(group) => setModal({ type: 'group-options', group })}
-      onDeleteChat={(friendName) => setModal({ type: 'delete-chat', friendName })}
+      onChatOptions={(friend) =>{
+        if(friend) setModal({ type: 'direct-chat-options', friend })
+        else showToast('Could not find this friend’s account.')
+      }}
+      blockedChatIds={blockedChatIds}
+      onToggleBlockedChat={toggleBlockedChat}
       onViewInbox={openInbox}
       onSelectInboxChat={(friend) =>{
         setInboxSelected(true)
@@ -1555,6 +1725,8 @@ function App(){
 
   const renderMessages =() =>{
     const chatMessages = messages[currentChat] || []
+    const currentChatFriend = [...friendsList, ...people].find((friend) => friend.name === currentChat)
+    const currentChatBlocked = currentChatFriend?.id && blockedChatIds.has(currentChatFriend.id)
     return(
       <>
         <div className="section-title"><div><h2>Messages</h2><p>Keep in touch with your friends.</p></div></div>
@@ -1573,16 +1745,18 @@ function App(){
               ? <img src={people.find((friend) => friend.name === currentChat).avatarUrl} alt="" />
               : currentChat[0]}</span><div><strong>{currentChat}</strong><small>{people.find((friend) => friend.name === currentChat)?.status}</small></div></div>
             <div className="chat-messages" ref={directChatMessagesRef}>
-             {chatMessages.map((message, index) =>(
+             {currentChatBlocked
+               ? <div className="blocked-private-chat" role="status"><p>Chat with {currentChat} is blocked. Messages are hidden until you unblock this friend.</p><button type="button" onClick={() => toggleBlockedChat(currentChatFriend)}>Unblock chat</button></div>
+               : chatMessages.map((message, index) =>(
                 <div key={`${currentChat}-${index}`} className={message.from === profileName ? 'message-bubble own' : 'message-bubble'}>
-                  <p>{message.text}</p><small>{message.time}</small>
+                  <p><MessageText text={message.text} /></p><small>{message.time}</small>
                 </div>
               ))}
             </div>
-            <form className="chat-form" onSubmit={sendMessage}>
-              <input aria-label="Write a message" placeholder={`Message ${currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
-              <button className="primary-btn compact" type="submit">Send</button>
-            </form>
+            {!currentChatBlocked && <form className="chat-form" onSubmit={sendMessage}>
+                <input aria-label="Write a message" placeholder={`Message ${currentChat}...`} value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} />
+                <button className="primary-btn compact" type="submit">Send</button>
+              </form>}
           </div>
         </section>
       </>
@@ -1922,6 +2096,18 @@ function App(){
                   </label>
                   <button className="primary-btn modal-submit" type="submit">Add to group</button>
                 </form>
+              </>
+            )}
+           {modal.type === 'direct-chat-options' &&(
+              <>
+                <h2>Chat with {modal.friend.name}</h2>
+                <p className="modal-intro">{blockedChatIds.has(modal.friend.id)
+                  ? 'Messages from this friend are hidden on this device.'
+                  : 'Manage messages from this friend.'}</p>
+                <button className="secondary-btn group-option-button" type="button" onClick={() => toggleBlockedChat(modal.friend)}>
+                  {blockedChatIds.has(modal.friend.id) ? 'Unblock chat' : 'Block chat'}
+                </button>
+                <button className="text-action danger-action group-option-button" type="button" onClick={() => setModal({ type: 'delete-chat', friendName: modal.friend.name })}>Delete conversation</button>
               </>
             )}
            {modal.type === 'delete-chat' &&(
