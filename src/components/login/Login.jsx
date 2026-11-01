@@ -1,123 +1,135 @@
-import Register from "./Register";
-import ForgetPassword from './ForgetPassword';
+import{ useState } from "react";
+import{ supabase } from "../../../supabase";
+import "./Auth.css";
 
-import React, { useState } from 'react';
-import { 
-  User, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  Sprout 
-} from 'lucide-react';
-import './login.css';
-
-export default function Login() {
+export default function Login({
+  onRegister,
+  onForgotPassword,
+  onLoginSuccess,
+}){
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  async function handleLogin(event){
+    event.preventDefault();
+    setError("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login submitted:', formData);
-  };
+    if(!identifier.trim() || !password){
+      setError("Please enter your email address and password.");
+      return;
+    }
 
-  return (<>
-    <Register/>
-    
-    <div className="login-container">
-      {/* Top Header / Logo */}
-      <header className="login-header">
-        <div className="logo-badge">
-          <Sprout className="logo-icon" />
-        </div>
-        <span className="brand-name">Mahagedara</span>
+    if(!supabase){
+      setError("Supabase is not configured. Add your project URL and publishable key.");
+      return;
+    }
+
+    setLoading(true);
+
+    try{
+      const{ data, error: authError } = await supabase.auth.signInWithPassword({
+        email: identifier.trim().toLowerCase(),
+        password,
+      });
+
+      if(authError) throw authError;
+
+      onLoginSuccess?.(data.user);
+    } catch(err){
+      setError(err.message || "Unable to log in. Please try again.");
+    } finally{
+      setLoading(false);
+    }
+  }
+  return(
+    <main className="auth-page">
+      <header className="auth-brand">
+        <span className="brand-icon"><img src="/mg.png" width="35px" height="auto"/></span>
+        <span>Mahagedara</span>
       </header>
 
-      {/* Main Login Card */}
-      <main className="login-main">
-        <div className="login-card">
-          <h1 className="login-title">Login</h1>
+      <section className="auth-card">
+        <h1>Login</h1>
 
-          <form onSubmit={handleSubmit} className="login-form">
-            {/* Username / Email Field */}
-            <div className="form-group">
-              <label htmlFor="username">Username or email</label>
-              <div className="input-wrapper">
-                <User className="input-icon" size={18} />
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  placeholder="Enter your username or email"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+        <form onSubmit={handleLogin}>
+          <div className="auth-field">
+            <label htmlFor="login-email">Email</label>
+            <div className="auth-input-wrap">
+              <span aria-hidden="true">♙</span>
+              <input
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                placeholder="Enter your email address"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
+              />
             </div>
+          </div>
 
-            {/* Password Field */}
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <div className="input-wrapper">
-                <Lock className="input-icon" size={18} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label="Toggle password visibility"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Forgot Password Link */}
-            <div className="forgot-password-container">
-              <a href="#forgot" onClick={(e) => e.preventDefault()} className="forgot-link">
-                Forgot password?
-              </a>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="button-group">
-              <button type="submit" className="btn-primary">
-                Login <ArrowRight size={16} />
-              </button>
-              <button 
-                type="button" 
-                className="btn-secondary"
-                onClick={() => console.log('Navigate to register')}
+          <div className="auth-field">
+            <label htmlFor="login-password">Password</label>
+            <div className="auth-input-wrap">
+              <span aria-hidden="true">♙</span>
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
               >
-                Register
+               {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-          </form>
-        </div>
-      </main>
+          </div>
 
-      {/* Footer */}
-      <footer className="login-footer">
-        <p>© 2026 Mahagedara</p>
+          <div className="auth-forgot">
+            <button
+              type="button"
+              className="auth-link"
+              onClick={onForgotPassword}
+            >
+              Forgot password?
+            </button>
+          </div>
+
+         {error &&(
+            <p className="auth-error" role="alert">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            className="auth-button auth-primary auth-full-button"
+            disabled={loading}
+          >
+           {loading ? "Logging in..." : "Login"}
+          </button>
+          <p className="auth-switch">
+            Don&apos;t have an account?{" "}
+            <button type="button" className="auth-link" onClick={onRegister}>
+              Register
+            </button>
+          </p>
+        </form>
+      </section>
+
+      <footer className="auth-footer">
+        © 2026 Mahagedara
       </footer>
-    </div>
-    <ForgetPassword/>
-    </>
+    </main>
   );
 }
