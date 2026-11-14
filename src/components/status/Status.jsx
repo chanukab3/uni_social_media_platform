@@ -167,10 +167,8 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
             <article className="wall-event-detail">
              {events[selectedEventIndex].image && <img src={events[selectedEventIndex].image} alt="" />}
               <div>
-                
-                <h3>{events[selectedEventIndex].title}</h3>
-                <p>{events[selectedEventIndex].detail}</p>
-                <span className="wall-event-detail-date">{events[selectedEventIndex].date.replace('\n', ' ')}</span>
+                <div className="event-edit">
+                  <span className="wall-event-detail-date">{events[selectedEventIndex].date.replace('\n', ' ')}</span>
                {isAdmin && events[selectedEventIndex].id && onDeleteEvent && <button
                   className="text-action danger-action event-delete-button"
                   type="button"
@@ -189,6 +187,10 @@ function Status({ events, setEvents, isAdmin, userId, profileName, profileHandle
                     setCreateOpen(true)
                   }}
                 >Edit event</button>}
+                </div>
+                <h3>{events[selectedEventIndex].title}</h3>
+                <p>{events[selectedEventIndex].detail}</p>
+                
               </div>
             </article>
           )}

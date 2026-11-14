@@ -2351,16 +2351,6 @@ textarea::placeholder{
   font-size: 0.8rem;
 }
 
-.event-delete-button{
-  margin-top: 10px;
-  height: 30px;
-  background-color: #303032;
-  margin: 0 20px;
-  padding: 3px 12px 5px;
-  text-align: center;
-  border-radius: 6px;
-  box-shadow: #262528;
-}
 
 .composer-photo-limit,
 .profile-photo-hint{

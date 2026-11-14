@@ -198,6 +198,25 @@
   background: linear-gradient(145deg, #160c22, #0d0815);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32), 0 3px 18px rgba(111, 31, 167, 0.14);
 }
+.event-edit{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.event-edit span{
+  padding: 5px 0px;
+}
+.event-edit-button,
+.event-delete-button{
+  height: 25px;
+  background-color: #303032;
+  margin: 0 5px;
+  padding: 3px 12px 5px;
+  text-align: center;
+  border-radius: 6px;
+  box-shadow: #262528;
+  font-size: 0.6rem;
+}
 
 .wall-event-detail > img{
   width: 100%;
@@ -226,7 +245,7 @@
 .wall-event-detail p,
 .wall-event-detail-date{
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   line-height: 1.5;
   margin-right: 10px;
   color: #b9b1c3;
@@ -281,12 +300,6 @@
   width: 16px;
   height: 16px;
   accent-color: var(--accent);
-}
-
-.event-edit-button,
-.event-delete-button{
-  display: inline-block;
-  margin: 12px 10px 0 0;
 }
 
 @media(max-width: 600px){
